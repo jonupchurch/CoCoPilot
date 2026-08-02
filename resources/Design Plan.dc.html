@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#f7f7f5;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1c1c1a;}
+  *{box-sizing:border-box;}
+  a{color:oklch(0.55 0.12 250);text-decoration:none;}
+  a:hover{color:oklch(0.55 0.12 250);text-decoration:underline;}
+</style>
+</helmet>
+<div style="max-width:880px;margin:0 auto;padding:64px 40px 120px;">
+
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;">Design plan · wireframe round 1</div>
+  <h1 style="margin:14px 0 0;font-size:38px;font-weight:600;letter-spacing:-0.025em;line-height:1.1;">Spec-Kit Mission Control</h1>
+  <p style="margin:16px 0 0;font-size:16px;line-height:1.65;color:#6e6e66;max-width:620px;text-wrap:pretty;">A read-only instrument panel for a repo that an AI agent is actively building. Everything on screen is derived from files the agent already writes; the board's only job is to make that legible from across the desk.</p>
+
+  <div style="margin-top:48px;padding-top:22px;border-top:1px solid #d2d2cb;">
+    <div style="font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;font-weight:600;">01 · Primary journey</div>
+    <p style="margin:14px 0 20px;font-size:14.5px;line-height:1.65;color:#6e6e66;max-width:620px;">One loop, repeated for hours. The board is a second monitor; Claude Code is the first.</p>
+    <div style="border:1px solid #e4e4df;background:#fff;">
+      <sc-for list="{{ journey }}" as="j" hint-placeholder-count="6">
+        <div style="{{ j.style }}">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9c9c94;width:26px;flex:0 0 auto;padding-top:3px;">{{ j.n }}</span>
+          <div style="min-width:0;">
+            <div style="font-size:14.5px;font-weight:500;">{{ j.title }}</div>
+            <div style="margin-top:5px;font-size:13.5px;line-height:1.6;color:#6e6e66;text-wrap:pretty;">{{ j.body }}</div>
+            <div style="margin-top:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9c9c94;">{{ j.surface }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding-top:22px;border-top:1px solid #d2d2cb;">
+    <div style="font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;font-weight:600;">02 · Information architecture</div>
+    <p style="margin:14px 0 20px;font-size:14.5px;line-height:1.65;color:#6e6e66;max-width:620px;">Two layers, always both visible. The <strong style="color:#1c1c1a;font-weight:600;">live layer</strong> (header status, banner, activity rail) is persistent chrome. The <strong style="color:#1c1c1a;font-weight:600;">browse layer</strong> (tabs) is where you go read things.</p>
+    <div style="border:1px solid #e4e4df;background:#fff;padding:22px 24px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:2;color:#3a3a36;white-space:pre;overflow:auto;">{{ iaTree }}</div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="border-left:2px solid #d2d2cb;padding:2px 0 2px 12px;font-size:13px;line-height:1.6;color:#6e6e66;">Activity is a <strong style="color:#1c1c1a;font-weight:600;">rail, not a tab</strong> — you can read spec.md and still see the agent commit.</div>
+      <div style="border-left:2px solid #d2d2cb;padding:2px 0 2px 12px;font-size:13px;line-height:1.6;color:#6e6e66;">Constitution sits at repo level, not inside a feature — it applies across all of <span style="font-family:'IBM Plex Mono',monospace;">specs/</span>.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding-top:22px;border-top:1px solid #d2d2cb;">
+    <div style="font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;font-weight:600;">03 · Key decisions &amp; rationale</div>
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:1px;background:#e4e4df;border:1px solid #e4e4df;">
+      <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="9">
+        <div style="background:#fff;padding:16px 18px;">
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9c9c94;">{{ d.n }}</span>
+            <span style="font-size:14.5px;font-weight:600;">{{ d.title }}</span>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:12px;">
+            <span style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#9c9c94;width:64px;flex:0 0 auto;padding-top:2px;">Because</span>
+            <span style="font-size:13.5px;line-height:1.6;color:#6e6e66;text-wrap:pretty;">{{ d.why }}</span>
+          </div>
+          <sc-if value="{{ d.cost }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:7px;display:flex;gap:12px;">
+              <span style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#9c9c94;width:64px;flex:0 0 auto;padding-top:2px;">Costs</span>
+              <span style="font-size:13.5px;line-height:1.6;color:#6e6e66;text-wrap:pretty;">{{ d.cost }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding-top:22px;border-top:1px solid #d2d2cb;">
+    <div style="font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;font-weight:600;">04 · Open questions</div>
+    <p style="margin:14px 0 20px;font-size:14.5px;line-height:1.65;color:#6e6e66;max-width:620px;">Each has a recommended default already built into the wireframe — answer only where you disagree.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <sc-for list="{{ questions }}" as="q" hint-placeholder-count="8">
+        <div style="border:1px solid #e4e4df;background:#fff;padding:16px 18px;">
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9c9c94;">{{ q.n }}</span>
+            <span style="font-size:14.5px;font-weight:600;text-wrap:pretty;">{{ q.q }}</span>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 7px;border:1px solid oklch(0.55 0.12 250);color:oklch(0.55 0.12 250);flex:0 0 auto;">My default</span>
+            <span style="font-size:13.5px;line-height:1.6;color:#3a3a36;text-wrap:pretty;">{{ q.a }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding-top:22px;border-top:1px solid #d2d2cb;">
+    <div style="font-size:11.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9c9c94;font-weight:600;">05 · What's not designed yet</div>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:9px;">
+      <sc-for list="{{ gaps }}" as="g" hint-placeholder-count="5">
+        <div style="display:flex;gap:11px;align-items:flex-start;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9c9c94;padding-top:3px;">—</span>
+          <span style="font-size:13.5px;line-height:1.6;color:#6e6e66;text-wrap:pretty;">{{ g }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const row = (n, title, body, surface, last) => ({
+  n, title, body, surface,
+  style: 'display:flex;gap:12px;padding:15px 17px;' + (last ? '' : 'border-bottom:1px solid #e4e4df;')
+});
+
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      journey: [
+        row('01','Open the board on the second monitor','Repo and feature are already selected from last session state; the header shows whether an agent is running.','header · feature switcher'),
+        row('02','Skim the plan before starting','Read spec.md and plan.md to remember what "done" means for this feature.','Spec / Plan tabs'),
+        row('03','Run /implement in Claude Code','Nothing is clicked in Mission Control. The board picks up the first event within a second.','banner goes live'),
+        row('04','Watch','Cards move to In progress, the feed narrates started / test / commit / done. The banner names the current task.','Board + Activity rail'),
+        row('05','Get pulled in by a blocker','Banner turns to the alert state, the blocker pins to the top of the feed, its card gets a warn border. The human answers in Claude Code.','banner · pinned blocker'),
+        row('06','Drill into a task or a resource','Click a card for its source line and per-task agent log; open contracts/ to check a schema the agent just used.','task panel · Resources', true)
+      ],
+      iaTree:
+'Mission Control\n' +
+'│\n' +
+'├─ LIVE LAYER  (persistent, never navigated away from)\n' +
+'│   ├─ Header      repo · feature switcher · progress · agent status\n' +
+'│   ├─ Banner      currently working on  →  blocked  →  idle\n' +
+'│   └─ Activity    feed of started / test / commit / done\n' +
+'│                  blockers pinned above the stream\n' +
+'│\n' +
+'└─ BROWSE LAYER  (tabs, scoped to the selected feature)\n' +
+'    ├─ Board          To do · In progress · Blocked · Done\n' +
+'    │                 group by  status | phase | user story\n' +
+'    │                 └─ Task detail panel  (source line, agent log)\n' +
+'    ├─ Spec           spec.md + outline rail\n' +
+'    ├─ Plan           plan.md + outline rail\n' +
+'    ├─ Resources      tree: research · data-model · contracts/*\n' +
+'    └─ Constitution   repo-wide, not per feature\n' +
+'\n' +
+'States   agent running · blocker raised · agent idle · no specs/',
+      decisions: [
+        { n:'D1', title:'Read-only, and it says so', why:'You confirmed the human is an observer. Removing every write affordance makes the board honest and removes a whole class of "who owns this state" ambiguity — tasks.md is the truth, the agent is the only writer.', cost:'The task panel needs an explicit line explaining why there is no checkbox, or people will hunt for one.' },
+        { n:'D2', title:'Activity as a persistent rail', why:'The stated magic moment is board + narration together. A tab would force a choice between them.', cost:'~350px of width. Collapses to a vertical spine when you need the board wide.' },
+        { n:'D3', title:'One banner, three states', why:'Rather than a separate blocker surface, the banner is the single place that answers "what is the agent doing right now" — including "nothing" and "waiting on you". One place to look, always.', cost:'The alert state has to be loud enough to catch peripheral vision without being loud enough to annoy across a four-hour session.' },
+        { n:'D4', title:'Grouping changes columns, not cards', why:'Status grouping gives kanban motion; phase and user-story grouping turn the same board into a plan-shaped read. Cards swap their meta chip (phase label ↔ status chip) so no information is lost either way.', cost:'Phase grouping can produce 5+ columns; the board scrolls horizontally rather than shrinking cards.' },
+        { n:'D5', title:'[P] is a quiet badge, not a lane', why:'You left this to me. Parallelism is a property of a task, not a place — a dedicated lane would double the board\'s width for something that changes nothing about what the human does. In progress simply holds more than one card when the agent runs parallel tasks.', cost:'If the agent ever runs 6+ tasks at once, the In progress column becomes the whole story and may want a compact mode.' },
+        { n:'D6', title:'Monospace for machine, sans for human', why:'Task IDs, paths, commit hashes and log lines are things the repo produced; nav, headings and prose are ours. The split is a legibility system, not decoration — you learn in ten seconds which text you can grep for.', cost:'' },
+        { n:'D7', title:'Two hues only: accent = now, warn = blocked', why:'On a board watched for hours, color has to mean something. Everything else — including Done — is neutral. Done fades rather than turning green; completion is the absence of demand on you.', cost:'Done is deliberately low-contrast; if a user\'s main job is auditing completed work, that\'s the wrong emphasis.' },
+        { n:'D8', title:'Empty state teaches Spec-Kit, offers no button', why:'You chose "instructions to run /specify". The app cannot create specs, so a CTA would be a lie. Four numbered commands plus a line confirming the watcher is live is the whole screen.', cost:'' },
+        { n:'D9', title:'Feature switcher carries per-feature agent status', why:'Designing for one active feature, leaving room for several: each row in the switcher already shows progress and "agent running now / idle", so multi-agent is an additive change, not a restructure.', cost:'' }
+      ],
+      questions: [
+        { n:'Q1', q:'How does the board know the agent\'s status — parsed from tasks.md checkboxes, or a real event stream?', a:'Assume both: tasks.md for authoritative state, an event stream for narration and the "currently working on" pointer. The wireframe shows what each contributes. If there\'s no event stream, the banner and feed degrade to file-diff inference and get noticeably duller.' },
+        { n:'Q2', q:'Should the board follow the agent — auto-switching features when it moves on?', a:'Yes, but only when the human hasn\'t manually switched in the last few minutes; then show a "agent moved to 002 — follow" nudge instead of yanking the view.' },
+        { n:'Q3', q:'What happens when the agent is silent for a long time?', a:'After ~90s with no events the banner adds a "no updates for 4m" line and the status dot goes hollow. Silence is ambiguous and needs its own state — otherwise "running" is a lie.' },
+        { n:'Q4', q:'Does the feed persist across a restart of the board?', a:'In-memory only for now, with a note that the last N events are lost on reload. Persisting is easy later; deciding what "the trail" means is the harder question.' },
+        { n:'Q5', q:'Should completed tasks stay in the Done column forever, or collapse?', a:'Collapse everything done more than one phase ago behind a "24 earlier · show" row. Keeps the column honest without making it the biggest thing on screen.' },
+        { n:'Q6', q:'How rich should file writes be in the feed? You left them out of the event list.', a:'Keep them out of the main stream, but surface files-touched inside the task detail panel. In the stream they drown the events you actually chose (tests, commits, blockers).' },
+        { n:'Q7', q:'Do we show git state — dirty working tree, branch, uncommitted agent work?', a:'One quiet indicator in the header: branch name plus a dot when the tree is dirty. Anything more turns this into a git client.' },
+        { n:'Q8', q:'Should the Spec tab link tasks to the requirement they implement?', a:'Yes, one direction only: task detail shows "implements US1 / FR-003". A full two-way traceability matrix is a bigger feature and probably its own screen.' },
+        { n:'Q9', q:'Dark by default?', a:'Follow the OS. This is a second-monitor tool for people whose editor is usually dark, but forcing it is presumptuous.' }
+      ],
+      gaps: [
+        'Multi-feature parallel agents — the switcher anticipates it, the board does not yet show it.',
+        'Long-column behaviour past ~100 tasks (virtualization, collapse rules, in-column search).',
+        'Keyboard model: jump to current task, cycle tabs, focus the feed.',
+        'Error surfaces: unparseable tasks.md, watcher disconnected, agent process died.',
+        'The compact / glance layout, if you ever want this in a narrow side-by-side window.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
