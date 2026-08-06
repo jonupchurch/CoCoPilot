@@ -106,6 +106,14 @@ this project is pre-release and not yet versioned.
   empirical and survive the restart — notably `- [x]` ×554 vs `- [X]` ×341
   inside a single repo, which would break a case-sensitive parser.
 
+- **Push schema drafted** in `docs/design/push-schema.md` — the first design doc
+  of the new round. Defines the one payload all three surfaces wrap, and splits
+  it into the three fields the model composes (`task`, `note`, `chip`) and the
+  rest the surface derives, on the reasoning that three fields is something an
+  agent gets right mid-task and seven is a form it fills in badly. Leaves three
+  open points: `sessionId` outside an MCP server process, pushes naming an
+  unscanned feature, and port discovery.
+
 ### Added
 
 - **Spec-Kit + ai-tools scaffolding.** Copied the portable toolkit from

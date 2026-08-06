@@ -26,7 +26,7 @@ should be written until the design docs exist and are reviewed.
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
 | Design exports (`resources/`) | ✅ Round 1 landed — Brand, Design System, Overview Panel (4 tabs); canon for look and feel per decision 8 |
 | Design revisions owed | ⬜ Narrow-width Stories/Tasks; the session switcher + dismiss; two-state tasks (decision 19); the empty state before anything is pushed; the Notes tab, which the design leaves undesigned |
-| Design docs (`docs/design/`) | ⬜ Not started |
+| Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
 
@@ -319,14 +319,11 @@ in `resources/` are the *new* round, landed the same day.
 
 Ordered roughly by how much downstream work each one blocks.
 
-1. **The push schema, written down.** No longer an open decision so much as an
-   artifact owed. Decision 7 fixed the shape, decision 6 the mechanism, decision
-   13 the session identity, and decision 19 removed task status from the payload
-   entirely — leaving repo, branch, current task, prose, and session chip. What
-   remains is to write it out properly as the contract all three surfaces wrap:
-   field names, which are required, how a push references a feature the board
-   has not scanned yet, and what the API returns when the board is not running
-   (decision 6's error copy).
+1. **The push schema** — drafted in
+   [docs/design/push-schema.md](docs/design/push-schema.md), **awaiting review**.
+   Three open points remain inside it: how `sessionId` works for a push that is
+   not from an MCP server process, what the board shows when a push names a
+   feature it has not scanned, and how the MCP server discovers the app's port.
 2. **Packaging and distribution** per platform, including code signing.
    Sharpened by decision 6: Claude Code *spawns* the MCP server as its own child
    process, so an Electron app has to ship a separately-spawnable Node entry
