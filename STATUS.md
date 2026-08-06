@@ -28,8 +28,9 @@ should be written until the design docs exist and are reviewed.
 | Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against all 27 decisions; canon per decision 8 |
 | Design revisions owed | ✅ None outstanding |
 | Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
-| Feature specs (`specs/`) | ⬜ None |
-| Implementation | ⬜ Blocked on design review |
+| Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
+| Implementation plans | ⬜ None — rule 7 wants all nine planned before any is built |
+| Implementation | ⬜ Blocked on planning |
 
 ## What this is
 

@@ -200,6 +200,16 @@ this project is pre-release and not yet versioned.
   open points: `sessionId` outside an MCP server process, pushes naming an
   unscanned feature, and port discovery.
 
+- **All nine feature specs written**, each with a passing quality checklist and
+  no clarification markers — every gap resolved with a documented assumption.
+  Several recurring shapes emerged: the guarantees the product rests on (never
+  reads the repo, never writes, never judges, never persists) are stated as
+  observable absences so they can be tested rather than asserted; prohibitions
+  are written as requirements, because the behaviours that would break those
+  guarantees are exactly the ones a later change would add as an obvious
+  courtesy; and comprehension appears as a success criterion where a
+  misunderstanding would cost the user information.
+
 ### Added
 
 - **Spec-Kit + ai-tools scaffolding.** Copied the portable toolkit from
