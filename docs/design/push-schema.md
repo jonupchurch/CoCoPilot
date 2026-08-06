@@ -58,10 +58,37 @@ nothing is reconciled). Cap its length, store it as text, render it as text.
 Never as markup: it is attacker-influenceable in the same sense any model output
 is, and it lands in a desktop app.
 
+## The second push: a note
+
+Everything above **replaces**. A note **appends** — notes accumulate over a
+session, which is the one place the board holds a growing list rather than a
+latest value (decisions 20 and 21). It is therefore a separate call, not a
+field on the status push, because the two have opposite semantics and folding
+them together would make `note` mean different things on different calls.
+
+```
+POST http://127.0.0.1:<port>/v1/note
+```
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `repo`, `branch`, `sessionId` | — | yes | Same session identity, same derivation. |
+| `text` | string | yes | The note. Written either because the user asked for one or because the agent judged it worth recording. |
+
+Exposed as `cocopilot_note` over MCP and `cocopilot note "…"` on the CLI.
+
+Notes are volatile like everything else — they clear when the app closes
+(decision 21). Anything worth keeping gets written into the repository by the
+**agent**, with its own file tools, which is outside this API entirely. The tool
+description should say so, or an agent will treat the board as storage.
+
+Same plain-text handling as `note` above: length-capped, rendered as text, never
+as markup.
+
 ## What the agent supplies versus what the surface fills in
 
-Only `task`, `note` and `chip` should ever come from the model. Everything else
-the surface derives:
+Only `task`, `note`, `chip` and a note's `text` should ever come from the model.
+Everything else the surface derives:
 
 - **`repo`** — the MCP server's working directory; the CLI's `git rev-parse
   --show-toplevel`.

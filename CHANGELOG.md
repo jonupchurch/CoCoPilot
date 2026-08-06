@@ -106,6 +106,26 @@ this project is pre-release and not yet versioned.
   empirical and survive the restart — notably `- [x]` ×554 vs `- [X]` ×341
   inside a single repo, which would break a case-sensitive parser.
 
+- **Notes decided:** the tab holds notes the agent writes, either because the
+  user asked it to record something or because the agent judged it worth
+  recording. The user never types into the board, so Notes stays inside the
+  one-way rule. Notes accumulate where everything else replaces, making them a
+  second kind of push.
+- **CoCoPilot owns no durable state** — it is a display panel. Nothing survives
+  closing the window; everything on screen is re-derived from disk or was pushed
+  since launch. Decision 6 stands with no carve-outs, including for notes.
+  Durability is the agent's job: the user asks it to write to the repository
+  with its own file tools, which leaves the never-writes rule untouched and
+  produces a file the user owns. Removes the database, migrations, storage
+  versioning and corrupt-state recovery from the build entirely, and forbids any
+  UI that implies permanence.
+- **Round 2 design brief written** — `resources/designprompt2.md`, a revision
+  brief rather than a restart. Locks the round 1 identity, colour system, type,
+  spacing and the subdivided-panel structure explicitly so they are not
+  re-derived, and asks for six changes: two-state tasks, a Content blocks
+  section that matches a read-only product, narrow-width Stories and Tasks, a
+  session switcher that is absent at one session, an empty state, and the Notes
+  tab, whose contents are now decided.
 - **Push schema drafted** in `docs/design/push-schema.md` — the first design doc
   of the new round. Defines the one payload all three surfaces wrap, and splits
   it into the three fields the model composes (`task`, `note`, `chip`) and the

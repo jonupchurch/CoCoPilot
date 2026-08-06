@@ -25,7 +25,7 @@ should be written until the design docs exist and are reviewed.
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
 | Design exports (`resources/`) | ✅ Round 1 landed — Brand, Design System, Overview Panel (4 tabs); canon for look and feel per decision 8 |
-| Design revisions owed | ⬜ Narrow-width Stories/Tasks; the session switcher + dismiss; two-state tasks (decision 19); the empty state before anything is pushed; the Notes tab, which the design leaves undesigned |
+| Design revisions owed | 🟡 Brief written — [`resources/designprompt2.md`](resources/designprompt2.md); needs a Claude Design run |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
@@ -290,6 +290,34 @@ their head across a long agent session.
       no longer carries task status at all — it carries session identity (repo,
       branch), which task is current, the prose, and the session chip. That is
       most of open question 1.
+20. **Notes holds agent-written notes: what the user asked to be stored, and
+    what the agent judges worth adding.** The user does not type into the board —
+    they tell the agent, and the agent pushes. That keeps Notes inside the
+    one-way rule (decision 11) and inside "the AI drives the screen"
+    (decision 12) rather than making it the one place the board takes input.
+    - *New in the schema:* Notes accumulate, where a status push replaces. This
+      is therefore a second kind of push — an append — not a field on the
+      existing one. See [docs/design/push-schema.md](docs/design/push-schema.md).
+    - *Volatile like everything else,* per decision 21. Notes clear when the app
+      closes, and the UI must not imply otherwise.
+21. **CoCoPilot owns no durable state. It is a display panel.** Nothing the app
+    holds survives closing it — not narration, not notes, not the session list.
+    Everything on screen is either re-derived from disk (repo files, git,
+    Claude Code transcripts) or was pushed since launch. Decision 6 is absolute,
+    with no carve-outs.
+    - *Where durability actually lives:* the user asks the **agent** to write it
+      into the repository with the agent's own file tools. That is the agent
+      doing what it always does, not CoCoPilot writing — decision 11 is
+      untouched — and the result is a file the user owns, reviews and commits,
+      which is a better home for anything worth keeping than an app database
+      would be.
+    - *Consequence for the UI:* nothing may imply permanence. No "saved" state,
+      no archive, no history presented as reaching further back than this
+      launch. Where the board shows accumulated things — notes, the session
+      list — it should read as this-session, because that is what it is.
+    - *Consequence for the build:* no database, no migrations, no storage format
+      to version, and no corrupt-state recovery path. This is a substantial
+      amount of work that simply does not exist.
 
 ## What survives the restart
 
