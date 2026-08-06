@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-1012ed30-3725-49b4-8bc3-2e7f018fe071/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { background: #efe4d2; }
+  a { color: #8c491a; }
+  a:hover { color: #643312; }
+</style>
+</helmet>
+
+<div style="font-family:'Figtree', system-ui, sans-serif; color:#201e1d; padding:56px 56px 80px; display:flex; flex-direction:column; gap:56px; max-width:1180px">
+
+  <header style="display:flex; flex-direction:column; gap:22px">
+    <div style="background:#0e0d0c; border-radius:28px; padding:36px 40px; display:flex; align-items:center; gap:18px">
+      <div style="width:56px; height:56px; border-radius:18px; background:#1a1817; border:1px solid #2b2724; display:flex; align-items:center; justify-content:center; flex:none">
+        <div style="display:flex; align-items:center">
+          <span style="width:19px; height:19px; border-radius:999px; background:#7fb2e8"></span>
+          <span style="width:19px; height:19px; border-radius:999px; background:#37bda9; margin-left:-6px"></span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:3px">
+        <div style="font-family:'JetBrains Mono', monospace; font-weight:700; font-size:28px; letter-spacing:-.05em; color:#eff3f4"><span style="color:#7fb2e8">Co</span><span style="color:#37bda9">Co</span>Pilot</div>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Design system · v0.1</div>
+      </div>
+    </div>
+    <p style="margin:0; font-size:16px; line-height:1.6; color:#3c372f; max-width:760px; text-wrap:pretty">Locked from <strong>5a</strong>. Everything here is sized for a panel that lives beside an editor: dense, quiet at rest, and legible over whatever theme is behind it. One panel with subdivisions and a multi-panel arrangement are both covered by the same tokens.</p>
+  </header>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Colour</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">Three signal colours, four greys, one ivory. Nothing else ships.</p>
+    </div>
+
+    <div style="background:#0e0d0c; border-radius:24px; padding:32px; display:flex; flex-direction:column; gap:28px">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; margin-bottom:14px">Signal</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px">
+          <div style="display:flex; flex-direction:column; gap:9px"><div style="height:68px; border-radius:16px; background:#37bda9"></div><div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eff3f4">--teal · 37BDA9</div><div style="font-size:12.5px; color:#948a7f; line-height:1.5">Action. Primary buttons, links, anything the user can press.</div></div>
+          <div style="display:flex; flex-direction:column; gap:9px"><div style="height:68px; border-radius:16px; background:#7fb2e8"></div><div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eff3f4">--blue · 7FB2E8</div><div style="font-size:12.5px; color:#948a7f; line-height:1.5">Working. Progress, streaming output, anything the copilot is doing on its own.</div></div>
+          <div style="display:flex; flex-direction:column; gap:9px"><div style="height:68px; border-radius:16px; background:#f6a06b"></div><div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eff3f4">--ember · F6A06B</div><div style="font-size:12.5px; color:#948a7f; line-height:1.5">Attention. Blocked, failed, needs a decision. Never decorative.</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; margin-bottom:14px">Ground and ink</div>
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px">
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#0e0d0c; border:1px solid #2b2724"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--bg<br>0E0D0C</div></div>
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#1a1817"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--surface<br>1A1817</div></div>
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#221f1d"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--raised<br>221F1D</div></div>
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#2b2724"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--line<br>2B2724</div></div>
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#948a7f"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--muted<br>948A7F</div></div>
+          <div style="display:flex; flex-direction:column; gap:8px"><div style="height:56px; border-radius:14px; background:#eff3f4"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">--ink<br>EFF3F4</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; margin-bottom:14px">Tints — 14% of the signal over --surface, for fills behind small text</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px">
+          <div style="height:44px; border-radius:14px; background:#1c2a28; display:flex; align-items:center; padding:0 16px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9">--teal-tint · 1C2A28</div>
+          <div style="height:44px; border-radius:14px; background:#1e2630; display:flex; align-items:center; padding:0 16px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#7fb2e8">--blue-tint · 1E2630</div>
+          <div style="height:44px; border-radius:14px; background:#2a2119; display:flex; align-items:center; padding:0 16px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#f6a06b">--ember-tint · 2A2119</div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #2b2724; padding-top:20px; font-size:12.5px; color:#948a7f; line-height:1.6; max-width:680px">Signal colours are for fills and 12px+ text only. Body copy is always <span style="color:#eff3f4">--ink</span> or <span style="color:#eff3f4">--muted</span>. Two signals never appear in the same control.</div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Type</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">Figtree for prose, JetBrains Mono for anything the machine wrote. Caprasimo stays in marketing — it does not appear in the product.</p>
+    </div>
+    <div style="background:#0e0d0c; border-radius:24px; padding:32px; display:flex; flex-direction:column; gap:18px">
+      <div style="display:grid; grid-template-columns:150px 1fr; gap:16px 24px; align-items:baseline">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">display / 18·700</div>
+        <div style="font-family:'JetBrains Mono', monospace; font-weight:700; font-size:18px; letter-spacing:-.04em; color:#eff3f4">CoCoPilot</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">title / 15·700</div>
+        <div style="font-family:'Figtree'; font-weight:700; font-size:15px; letter-spacing:-.01em; color:#eff3f4">Extract this into a hook</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">body / 13·400</div>
+        <div style="font-family:'Figtree'; font-size:13px; line-height:1.55; color:#eff3f4">Three call sites repeat the same session-fetch logic. Pulling it into <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#a9e5da">useSession</span> removes 24 lines.</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">meta / 12·500</div>
+        <div style="font-family:'Figtree'; font-weight:500; font-size:12px; color:#948a7f">2 minutes ago · claude-sonnet</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">code / 12·400</div>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#eff3f4">src/hooks/useSession.ts:42</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">label / 11·500 caps</div>
+        <div style="font-family:'JetBrains Mono', monospace; font-weight:500; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Suggestions</div>
+      </div>
+      <div style="border-top:1px solid #2b2724; padding-top:18px; font-size:12.5px; color:#948a7f; line-height:1.6; max-width:680px">11px is the floor, and only for uppercase mono labels. Nothing below 12px carries meaning you can't get elsewhere on screen.</div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Space, radius, elevation</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">A 4px step. Panels are round; the things inside them are less round as they get smaller.</p>
+    </div>
+    <div style="background:#0e0d0c; border-radius:24px; padding:32px; display:flex; flex-wrap:wrap; gap:44px">
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Space</div>
+        <div style="display:flex; align-items:flex-end; gap:10px">
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:4px; height:4px; background:#37bda9; border-radius:2px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">4</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:8px; height:8px; background:#37bda9; border-radius:2px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">8</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:12px; height:12px; background:#37bda9; border-radius:2px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">12</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:16px; height:16px; background:#37bda9; border-radius:3px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">16</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:24px; height:24px; background:#37bda9; border-radius:4px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">24</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:32px; height:32px; background:#37bda9; border-radius:5px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">32</div></div>
+        </div>
+        <div style="font-size:12.5px; color:#948a7f; line-height:1.55; max-width:280px">Panel padding 16. Gap between rows 8. Gap between sections 16.</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Radius</div>
+        <div style="display:flex; gap:12px; align-items:flex-end">
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:54px; height:54px; background:#1a1817; border:1px solid #2b2724; border-radius:16px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">16 panel</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:54px; height:54px; background:#1a1817; border:1px solid #2b2724; border-radius:12px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">12 card</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:54px; height:54px; background:#1a1817; border:1px solid #2b2724; border-radius:8px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">8 field</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:54px; height:28px; background:#1a1817; border:1px solid #2b2724; border-radius:999px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">pill</div></div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Elevation</div>
+        <div style="display:flex; gap:14px; align-items:flex-end">
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:74px; height:54px; background:#1a1817; border:1px solid #2b2724; border-radius:12px"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">flat</div></div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:center"><div style="width:74px; height:54px; background:#221f1d; border:1px solid #2b2724; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.55)"></div><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#948a7f">floating</div></div>
+        </div>
+        <div style="font-size:12.5px; color:#948a7f; line-height:1.55; max-width:260px">Only the window itself floats. Inside the panel, depth is a border, not a shadow.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Controls</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">28px standard height, 24px dense. Hit targets stay 28px even where the label looks smaller.</p>
+    </div>
+    <div style="background:#0e0d0c; border-radius:24px; padding:32px; display:flex; flex-direction:column; gap:26px">
+
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Buttons — rest, hover, pressed, disabled</div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center">
+          <span style="background:#37bda9; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Apply</span>
+          <span style="background:#45cfc7; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Apply</span>
+          <span style="background:#2a9c8c; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Apply</span>
+          <span style="background:#37bda9; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box; opacity:.4">Apply</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center">
+          <span style="border:1px solid #2b2724; color:#eff3f4; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Skip</span>
+          <span style="border:1px solid #3d3833; background:#1a1817; color:#eff3f4; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Skip</span>
+          <span style="border:1px solid #3d3833; background:#221f1d; color:#eff3f4; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Skip</span>
+          <span style="color:#37bda9; border-radius:999px; padding:6px 10px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Open in Claude</span>
+          <span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:6px 10px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box">Open in Claude</span>
+          <span style="width:28px; height:28px; border-radius:999px; border:1px solid #2b2724; color:#948a7f; display:inline-flex; align-items:center; justify-content:center; font-size:14px">×</span>
+          <span style="border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600; height:28px; display:inline-flex; align-items:center; box-sizing:border-box; background:#1a1817; color:#eff3f4; outline:2px solid #37bda9; outline-offset:2px">Focus ring</span>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid #2b2724; padding-top:22px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Status chips — one per panel, top right</div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center">
+          <span style="background:#1a1817; color:#948a7f; border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:600; display:inline-flex; align-items:center; gap:7px"><span style="width:6px; height:6px; border-radius:999px; background:#948a7f"></span>Idle</span>
+          <span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:600; display:inline-flex; align-items:center; gap:7px"><span style="width:6px; height:6px; border-radius:999px; background:#37bda9"></span>Watching</span>
+          <span style="background:#1e2630; color:#7fb2e8; border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:600; display:inline-flex; align-items:center; gap:7px"><span style="width:6px; height:6px; border-radius:999px; background:#7fb2e8"></span>Thinking</span>
+          <span style="background:#2a2119; color:#f6a06b; border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:600; display:inline-flex; align-items:center; gap:7px"><span style="width:6px; height:6px; border-radius:999px; background:#f6a06b"></span>Needs you</span>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:32px; border-top:1px solid #2b2724; padding-top:22px">
+        <div style="display:flex; flex-direction:column; gap:12px; width:300px">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Input</div>
+          <div style="background:#1a1817; border:1px solid #2b2724; border-radius:8px; padding:8px 10px; display:flex; align-items:center; gap:8px">
+            <span style="font-size:13px; color:#948a7f; flex:1">Ask about this file…</span>
+            <span style="width:22px; height:22px; border-radius:999px; background:#37bda9; color:#0e0d0c; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700">↑</span>
+          </div>
+          <div style="background:#1a1817; border:1px solid #37bda9; border-radius:8px; padding:8px 10px; display:flex; align-items:center; gap:2px">
+            <span style="font-size:13px; color:#eff3f4">why does this rerender</span>
+            <span style="width:1.5px; height:15px; background:#37bda9"></span>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Segmented</div>
+          <div style="display:inline-flex; background:#1a1817; border:1px solid #2b2724; border-radius:999px; padding:2px">
+            <span style="background:#37bda9; color:#0e0d0c; border-radius:999px; padding:5px 14px; font-size:12px; font-weight:600">Suggest</span>
+            <span style="color:#948a7f; padding:5px 14px; font-size:12px; font-weight:600">Explain</span>
+            <span style="color:#948a7f; padding:5px 14px; font-size:12px; font-weight:600">Review</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; margin-top:6px">Toggle</div>
+          <div style="display:flex; gap:14px; align-items:center">
+            <span style="width:34px; height:20px; border-radius:999px; background:#37bda9; display:inline-flex; align-items:center; justify-content:flex-end; padding:0 3px; box-sizing:border-box"><span style="width:14px; height:14px; border-radius:999px; background:#0e0d0c"></span></span>
+            <span style="width:34px; height:20px; border-radius:999px; background:#2b2724; display:inline-flex; align-items:center; padding:0 3px; box-sizing:border-box"><span style="width:14px; height:14px; border-radius:999px; background:#948a7f"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Content blocks</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">The four things a panel actually shows.</p>
+    </div>
+    <div style="background:#0e0d0c; border-radius:24px; padding:32px; display:flex; flex-wrap:wrap; gap:16px">
+
+      <div style="width:340px; background:#1a1817; border:1px solid #2b2724; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#37bda9">Refactor</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f; margin-left:auto">−24 lines</span>
+        </div>
+        <div style="font-size:15px; font-weight:700; letter-spacing:-.01em; color:#eff3f4">Extract this into a hook</div>
+        <div style="font-size:13px; line-height:1.55; color:#c9c3bb">Three call sites repeat the same session fetch. One hook covers all of them.</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">src/hooks/useSession.ts:42</div>
+        <div style="display:flex; gap:8px; padding-top:2px">
+          <span style="background:#37bda9; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600">Apply</span>
+          <span style="border:1px solid #2b2724; color:#eff3f4; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600">Skip</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; padding-top:6px; border-top:1px solid #2b2724">Suggestion card</div>
+      </div>
+
+      <div style="width:340px; background:#1a1817; border:1px solid #2b2724; border-radius:12px; padding:0; display:flex; flex-direction:column; overflow:hidden">
+        <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #2b2724">
+          <span style="width:6px; height:6px; border-radius:999px; background:#37bda9"></span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">useSession.ts</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">2m</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #2b2724">
+          <span style="width:6px; height:6px; border-radius:999px; background:#7fb2e8"></span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">routes/index.tsx</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">6m</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:#221f1d">
+          <span style="width:6px; height:6px; border-radius:999px; background:#f6a06b"></span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">api/client.ts</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#f6a06b">conflict</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; padding:10px 14px">File rows — hover is --raised</div>
+      </div>
+
+      <div style="width:340px; background:#1a1817; border:1px solid #2b2724; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="width:6px; height:6px; border-radius:999px; background:#7fb2e8"></span>
+          <span style="font-size:13px; color:#7fb2e8; font-weight:600">Reading 4 files</span>
+        </div>
+        <div style="height:3px; border-radius:999px; background:#2b2724; overflow:hidden"><div style="width:62%; height:3px; background:#7fb2e8; border-radius:999px"></div></div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f; line-height:1.6">scanning src/api/client.ts<br>scanning src/hooks/useSession.ts</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; padding-top:6px; border-top:1px solid #2b2724">Working state</div>
+      </div>
+
+      <div style="width:340px; background:#2a2119; border:1px solid #4a3a29; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px">
+        <div style="font-size:13px; font-weight:700; color:#f6a06b">Conflicting edit in api/client.ts</div>
+        <div style="font-size:13px; line-height:1.55; color:#e0d5c8">The file changed on disk while the suggestion was open. Re-read before applying.</div>
+        <div style="display:flex; gap:8px">
+          <span style="background:#f6a06b; color:#0e0d0c; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600">Re-read</span>
+          <span style="border:1px solid #4a3a29; color:#f4e6d8; border-radius:999px; padding:6px 16px; font-size:12.5px; font-weight:600">Discard</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#a8886a; padding-top:6px; border-top:1px solid #4a3a29">Attention block — the only tinted card</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Panel layout</h2>
+      <p style="margin:0; font-size:14px; color:#645c50">One window, subdivided by a 1px <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px">--line</span> rule and an 11px caps label. Multi-panel is the same parts, split into separate windows.</p>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start">
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Single panel, subdivided · 360×560</div>
+        <div style="width:360px; background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 16px 44px rgba(32,30,29,.3); overflow:hidden; display:flex; flex-direction:column">
+          <div style="display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid #2b2724">
+            <div style="display:flex; align-items:center; flex:none">
+              <span style="width:11px; height:11px; border-radius:999px; background:#7fb2e8"></span>
+              <span style="width:11px; height:11px; border-radius:999px; background:#37bda9; margin-left:-3.5px"></span>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; letter-spacing:-.03em; color:#eff3f4">CoCoPilot</span>
+            <span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600; margin-left:auto">Watching</span>
+            <span style="color:#948a7f; font-size:13px">⋯</span>
+          </div>
+
+          <div style="padding:12px 14px 6px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Now</div>
+          <div style="padding:0 14px 12px">
+            <div style="background:#1a1817; border:1px solid #2b2724; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px">
+              <div style="font-size:14px; font-weight:700; color:#eff3f4">Extract this into a hook</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">src/hooks/useSession.ts:42</div>
+              <div style="display:flex; gap:8px; padding-top:2px">
+                <span style="background:#37bda9; color:#0e0d0c; border-radius:999px; padding:5px 14px; font-size:12px; font-weight:600">Apply</span>
+                <span style="border:1px solid #2b2724; color:#eff3f4; border-radius:999px; padding:5px 14px; font-size:12px; font-weight:600">Skip</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid #2b2724; padding:12px 14px 6px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Context · 4 files</div>
+          <div style="padding:0 0 8px">
+            <div style="display:flex; align-items:center; gap:9px; padding:7px 14px"><span style="width:5px; height:5px; border-radius:999px; background:#37bda9"></span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">useSession.ts</span><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">2m</span></div>
+            <div style="display:flex; align-items:center; gap:9px; padding:7px 14px; background:#1a1817"><span style="width:5px; height:5px; border-radius:999px; background:#7fb2e8"></span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">routes/index.tsx</span><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">6m</span></div>
+            <div style="display:flex; align-items:center; gap:9px; padding:7px 14px"><span style="width:5px; height:5px; border-radius:999px; background:#f6a06b"></span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">api/client.ts</span><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#f6a06b">conflict</span></div>
+          </div>
+
+          <div style="border-top:1px solid #2b2724; padding:12px 14px 6px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">History</div>
+          <div style="padding:0 14px 14px; display:flex; flex-direction:column; gap:7px">
+            <div style="font-size:12.5px; color:#c9c3bb">Renamed <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">fetchUser</span> across 6 files</div>
+            <div style="font-size:12.5px; color:#948a7f">Added tests for the session reducer</div>
+          </div>
+
+          <div style="margin-top:auto; border-top:1px solid #2b2724; padding:10px 14px">
+            <div style="background:#1a1817; border:1px solid #2b2724; border-radius:8px; padding:7px 10px; display:flex; align-items:center; gap:8px">
+              <span style="font-size:12.5px; color:#948a7f; flex:1">Ask about this file…</span>
+              <span style="width:20px; height:20px; border-radius:999px; background:#37bda9; color:#0e0d0c; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700">↑</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Split into panels · same parts, own chrome</div>
+        <div style="display:flex; flex-direction:column; gap:12px; width:360px">
+          <div style="background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 16px 44px rgba(32,30,29,.3); overflow:hidden">
+            <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-bottom:1px solid #2b2724">
+              <div style="display:flex; align-items:center; flex:none"><span style="width:10px; height:10px; border-radius:999px; background:#7fb2e8"></span><span style="width:10px; height:10px; border-radius:999px; background:#37bda9; margin-left:-3px"></span></div>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; flex:1">Suggestions</span>
+              <span style="background:#1e2630; color:#7fb2e8; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600">Thinking</span>
+            </div>
+            <div style="padding:12px 13px; display:flex; flex-direction:column; gap:9px">
+              <div style="height:3px; border-radius:999px; background:#2b2724; overflow:hidden"><div style="width:62%; height:3px; background:#7fb2e8"></div></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#948a7f">reading src/api/client.ts</div>
+            </div>
+          </div>
+          <div style="background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 16px 44px rgba(32,30,29,.3); overflow:hidden">
+            <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-bottom:1px solid #2b2724">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; flex:1">Context</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">4 files</span>
+            </div>
+            <div style="padding:6px 0">
+              <div style="display:flex; align-items:center; gap:9px; padding:7px 13px"><span style="width:5px; height:5px; border-radius:999px; background:#37bda9"></span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">useSession.ts</span></div>
+              <div style="display:flex; align-items:center; gap:9px; padding:7px 13px"><span style="width:5px; height:5px; border-radius:999px; background:#f6a06b"></span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eff3f4; flex:1">api/client.ts</span></div>
+            </div>
+          </div>
+          <div style="background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 16px 44px rgba(32,30,29,.3); padding:10px 13px; display:flex; align-items:center; gap:9px">
+            <div style="display:flex; align-items:center; flex:none"><span style="width:10px; height:10px; border-radius:999px; background:#7fb2e8"></span><span style="width:10px; height:10px; border-radius:999px; background:#37bda9; margin-left:-3px"></span></div>
+            <span style="font-size:12.5px; color:#948a7f; flex:1">Ask about this file…</span>
+            <span style="width:20px; height:20px; border-radius:999px; background:#37bda9; color:#0e0d0c; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700">↑</span>
+          </div>
+          <div style="font-size:12.5px; color:#645c50; line-height:1.55">Each window keeps the two-disc mark only if it can be dragged on its own; a docked subdivision uses the caps label alone.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:20px">
+    <div style="display:flex; flex-direction:column; gap:4px">
+      <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:30px; margin:0">Rules</h2>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:16px">
+      <div style="flex:1; min-width:320px; background:#e8dcc5; border-radius:20px; padding:24px 26px; display:flex; flex-direction:column; gap:10px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#56633f">Do</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">One status chip per window, always top right.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Mono for anything read from the codebase — paths, symbols, output.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Separate sections with a rule and a caps label, not with a card inside a card.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Keep the resting panel colourless: teal appears on the one thing to press.</div>
+      </div>
+      <div style="flex:1; min-width:320px; background:#e8dcc5; border-radius:20px; padding:24px 26px; display:flex; flex-direction:column; gap:10px">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8c491a">Don't</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Don't use ember for anything that isn't blocked or failing.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Don't put two signal colours in one control.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Don't shadow anything inside the panel; depth is a border.</div>
+        <div style="font-size:14px; line-height:1.6; color:#3c372f">Don't use Caprasimo in the product. It is the marketing voice only.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+</body>
+</html>
