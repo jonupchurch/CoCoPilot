@@ -132,6 +132,14 @@ this project is pre-release and not yet versioned.
   superseded: it ran before the no-repo-reads and free-string-status calls, so
   task-state rendering owes a round 3. Its `focus`-versus-status split survives
   and is now load-bearing.
+- **Round 2's five open questions ruled on.** Three defaults accepted as
+  written: declaration-order pills, `×` with a clarifying tooltip, and a muted
+  unread dot on Notes with no count. Two changed — the `now` tag carries its own
+  elapsed time rather than muting after ten minutes, since a threshold is the
+  thing the liveness decision rules out and a stated duration cannot be wrong;
+  and session pills carry their own chip and elapsed time, closing a hole where
+  a `needs-you` on an unselected session would have been an ask that never
+  arrived.
 - **Notes decided:** the tab holds notes the agent writes, either because the
   user asked it to record something or because the agent judged it worth
   recording. The user never types into the board, so Notes stays inside the

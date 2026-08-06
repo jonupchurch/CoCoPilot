@@ -25,7 +25,7 @@ should be written until the design docs exist and are reviewed.
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
 | Design exports (`resources/`) | ✅ Round 2 landed — Brand, Design System, Overview Panel (revised), Round 2 decisions doc; canon per decision 8 |
-| Design round 3 owed | ⬜ Task-state rendering only — round 2 ran before decisions 24–25 (see below) |
+| Design round 3 owed | ⬜ Task-state rendering; the elapsed `now` tag; live state on session pills (see below) |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
@@ -458,21 +458,31 @@ survives untouched. Arbitrary status strings need it more, not less. What round
 values (todo, active, blocked, done) carrying the round 1 colours, and a defined
 neutral fallback for everything else.
 
-### Round 2's own open questions, defaults not yet accepted
+### Round 2's own open questions — all five ruled on, 2026-08-06
 
-The design doc proposes a default for each. None has been ruled on:
+Three defaults accepted as written, two changed:
 
-1. **Does the `now` marker go stale?** *Default:* after ten minutes with no
-   report the tag mutes while the teal rule stays — showing where the agent was
-   last seen without claiming that is where it is.
-2. **Does the whole board follow the selected session?** *Default:* yes, one
-   session selected, every tab shows it. No merged view.
-3. **What order do session pills sit in?** *Default:* order of declaration, not
-   recency, so pills do not move under a cursor aiming at one.
-4. **Should the dismiss control be labelled something other than ×?** *Default:*
-   keep ×, with "clears this board's copy" in the tooltip.
-5. **Does Notes need an unread signal?** *Default:* a muted dot when a note
-   arrives while you are elsewhere, cleared on visit. No count.
+1. **The `now` marker carries its own elapsed time** — `now` becomes `12m` as
+   time passes. **Changed** from round 2's "mute the tag after ten minutes",
+   which was a threshold and an automatic state change, the exact thing decision
+   15 rules out. A tag that states elapsed time is a fact and cannot be wrong at
+   any duration, so it needs no threshold. The teal rule stays either way: where
+   the agent was last seen is real information.
+2. **The board follows the selected session, and session pills carry their own
+   chip and elapsed time.** **Extended** from round 2's default, which left a
+   hole: decision 15 makes the chip the only way an agent can ask for attention,
+   so a `needs-you` on an unselected session would be an ask that never arrives.
+   No merged view — round 2's reasoning against interleaving two repos holds.
+3. **Pills sit in order of declaration**, not recency. Accepted as proposed.
+   Matters more now that pills carry live state and get glanced at rather than
+   read — position becomes stable enough to learn.
+4. **Dismiss keeps `×`**, with "clears this board's copy" in the tooltip.
+   Accepted as proposed, including round 2's own note that this is thin cover.
+   The fallback if it confuses in use is a text "hide" button, not an undo —
+   there is no state to undo into.
+5. **Notes gets a muted dot, no count.** Accepted as proposed. A count would
+   imply an inbox to zero out, and notes clear themselves when the window
+   closes.
 
 ### Not designed yet, per round 2
 
