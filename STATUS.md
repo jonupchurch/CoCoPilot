@@ -25,7 +25,7 @@ should be written until the design docs exist and are reviewed.
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
 | Design exports (`resources/`) | ✅ Round 2 landed — Brand, Design System, Overview Panel (revised), Round 2 decisions doc; canon per decision 8 |
-| Design round 3 owed | ⬜ Task-state rendering; the elapsed `now` tag; live state on session pills (see below) |
+| Design round 3 owed | 🟡 Brief written — [`resources/designprompt3.md`](resources/designprompt3.md); needs a Claude Design run |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |

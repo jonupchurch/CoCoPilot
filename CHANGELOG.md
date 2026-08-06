@@ -132,6 +132,13 @@ this project is pre-release and not yet versioned.
   superseded: it ran before the no-repo-reads and free-string-status calls, so
   task-state rendering owes a round 3. Its `focus`-versus-status split survives
   and is now load-bearing.
+- **Round 3 design brief written** — `resources/designprompt3.md`. A short round:
+  free-string task statuses with a defined neutral fallback, the `now` tag
+  carrying its own elapsed time, and session pills carrying their own chip and
+  elapsed time. Locks both previous rounds explicitly, including round 2's
+  `focus`-versus-status split, which free-form statuses make more necessary
+  rather than less. Names overflow as optional — the largest gap round 2
+  identified in itself, and a natural companion to the pill density work.
 - **Round 2's five open questions ruled on.** Three defaults accepted as
   written: declaration-order pills, `×` with a clarifying tooltip, and a muted
   unread dot on Notes with no count. Two changed — the `now` tag carries its own
