@@ -132,6 +132,14 @@ this project is pre-release and not yet versioned.
   superseded: it ran before the no-repo-reads and free-string-status calls, so
   task-state rendering owes a round 3. Its `focus`-versus-status split survives
   and is now load-bearing.
+- **Distribution decided:** the MCP server ships as an npx-able npm package,
+  with the CLI alongside it. The point is code signing — Claude Code has to
+  spawn the server independently of the app, and shipping that as JavaScript
+  takes it out of the notarization story entirely, leaving the Electron app as
+  the only thing to sign. Costs a Node dependency and an npx cold start, and
+  lets the published server drift from the installed app — detectable, since the
+  HTTP path is versioned and the health check already returns a version.
+  **Closes the last open design question.**
 - **Round 3 design brief written** — `resources/designprompt3.md`. A short round:
   free-string task statuses with a defined neutral fallback, the `now` tag
   carrying its own elapsed time, and session pills carrying their own chip and

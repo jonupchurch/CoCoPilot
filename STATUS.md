@@ -23,7 +23,8 @@ should be written until the design docs exist and are reviewed.
 | Direction of flow | ✅ One-way, agent → board. Never writes to the user's repo (decision 11) |
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
-| Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
+| Architecture — everything else | ✅ Settled across decisions 1–27; no open design questions remain |
+| Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
 | Design exports (`resources/`) | ✅ Round 2 landed — Brand, Design System, Overview Panel (revised), Round 2 decisions doc; canon per decision 8 |
 | Design round 3 owed | 🟡 Brief written — [`resources/designprompt3.md`](resources/designprompt3.md); needs a Claude Design run |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
@@ -403,6 +404,23 @@ their head across a long agent session.
       where everything else replaces (decision 20). Folding them into the
       snapshot would force the agent to carry every note it has ever written
       just to add one.
+27. **The MCP server ships as an npx-able npm package** — `.mcp.json` runs
+    `npx -y @cocopilot/mcp`. The CLI ships the same way, most likely as a second
+    binary in the same package.
+    - *The real win is code signing.* Decision 6 requires something Claude Code
+      can spawn independently of the app, and shipping that as JavaScript takes
+      it out of the signing and notarization story entirely. The Electron app
+      remains the only thing to notarize, instead of also having to cover a
+      binary launched outside its own startup.
+    - *Matches convention,* so it configures the way every other MCP server the
+      user already has does, and works identically on all three platforms with
+      no per-platform path to get wrong.
+    - *Cost:* Node has to be present, there is an `npx` cold start per session,
+      and the published server can drift from the installed app.
+    - *Drift is detectable, not silent.* The HTTP path is versioned (`/v1`) and
+      decision 22's health check already returns a version, so a mismatched pair
+      can say so rather than failing obscurely. Worth building in from the
+      start — it is nearly free then and awkward to retrofit.
 
 ## What survives the restart
 
@@ -500,13 +518,11 @@ Ordered roughly by how much downstream work each one blocks.
    [docs/design/push-schema.md](docs/design/push-schema.md), **awaiting review**.
    All three of its original open points are now decided (23, 22, and 24
    respectively). What is left is review, not unknowns.
-2. **Packaging and distribution** per platform, including code signing.
-   Sharpened by decision 6: Claude Code *spawns* the MCP server as its own child
-   process, so an Electron app has to ship a separately-spawnable Node entry
-   point that lives outside the app bundle and starts with the app closed.
-   Whether that is an npx-able package, a small per-platform binary, or a
-   documented path into the installed app is open, and it collides with macOS
-   signing and notarization.
+2. **Packaging the Electron app** per platform. The *design* question here is
+   closed by decision 27 — the spawnable piece ships via npx and is out of the
+   signing story. What remains is ordinary build work: installers for Windows,
+   macOS and Linux, and macOS notarization for the app itself. Well-trodden, and
+   not a thing to decide on paper.
 
 ## Notable wrinkle
 
