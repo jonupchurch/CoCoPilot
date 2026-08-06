@@ -547,6 +547,29 @@ affordance; long sessions, where "Show all 18" has no destination and Notes is
 drawn at six entries rather than forty; and the agent going away mid-session —
 process exit or socket drop — as distinct from merely being quiet.
 
+## The initial feature set
+
+Sliced by component, 2026-08-06. Rule 7 says all nine get specced before any is
+implemented, so that shared models and cross-feature dependencies surface on
+paper rather than mid-build. Build order is roughly the numbering.
+
+| # | Feature | Covers |
+|---|---|---|
+| 1 | Push contract and local service | `POST /v1/push`, `/v1/note`, `/v1/health`; in-memory per-session state; validation; snapshot-replace and note-append semantics |
+| 2 | MCP server and CLI | The npx package, both thin clients, lazy connection, port discovery, fail-soft messaging |
+| 3 | Window shell | Electron app, one window, title bar with repo/branch/elapsed/chip, tab strip, empty state, stable user-owned width |
+| 4 | Overview tab | The pushed sections — Spec, Plan, Focus, Changed files — with collapsible headers carrying their own summaries |
+| 5 | Transcript reader | Tailing `~/.claude/projects/<slug>/*.jsonl`; Last prompt, History, In context |
+| 6 | Stories and Tasks tabs | Master–detail, the 640px breakpoint, free-string status rendering with the recognised-value vocabulary |
+| 7 | Notes | Append endpoint, the list, the impermanence footer, the unread dot |
+| 8 | Multiple sessions | Switcher appearing at two, pills carrying chip and elapsed, dismiss |
+| 9 | Packaging and distribution | Per-platform installers, macOS notarization, publishing the npx package |
+
+**Known cost of this slicing:** features 1, 2 and 5 deliver nothing a user can
+see. Their specs need acceptance criteria that are *testable* rather than
+*observable* — a push with an over-long note is rejected, a client with no board
+running gets the documented message — or they will read as unfalsifiable.
+
 ## Open questions
 
 Ordered roughly by how much downstream work each one blocks.
