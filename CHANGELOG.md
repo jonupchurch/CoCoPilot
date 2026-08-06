@@ -200,6 +200,24 @@ this project is pre-release and not yet versioned.
   open points: `sessionId` outside an MCP server process, pushes naming an
   unscanned feature, and port discovery.
 
+- **All nine implementation plans written**, satisfying the plan-the-whole-set
+  principle. Feature 001's plan carries the shared technical foundation the
+  other eight reference: TypeScript strict, npm workspaces with a published
+  client package separate from the installed app, `node:http` with no framework,
+  Zod as the single source of both validation and types, Vitest and Playwright.
+  Feature 002 fixes the port range at 41847–41851.
+- **Transcript format grounded empirically** in feature 005's research, verified
+  against a real 384 KB transcript rather than assumed — and it found a trap of
+  the same class as the Spec-Kit checkbox-case finding: `type: "user"` records
+  are **not** prompts. The sample held 37 of them and roughly 10 actual human
+  prompts, the rest being tool results. Classification must inspect message
+  content, never record type, or the board shows a developer tool output
+  presented as things they typed.
+- **Stack packs written** — `stacks/electron.md` and `stacks/vite-react.md`,
+  owed before any framework code. Both encode the prohibitions that protect this
+  product's guarantees: no data timers, no `dangerouslySetInnerHTML`, no
+  `nodeIntegration`, no colour literals outside the token file. The stale
+  `nextjs.md` reference in the stacks README is corrected.
 - **All nine feature specs written**, each with a passing quality checklist and
   no clarification markers — every gap resolved with a documented assumption.
   Several recurring shapes emerged: the guarantees the product rests on (never

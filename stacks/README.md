@@ -25,10 +25,13 @@ hasn't already established a pattern.
 
 ## Available packs
 
-- [`nextjs.md`](nextjs.md) — Next.js App Router.
+- [`electron.md`](electron.md) — the desktop shell: process split, isolation,
+  the IPC boundary.
+- [`vite-react.md`](vite-react.md) — the renderer: state, derivation, tokens,
+  and the things that would quietly break this product's guarantees.
 
 ## Adding a pack
 
-Copy the shape of `nextjs.md`: a short "defaults" section, a "where things go"
-section, a "don't" list, and a "verify" checklist. Keep it to one screen —
+Copy the shape of the packs above: a short "defaults" section, a "where things
+go" section, a "don't" list, and a "verify" checklist. Keep it to one screen —
 it's a reference to glance at, not documentation to read through.

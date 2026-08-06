@@ -29,8 +29,9 @@ should be written until the design docs exist and are reviewed.
 | Design revisions owed | ✅ None outstanding |
 | Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
-| Implementation plans | ⬜ None — rule 7 wants all nine planned before any is built |
-| Implementation | ⬜ Blocked on planning |
+| Implementation plans | ✅ All nine planned; constitution check passes with no violations |
+| Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
+| Implementation | 🟢 **Unblocked** — rule 7 satisfied; start at feature 001 on a branch |
 
 ## What this is
 
@@ -422,6 +423,18 @@ their head across a long agent session.
       decision 22's health check already returns a version, so a mismatched pair
       can say so rather than failing obscurely. Worth building in from the
       start — it is nearly free then and awkward to retrofit.
+28. **The window is notified in-process when held state changes.** It does not
+    poll, and there is no streaming connection. The service and the window are
+    in the same application, so state notifies the window directly.
+    - *Rationale:* immediate updates, nothing running while idle, and no
+      interval to tune — which matters for a panel left open all day. It also
+      keeps the "window never refreshes itself" rule clean: nothing fires on a
+      timer at all, rather than a timer we have to argue is a different kind.
+    - *Cost:* couples the window to an in-process service. A remote window would
+      need a second mechanism — accepted, since decision 18 already ruled remote
+      viewing out.
+    - *Left open by the specs on purpose,* and decided here before planning so
+      that features 1 and 3 through 8 do not each assume something different.
 
 ## What survives the restart
 
