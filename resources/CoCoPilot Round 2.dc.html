@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-1012ed30-3725-49b4-8bc3-2e7f018fe071/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { background: #efe4d2; }
+  a { color: #8c491a; }
+  a:hover { color: #643312; }
+</style>
+</helmet>
+
+<div style="font-family:'Figtree', system-ui, sans-serif; color:#201e1d; padding:56px 56px 88px; display:flex; flex-direction:column; gap:48px; max-width:880px">
+
+  <header style="display:flex; flex-direction:column; gap:14px">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">CoCoPilot · round 2</div>
+    <h1 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:44px; line-height:1.05; margin:0">Decisions and their costs</h1>
+    <p style="margin:0; font-size:16px; line-height:1.6; color:#3c372f; max-width:640px; text-wrap:pretty">What changed in the board since round 1, why, and what each change costs. The brand, the colour system, the type, the spacing and the subdivided panel are unchanged.</p>
+  </header>
+
+  <section style="display:flex; flex-direction:column; gap:22px">
+    <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:28px; margin:0">Decisions</h2>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">01</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">A task is done or not done</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">A Spec-Kit checkbox carries one bit. <em>Active</em> and <em>blocked</em> had no source in the repository, so they are gone from the data model, from the two tabs and from the Overview spec section.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> The task list loses almost all of its colour, and "why has this not moved in an hour" is no longer answerable from the checkbox. It has to come from the agent's prose, which may be silent.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">02</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">"Now" is a marker, not a state</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">The row the agent last reported working on keeps its empty checkbox and gains a 2px teal left rule, an ivory title and a mono <span style="font-family:'JetBrains Mono',monospace; font-size:13px">now</span> tag. The task detail repeats it as a line of the agent's own prose: <span style="font-family:'JetBrains Mono',monospace; font-size:13px">reported now · editing src/hooks/useSession.ts</span>. It reads at a glance because it is the only teal in a grey list.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> The marker is only as fresh as the last report. If the agent moves on quietly, the rule sits on the wrong row until it speaks again — which is why the title bar carries the elapsed clock right next to it.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">03</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">Elapsed time instead of judgement</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">The title bar reads <span style="font-family:'JetBrains Mono',monospace; font-size:13px">heard 40s ago</span> beside the status chip. Nothing on the board ever says stalled, stuck or failed on the agent's behalf.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> A dead agent and a four-minute typecheck look identical for the first four minutes. The user does the interpreting, which is the correct trade but not a free one.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">04</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">Width belongs to the user; the split breaks at 640px</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">The window never resizes itself. At 640px and above, Stories and Tasks are master–detail. Below it they diverge: <strong>Stories collapses its list into a picker</strong> and gives the detail the full width, while <strong>Tasks stacks</strong> its short list above the detail.</p>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">Recommended, and built that way: the story list is five rows of three lines — stacking it would push the detail 220px down the panel, and the picker pattern already exists on the Tasks tab. A story's task list is one to four single rows, so stacking costs nothing there.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> At 452px you cannot compare two stories without opening the picker, and selecting one is a click further away. Two different narrow behaviours across two adjacent tabs is also a thing to learn.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">05</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">The session row is absent until it is needed</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">At one session the chrome is exactly as it was. When a second declares itself, a 37px row slides in under the title bar over 220ms and the arriving pill holds a blue tint for a beat before settling — the same blue that means "the agent is doing something", used here for "this arrived on its own".</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> Everything below shifts down once. We took the single jump over reserving permanent empty chrome, because the one-session case is the common one and empty chrome would be a permanent tax on it.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">06</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">Dismiss erases the board's copy and nothing else</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">The × on a session pill drops what the board holds. The agent is not told, and a dismissed session reappears the moment it reports again.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> Reappearance looks like a bug to anyone who read × as "close". The tooltip says "dismiss this session" rather than close, which is thin cover — see the open questions.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">07</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">The empty state says waiting, not welcome</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">Mark at half opacity, one sentence, a listening pill, and a line saying the agent supplies the repository so there is nothing to set up. Tabs are hidden until something arrives — four empty tabs would be four dead ends.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> No diagnostics. Someone whose agent is running but not reporting sees the same screen as someone who has not started one, and the board genuinely cannot tell the difference.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">08</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">Notes are a transcript, not a store</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">Newest first, flat rows separated by rules, a relative-time gutter, and a source line in the agent's voice — <em>you asked</em>, <em>noticed while editing</em>, <em>worth knowing</em>. No cards, no pin, no save, no archive. The dashed footer states the whole truth: closing the window clears all twelve, and anything worth keeping should be written into the repository.</p>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">Density comes from the format: three lines per note at 13px, no container, so forty entries scroll as one column rather than forty boxes.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> Honesty about impermanence costs reassurance — a user may decline to rely on notes at all. That is the correct outcome and still a real loss. There is also no grouping at forty entries; the gutter is the only structure.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:18px; align-items:flex-start">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#8c491a; width:26px; flex:none; padding-top:3px">09</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="font-size:17px; font-weight:700; letter-spacing:-.01em">The design system now documents the real blocks</div>
+        <p style="margin:0; font-size:14px; line-height:1.65; color:#3c372f">"Content blocks" is now "What the board shows": section header with its summary, task row, file row, working state, agent note. The buttons, inputs, chips and toggles stay as the style reference for collapse, expand, copy and dismiss.</p>
+        <p style="margin:0; font-size:13.5px; line-height:1.65; color:#645c50"><strong style="color:#8c491a">Cost.</strong> The system no longer shows a primary button in a product context, so its most prominent specimen is now the least used control in the app.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:16px">
+    <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:28px; margin:0">Open questions</h2>
+    <div style="display:flex; flex-direction:column; gap:12px">
+      <div style="background:#e8dcc5; border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:5px">
+        <div style="font-size:14.5px; font-weight:700">Should the <span style="font-family:'JetBrains Mono',monospace; font-size:13.5px">now</span> marker go stale?</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#3c372f"><strong>Default:</strong> after ten minutes with no report, the tag drops to muted and the teal rule stays. The board still shows where the agent was last seen without claiming that is where it is.</div>
+      </div>
+      <div style="background:#e8dcc5; border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:5px">
+        <div style="font-size:14.5px; font-weight:700">Does the whole board follow the selected session?</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#3c372f"><strong>Default:</strong> yes. One session is selected and every tab shows it. No merged view — two repos interleaved in one history list would be unreadable.</div>
+      </div>
+      <div style="background:#e8dcc5; border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:5px">
+        <div style="font-size:14.5px; font-weight:700">What order do session pills sit in?</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#3c372f"><strong>Default:</strong> order of declaration, not recency. Most-recently-heard sorting moves pills under the cursor while you are aiming at one.</div>
+      </div>
+      <div style="background:#e8dcc5; border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:5px">
+        <div style="font-size:14.5px; font-weight:700">Should × be labelled something other than ×?</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#3c372f"><strong>Default:</strong> keep ×, add "clears this board's copy" to the tooltip. If dismissal turns out to confuse in use, the fallback is a small "hide" text button rather than an undo toast — the board owns no state to undo into.</div>
+      </div>
+      <div style="background:#e8dcc5; border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:5px">
+        <div style="font-size:14.5px; font-weight:700">Does the Notes tab need an unread signal?</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#3c372f"><strong>Default:</strong> a muted dot on the tab when a note arrives while you are elsewhere, cleared on visit. No count — counting invites clearing, and there is nothing to clear.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:14px">
+    <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:28px; margin:0">Not designed yet</h2>
+    <div style="display:flex; flex-direction:column; gap:7px; font-size:14px; line-height:1.65; color:#3c372f">
+      <div>The torn-off window. The <strong>+</strong> affordance is drawn; what a detached section looks like, and how it reports its own session, is not.</div>
+      <div>Overflow. Every view is drawn at a comfortable height. Scrolling, sticky section headers and what happens to five open sections in a 500px-tall window are all open.</div>
+      <div>Long sessions. "Show all 18" has no destination, and the Notes list is drawn at six entries, not forty.</div>
+      <div>The agent going away mid-session — process exit, socket drop — as distinct from simply being quiet.</div>
+    </div>
+  </section>
+
+  <section style="display:flex; flex-direction:column; gap:14px">
+    <h2 style="font-family:'Caprasimo', system-ui, sans-serif; font-size:28px; margin:0">Future work</h2>
+    <div style="display:flex; flex-direction:column; gap:7px; font-size:14px; line-height:1.65; color:#3c372f">
+      <div>Keyboard navigation across tabs, sections and rows.</div>
+      <div>Contrast over a light editor theme, once the panel can sit translucent (US-003).</div>
+      <div>Per-section detach and multi-monitor arrangements, beyond the single tear-off.</div>
+      <div>A compact 24px density for users who keep the board narrow all day.</div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+</body>
+</html>

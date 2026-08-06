@@ -106,6 +106,32 @@ this project is pre-release and not yet versioned.
   empirical and survive the restart — notably `- [x]` ×554 vs `- [X]` ×341
   inside a single repo, which would break a case-sensitive parser.
 
+- **The app never reads the user's repository.** No `tasks.md` parsing, no
+  `specs/` walk, no `.specify/feature.json`, no git — stories, tasks, criteria,
+  titles, states and file lists all arrive by push, and the board is a renderer
+  of what it is told. Supersedes the two-state task decision, whose only reason
+  was the checkbox. Amends the state model: nothing is re-derivable from the
+  repo, so every launch starts empty. Moves the Spec-Kit format grounding from
+  our parser, which no longer exists, to the agent-side tool.
+- **Task status is a free string**, not an enum. Recognised values (todo,
+  active, blocked, done) carry the round 1 colours; anything else renders
+  neutral, since an arbitrary string cannot honestly be given a signal colour.
+- **Every push is a full snapshot** and replaces what the board holds — no
+  deltas, no merging. Idempotent and self-healing, which matters more now that
+  no repo read remains to correct a drifted board. Notes stay the one exception,
+  appending rather than replacing.
+- **Port discovery decided:** fixed port plus a short fallback range, resolved
+  by a `/v1/health` check that must match on payload rather than on the
+  connection succeeding — probing a range means knocking on ports owned by other
+  software.
+- **Unattributed sessions:** pushes with no MCP server process behind them share
+  one session per repo, labelled as a script or hook, so a per-tool-call hook
+  cannot fill the switcher with one-shot entries.
+- **Design round 2 landed** — revised Overview Panel plus a decisions doc,
+  delivering all six briefed revisions. One of its decisions is already
+  superseded: it ran before the no-repo-reads and free-string-status calls, so
+  task-state rendering owes a round 3. Its `focus`-versus-status split survives
+  and is now load-bearing.
 - **Notes decided:** the tab holds notes the agent writes, either because the
   user asked it to record something or because the agent judged it worth
   recording. The user never types into the board, so Notes stays inside the

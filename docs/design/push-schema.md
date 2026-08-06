@@ -1,6 +1,7 @@
 # The push schema
 
-**Status:** draft, for review. **Written:** 2026-08-06.
+**Status:** draft, for review. **Written:** 2026-08-06, rewritten the same day
+for decisions 24–26.
 
 The contract every ingest surface wraps. Decision 6 made the HTTP API the one
 internal service and the MCP server and CLI thin adapters over it; this is the
@@ -12,59 +13,91 @@ numbered there and referenced throughout.
 
 ## What a push is
 
-One statement, from one agent, about what it is doing right now. Not an event
-log and not a diff: each push replaces the previous state for that session. The
-board holds the latest and nothing else, per decision 6.
+**The complete state of one session, replacing whatever the board held for it**
+(decision 26). Not a delta and not an event. The agent sends the whole picture
+each time it reports.
 
-Deliberately **not** in the payload:
+That is the direct consequence of decision 24: the app never opens a file in the
+user's repository. No `tasks.md` parsing, no `specs/` walk, no
+`.specify/feature.json`, no git. If it is on screen, it arrived in a push — or,
+for the three activity sections, from the Claude Code transcript (decision 10).
+
+Snapshot semantics are what make this safe. A dropped, duplicated or
+out-of-order push costs nothing, because the next one is authoritative. Under
+decision 24 that matters more than it usually would: there is no repo read left
+to correct a board that has drifted.
+
+Still deliberately **not** in the payload:
 
 | Not here | Why |
 |---|---|
-| Task status | Comes from `tasks.md`, checked or unchecked (decision 19). |
 | Prompt, history, files in context | Comes from the transcript (decision 10). |
-| Changed files, diff stats | Derived from git when the board updates. |
 | Presentation, layout, emphasis | The board owns layout (decision 7). |
 | Anything the board should do | Flow is one-way (decision 11). |
+| Notes | They append rather than replace. Separate call, below. |
 
-That leaves a small payload, which is the point. The more of the screen the
-agent has to remember to describe, the less of it will be accurate.
+## The envelope
 
-## The payload
+Identity, and none of it composed by the model:
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `repo` | absolute path | yes | Identifies the session and resolves the transcript directory by slug (decisions 13, 10). |
 | `branch` | string | yes | Shown beside the repo in the title bar. |
-| `sessionId` | string | yes | Distinguishes two agents in the same repo. See open point 1. |
-| `feature` | string | no | The `specs/` directory name, e.g. `002-session-hook`. Absent means "whatever `.specify/feature.json` points at". |
-| `task` | string | no | Normalised task ID, e.g. `T013`. Absent means working, but not on a numbered task. |
-| `note` | string | no | Free text for the human. The only field the model composes (decision 7). |
-| `chip` | enum | no | `idle` \| `watching` \| `thinking` \| `needs-you`. Defaults to `thinking` on a push that omits it. |
+| `sessionId` | string | yes | One per MCP server process. Pushes with no such process behind them share one *unattributed* session per repo, labelled as a script or hook (decision 23). |
 
-**Normalisation is ours, not the agent's.** The grounding found task IDs bare
-(`T001`) and bold (`**T001**`) inside one repo, and checkbox case inconsistent
-in the same file. The board normalises on read; `task` accepts either form and
-is stored bare. An agent that copies an ID straight out of `tasks.md` is never
-wrong.
+The board stamps receipt time itself. No client clock is ever trusted — the
+"heard 40s ago" display (decision 15) counts from arrival.
 
-**`chip` is the only way an agent asks for attention.** Under decisions 11 and
-15 the board never escalates on its own and never sets a chip on a timer, so
-`needs-you` is the entire mechanism. Worth stating plainly in the tool
-description, because an agent that does not know this will sit blocked and
-silent.
+## The body
 
-**`note` is unvalidatable by construction** and we accept that (decision 16 —
-nothing is reconciled). Cap its length, store it as text, render it as text.
-Never as markup: it is attacker-influenceable in the same sense any model output
-is, and it lands in a desktop app.
+Everything the board renders. All of it optional: a push may carry only what the
+agent knows, and the board shows what it has.
 
-## The second push: a note
+| Key | Shape | Notes |
+|---|---|---|
+| `feature` | `{ id, title, specPath? }` | The feature the session is working. |
+| `stories` | array of `{ id, title, priority?, status?, asA?, want?, soThat?, criteria[], taskIds[] }` | Drives the User Stories tab. |
+| `tasks` | array of `{ id, storyId?, title, status, detail?, checks[], files[] }` | Drives the Tasks tab and the Overview spec section. |
+| `plan` | `{ steps: [ { text, status, detail? } ] }` | The Plan section. |
+| `focus` | `{ task?, note?, chip? }` | What is happening right now. |
+| `changedFiles` | array of `{ path, change, added?, removed?, note? }` | The Changed files section. Pushed rather than read from git, since we do not read the repo. Lowest-priority section (decision 12). |
 
-Everything above **replaces**. A note **appends** — notes accumulate over a
-session, which is the one place the board holds a growing list rather than a
-latest value (decisions 20 and 21). It is therefore a separate call, not a
-field on the status push, because the two have opposite semantics and folding
-them together would make `note` mean different things on different calls.
+### `status` is a free string
+
+On a task, a story or a plan step, `status` is whatever text the agent chooses
+(decision 25). The board maps recognised values — `todo`, `active`, `blocked`,
+`done` and obvious synonyms — onto the round 1 colours, and renders anything
+else in neutral grey with the text shown as-is. An arbitrary string cannot
+honestly be assigned a signal colour when teal, blue and ember each mean
+something specific.
+
+### `focus` is not a status
+
+Which task is being worked on is tracked separately from what state that task is
+in. This split came out of design round 2 and it is load-bearing: with
+open-ended status strings there is no state the board can reliably read
+"currently active" out of, so `focus.task` carries it explicitly. The board
+renders it as the teal left rule and `now` tag.
+
+`focus.chip` is one of `idle`, `watching`, `thinking`, `needs-you`. **This is
+the entire mechanism by which an agent asks for attention** — decisions 11 and
+15 mean the board never escalates on its own and never sets a chip on a timer.
+Say so in the tool description, or an agent will sit blocked and silent.
+
+### Normalising is the agent's job now
+
+Decision 24 removed our parser, so the Spec-Kit format traps in STATUS.md move
+to the agent side. Whatever tool reads `tasks.md` must handle `- [x]` and
+`- [X]`, bare `T001` and bold `**T001**`, tasks nesting under `###`, and
+hand-drifted headers. What arrives here should already be normalised. The board
+does not second-guess it (decision 16).
+
+## The second call: a note
+
+Notes **append** where everything else replaces — the one exception, and the
+reason it cannot be a field on the snapshot. Folding it in would force the agent
+to resend every note it had ever written in order to add one.
 
 ```
 POST http://127.0.0.1:<port>/v1/note
@@ -72,55 +105,59 @@ POST http://127.0.0.1:<port>/v1/note
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `repo`, `branch`, `sessionId` | — | yes | Same session identity, same derivation. |
-| `text` | string | yes | The note. Written either because the user asked for one or because the agent judged it worth recording. |
+| `repo`, `branch`, `sessionId` | — | yes | Same envelope. |
+| `text` | string | yes | The note itself. |
+| `source` | string | no | Why it exists, in the agent's voice — "you asked", "noticed while editing". Round 2 renders this. |
 
-Exposed as `cocopilot_note` over MCP and `cocopilot note "…"` on the CLI.
-
-Notes are volatile like everything else — they clear when the app closes
-(decision 21). Anything worth keeping gets written into the repository by the
-**agent**, with its own file tools, which is outside this API entirely. The tool
+Notes are volatile like everything else and clear when the app closes
+(decision 21). Anything worth keeping is written into the repository **by the
+agent**, with its own file tools, which is outside this API entirely. The tool
 description should say so, or an agent will treat the board as storage.
 
-Same plain-text handling as `note` above: length-capped, rendered as text, never
-as markup.
+## What the model composes versus what the surface derives
 
-## What the agent supplies versus what the surface fills in
-
-Only `task`, `note`, `chip` and a note's `text` should ever come from the model.
-Everything else the surface derives:
+Only content comes from the model — `focus`, and the titles, statuses, criteria
+and note text inside the body. The envelope is always derived:
 
 - **`repo`** — the MCP server's working directory; the CLI's `git rev-parse
   --show-toplevel`.
-- **`branch`** — read from git at push time.
-- **`sessionId`** — generated once per MCP server process, which matches the
-  lifetime of a Claude Code session, since Claude Code spawns one server per
-  session.
-- **timestamp** — never sent. The board stamps on receipt, which is what
-  decision 15's "last heard from 4m ago" counts from. A client-supplied clock
-  would be one more thing that can be wrong.
-
-This split matters more than it looks. Three fields is a thing an agent can get
-right mid-task; seven is a form it will fill in badly.
+- **`branch`** — read from git at push time by the surface.
+- **`sessionId`** — generated once per MCP server process, matching the lifetime
+  of a Claude Code session.
+- **timestamp** — never sent; stamped on receipt.
 
 ## The three surfaces
 
-All three resolve to one `POST` against the local service. Decision 18 binds it
-to `127.0.0.1` only — no auth, no TLS.
+All resolve to one `POST` against the local service, bound to `127.0.0.1` only
+with no auth and no TLS (decision 18).
 
 ```
 POST http://127.0.0.1:<port>/v1/push
+POST http://127.0.0.1:<port>/v1/note
+GET  http://127.0.0.1:<port>/v1/health   → { "app": "cocopilot", "version": "…" }
 ```
 
-**MCP** — one tool, `cocopilot_report`, exposing `task`, `note`, `chip`. The
-server starts cleanly whether or not the app is running and connects lazily per
-call (decision 6), because Claude Code discovers an MCP tool list once, at
-session start.
+**MCP** — `cocopilot_report` and `cocopilot_note`. The server starts cleanly
+whether or not the app is running and connects lazily per call (decision 6),
+because Claude Code discovers an MCP tool list once, at session start.
 
-**CLI** — `cocopilot report --task T013 --note "…" --chip needs-you`, for hooks
-and scripts. Same three fields, same derivation.
+**CLI** — `cocopilot report` and `cocopilot note "…"`, for hooks and scripts.
 
 **HTTP** — the full payload, for anything that is neither.
+
+## Finding the port
+
+The app claims a fixed port and walks up a short documented range if it is
+taken. Clients try the same sequence and use the first that identifies itself
+via `/v1/health`. Nothing is written to disk, keeping this consistent with
+decision 21.
+
+**Match on the payload, never on the connection succeeding.** Probing a range
+means knocking on ports owned by unrelated local software, and a client that
+treats any 200 as success will POST prompt text and file paths into some other
+program.
+
+Nothing in the range answering means the board is not running — already handled.
 
 ## When the board is not running
 
@@ -135,27 +172,28 @@ derails the work it monitors is worse than no monitoring tool:
 Localhost is not a trust boundary — any local process can reach this API, so
 every field is validated regardless of decision 18 (rule 2, `AGENTS.md`):
 
-- `repo` must be an existing directory and a git working tree. A push naming a
-  path that is not either is rejected, not rendered.
-- `feature` and `task` are matched against what was actually parsed out of the
-  repo. An unrecognised value is shown as unrecognised rather than silently
-  creating a phantom row.
-- `note` is length-capped and rendered as plain text, never as markup.
-- `chip` is a closed enum; anything else is rejected.
+- `repo` must be an existing directory. This is a path check, not a repo read —
+  we never open anything inside it.
+- `sessionId` and `branch` are length-capped opaque strings.
+- All free text — statuses, titles, notes, prose — is length-capped, capped in
+  count per collection, and rendered as **plain text, never markup**. It is
+  model-composed and lands in a desktop app.
+- Unknown keys are ignored rather than rejected, so an agent running a newer
+  tool against an older board degrades instead of failing.
 
-The realistic abuse here is a local process putting misleading text on the
-board, not code execution. Small blast radius, but small is not none.
+There is nothing to validate task and story identifiers *against* any more —
+decision 24 removed the parsed repo they used to be checked against. Whatever
+the agent sends is what the board shows.
 
-## Open points
+The realistic abuse is a local process putting misleading text on the board, not
+code execution. Small blast radius, but small is not none.
 
-1. **`sessionId` when the agent is not Claude Code.** Generating it per MCP
-   server process works because Claude Code spawns one per session. A CLI call
-   from a hook has no such process to belong to. Either the CLI derives a
-   stable id from the repo path and terminal, or hook-driven pushes join a
-   single "unattributed" session per repo.
-2. **A push naming a feature the board has not scanned.** Rescan on demand, or
-   show the pushed identifier alone until a scan catches up. The second is
-   cheaper and honest, and fits decision 12 — the AI caused the change, so the
-   AI's word for it is what is on screen.
-3. **Port discovery.** The MCP server has to find the app's port. A fixed port
-   collides; a written port file is one more piece of state. Not yet decided.
+## Costs carried
+
+- **The board is only as correct as the agent.** No independent source remains
+  to catch a stale or wrong push, by construction (decisions 16, 24).
+- **Every launch starts empty**, because nothing is re-derivable from disk. The
+  empty state is a routine screen, not a first-run one.
+- **The snapshot is expensive for the agent**, which must hold or rebuild the
+  whole picture to resend it. The agent-side tool should be efficient about
+  reconstructing it, and this is the main argument to revisit deltas later.

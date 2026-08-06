@@ -18,10 +18,11 @@ Since round 1, the architecture settled in ways that touch the design:
 
 - **One-way.** Data flows agent → board and never back. The board never sends
   anything to the agent and never writes to the user's repository.
-- **The AI drives the screen.** The window never refreshes itself — no polling,
-  no watching the repo. It follows the agent's reports and Claude Code's own
-  session transcript, which is where the prompt, history and in-context file
-  list come from.
+- **The AI drives the screen, and the app never reads the repository.** Not the
+  task files, not the specs, not git. Every story, task, criterion and status on
+  screen arrived because the agent reported it. The only file the app reads is
+  Claude Code's own session transcript, which is where the prompt, history and
+  in-context file list come from. The board is a renderer of what it is told.
 - **The board never renders a verdict.** It shows elapsed time — "last heard
   from 4m ago" — and never decides an agent is stuck. A healthy agent goes
   quiet for minutes during a typecheck.
@@ -58,27 +59,23 @@ that changes about them.
 
 ## Revisions
 
-### 1. Tasks have two states, not four
+### 1. Task states are open-ended
 
-A Spec-Kit checkbox carries checked or unchecked and nothing else, so *active*
-and *blocked* have no source and are being dropped from the data model. The
-agent's prose carries what is actually happening instead.
+Round 1's four states — todo, active, blocked, done — are right and stay exactly
+as drawn. What changed is that the set is no longer closed: the agent sends
+whatever string describes the task, so a status can arrive that none of the four
+treatments cover. "needs review", "deferred", "waiting on CI".
 
-Please rework the Stories tab, the Tasks tab and the Overview *Spec* section so
-a task is only ever **done** or **not done**. The blue in-progress dot and the
-ember blocked treatment on task rows both go.
+So please keep the four as they are, and define the **fallback**: how an
+unrecognised status renders. The working assumption is neutral muted grey with
+the status text shown as-is, on the reasoning that an arbitrary string cannot
+honestly be assigned a signal colour — teal, blue and ember all mean something
+specific, and guessing wrong is worse than staying quiet. Confirm or improve
+that.
 
-**Do not over-apply this.** These are session state, not task state, and they
-stay exactly as they are:
-
-- The panel status chips — Idle, Watching, Thinking, Needs you.
-- The *Plan* section, including its progress bar and its live
-  `editing src/hooks/useSession.ts` line.
-
-The open question for you: with two states, task rows lose most of their colour.
-Does the list still read at a glance, or does something else need to carry the
-"this is the one being worked on right now" signal? That signal is worth keeping
-even though the *state* is gone.
+Worth checking while you are in there: a task row now has to display arbitrary
+status text rather than an icon alone. Does the row still hold up when the
+status is fourteen characters instead of a dot?
 
 ### 2. The Design System's "Content blocks" no longer match the product
 
@@ -122,15 +119,21 @@ back.
 The hard part is the transition. A control that materialises in the chrome is
 jarring if it is not handled deliberately.
 
-### 5. The empty state
+### 5. The empty state, which is a routine screen and not a first-run one
 
-A board that has been opened but has had nothing reported to it yet has no repo,
-no branch, no spec and nothing to show. Round 1 has no screen for this, and it
-is the first thing every new user sees.
+A board that has had nothing reported to it yet has no repo, no branch, no spec
+and nothing to show. Round 1 has no screen for this.
+
+This matters more than it first appears. Because the app reads nothing from
+disk, **every launch starts empty** — not just the first one. Close the window
+mid-feature and reopen it and there is nothing there until the agent next
+reports. So this is a screen the user sees regularly, not a one-time welcome.
 
 It should make clear that the board is waiting on an agent rather than broken,
-without turning into a setup wizard — there is nothing for the user to
-configure, because the AI supplies everything.
+and it must not become a setup wizard — there is nothing for the user to
+configure, because the AI supplies everything. It should also carry its weight
+at the size of a panel that lives beside an editor, rather than assuming a
+full window of space for an illustration.
 
 ### 6. Notes — now decided, please design it
 

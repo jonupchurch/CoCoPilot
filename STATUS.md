@@ -24,8 +24,8 @@ should be written until the design docs exist and are reviewed.
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
-| Design exports (`resources/`) | ✅ Round 1 landed — Brand, Design System, Overview Panel (4 tabs); canon for look and feel per decision 8 |
-| Design revisions owed | 🟡 Brief written — [`resources/designprompt2.md`](resources/designprompt2.md); needs a Claude Design run |
+| Design exports (`resources/`) | ✅ Round 2 landed — Brand, Design System, Overview Panel (revised), Round 2 decisions doc; canon per decision 8 |
+| Design round 3 owed | ⬜ Task-state rendering only — round 2 ran before decisions 24–25 (see below) |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
@@ -268,7 +268,11 @@ their head across a long agent session.
       is not authorization. The blast radius is small given decisions 11 and 16
       (nothing is written to the repo and nothing is reconciled), but "small" is
       not "none": the realistic abuse is putting misleading text on the board.
-19. **A task has two states, and they come from the file.** Checked or
+19. ~~**A task has two states, and they come from the file.**~~ **Superseded by
+    decision 24**, which removed the file as a source. Kept for the reasoning
+    trail; the state set is re-decided in decision 25. Original text follows.
+
+    Checked or
     unchecked, read from `tasks.md`. There is no *active* and no *blocked* in the
     data model; the agent's prose carries what is actually happening.
     - *This is an explicit, informed override of decision 8*, taken knowing the
@@ -318,13 +322,101 @@ their head across a long agent session.
     - *Consequence for the build:* no database, no migrations, no storage format
       to version, and no corrupt-state recovery path. This is a substantial
       amount of work that simply does not exist.
+22. **Port discovery is a fixed port plus a documented fallback range,** resolved
+    by a health check. The app claims the fixed port and walks up a short range
+    if it is taken; the MCP server and CLI probe the same sequence and use the
+    first that identifies itself as CoCoPilot. Nothing is written to disk, which
+    keeps this consistent with decision 21.
+    - *The health check must identify us specifically.* Probing a range means
+      knocking on ports owned by unrelated local software, so a client that
+      treats any 200 as success would POST prompt text and file paths into some
+      other program. Match on the payload, never on the connection succeeding.
+    - *Degrades into an already-handled case:* nothing in the range answering
+      means the board is not running, which decision 6 already covers.
+23. **Pushes with no MCP server process behind them share one "unattributed"
+    session per repo,** labelled in the UI as a script or hook rather than
+    presented as an agent. Hooks and scripts have no process whose lifetime maps
+    to a session, and generating an id per invocation would fill decision 14's
+    switcher with one-shot entries — a hook firing per tool call would create a
+    session per call.
+    - *Accepted cost:* two unrelated scripts in one repo are indistinguishable.
+    - *Honest labelling matters here.* An unattributed push is not an agent
+      narrating, and showing it as one would misrepresent where the information
+      came from — the thing decision 16 already declined to police.
+24. **The app never reads the user's repository. The agent pushes everything.**
+    No `tasks.md` parsing, no `specs/` walk, no `.specify/feature.json`, no git.
+    Stories, tasks, acceptance criteria, titles, states and file lists all
+    arrive by push. The board is a renderer of what it is told.
+    - **Supersedes decision 19.** Task state came from the file because the file
+      was the only source; with nothing read from disk, state returns to the
+      push. The two-state limit was a consequence of the checkbox, and that
+      constraint is gone.
+    - *Amends decision 6.* The "two kinds of state, only one is ours" split no
+      longer includes repo files. What the board shows is now entirely pushes
+      plus the Claude Code transcript. Nothing is re-derivable from the
+      repository, so after a restart the board is empty until the agent pushes
+      again — which makes the empty state a routine screen rather than a
+      first-run one.
+    - *Moves the Spec-Kit grounding from us to the agent.* The `- [x]` versus
+      `- [X]` trap, bare versus bold task IDs, tasks nesting under `###` — none
+      of that is our parser's problem any more, because we have no parser. It
+      becomes guidance for the agent-side tool and its prompt. The findings are
+      no less true; they just apply somewhere else now. See below.
+    - *Makes decision 16 trivially true.* There is nothing to reconcile the
+      transcript against, because there is no independently-read source left.
+    - *Cost, accepted:* a much larger payload, and the board can only be as
+      correct as the agent is. An agent that stops pushing leaves a board frozen
+      at its last word, with no ability to notice the repo moved underneath it.
+    - *Not affected:* the Claude Code transcript (decision 10). That is not the
+      user's repository, and decision 12 already established that following the
+      file the AI writes is the AI updating the board.
+25. **Task status is a free string, not an enum.** The agent sends whatever
+    describes the task, and the board renders it. Chosen knowing the costs: two
+    sessions can describe the same situation differently, and there is no
+    guaranteed mapping from a status to a signal colour.
+    - *Loosens decision 7 for this one field.* "The schema fixes the skeleton"
+      still governs everything else — `repo`, `branch`, `sessionId` and the task
+      identifier stay typed and validated. The free-form set is now status,
+      the status note, and a note's text.
+    - *Derived, not asked — correct this if it is wrong:* the board keeps a
+      recognised-value table (todo, active, blocked, done, and the obvious
+      synonyms) mapped to the design's colours, and renders anything else in the
+      neutral muted grey. It is the only way to honour both this decision and
+      decision 8 — an arbitrary string cannot be assigned a signal colour, but
+      the common case should still look exactly like the design.
+    - *Changes the design brief.* Revision 1 in `resources/designprompt2.md`
+      flips from "cut tasks to two states" to "states are open-ended: render the
+      recognised set as designed, and define the unrecognised fallback."
+26. **Every push is a full snapshot and replaces what the board holds.** No
+    deltas, no merging. The agent sends the complete current picture for its
+    session each time it reports.
+    - *Rationale:* idempotent and self-healing. A dropped, duplicated or
+      out-of-order push costs nothing, because the next one is authoritative.
+      That matters more than usual under decision 24, where there is no repo
+      read left to correct a board that drifted.
+    - *Preserves decision 6's replace semantics* rather than introducing
+      accumulated state built from a sequence.
+    - *Cost:* a larger payload per call, and the agent must hold or rebuild the
+      whole picture in order to resend it — real context and time cost on every
+      update. The agent-side tool should be efficient about reconstructing it.
+    - *Notes remain the single exception,* and now the only one: they append
+      where everything else replaces (decision 20). Folding them into the
+      snapshot would force the agent to carry every note it has ever written
+      just to add one.
 
 ## What survives the restart
 
 **The Spec-Kit format grounding.** Verified against `../LMNTLZ` (21 features,
 1,076 task lines, Spec-Kit 0.12.12.dev0). This is empirical evidence about what
 real Spec-Kit files look like, not an architecture opinion, so it holds
-regardless of what gets built:
+regardless of what gets built.
+
+> **Whose problem this is changed.** Decision 24 removed our parser — the app
+> never reads the repository. These findings now apply to the **agent-side**
+> tool and its prompt, which is what actually reads `tasks.md` and pushes
+> normalised data. Every trap below is still a trap; it just gets sprung
+> somewhere else. Anything we ship that tells an agent how to read Spec-Kit
+> files needs this list.
 
 - Checkbox case is inconsistent *inside one repo* — `- [x]` ×554, `- [X]` ×341,
   `- [ ]` ×181. A case-sensitive parser silently misreads 341 completed tasks.
@@ -343,15 +435,61 @@ templates do not predict what real files look like.
 wireframes and design prompts from the previous round are gone; the exports now
 in `resources/` are the *new* round, landed the same day.
 
+## Design round 2
+
+Landed 2026-08-06 against [`resources/designprompt2.md`](resources/designprompt2.md):
+a revised Overview Panel plus a `CoCoPilot Round 2` decisions doc. It delivered
+all six revisions — open-ended widths breaking master–detail at 640px, a session
+row that slides in only at two sessions, dismiss that erases the board's copy
+alone, an empty state that says waiting rather than welcome, Notes as an
+explicitly impermanent transcript, and a Design System section retitled to what
+the board actually shows.
+
+**One decision in it is superseded.** Round 2 ran before decisions 24 and 25, so
+its decision 01 — "a task is done or not done, because a Spec-Kit checkbox
+carries one bit" — is built on a source we no longer read. The export implements
+it literally: `statusColor(s) { return s === 'done' ? teal : grey }`.
+
+The revision this needs is narrower than it looks. Round 2's decision 02 —
+separating *which task is being worked on* (a `focus` flag, teal left rule, mono
+`now` tag) from *what state it is in* — is exactly the right split, and it
+survives untouched. Arbitrary status strings need it more, not less. What round
+3 owes is only the status rendering: arbitrary text in the row, the recognised
+values (todo, active, blocked, done) carrying the round 1 colours, and a defined
+neutral fallback for everything else.
+
+### Round 2's own open questions, defaults not yet accepted
+
+The design doc proposes a default for each. None has been ruled on:
+
+1. **Does the `now` marker go stale?** *Default:* after ten minutes with no
+   report the tag mutes while the teal rule stays — showing where the agent was
+   last seen without claiming that is where it is.
+2. **Does the whole board follow the selected session?** *Default:* yes, one
+   session selected, every tab shows it. No merged view.
+3. **What order do session pills sit in?** *Default:* order of declaration, not
+   recency, so pills do not move under a cursor aiming at one.
+4. **Should the dismiss control be labelled something other than ×?** *Default:*
+   keep ×, with "clears this board's copy" in the tooltip.
+5. **Does Notes need an unread signal?** *Default:* a muted dot when a note
+   arrives while you are elsewhere, cleared on visit. No count.
+
+### Not designed yet, per round 2
+
+The torn-off window beyond the `+` affordance; overflow and scrolling anywhere,
+including sticky section headers and five open sections in a 500px-tall window;
+long sessions, where "Show all 18" has no destination and Notes is drawn at six
+entries rather than forty; and the agent going away mid-session — process exit
+or socket drop — as distinct from merely being quiet.
+
 ## Open questions
 
 Ordered roughly by how much downstream work each one blocks.
 
-1. **The push schema** — drafted in
+1. **The push schema** — drafted and then rewritten for decisions 24–26 in
    [docs/design/push-schema.md](docs/design/push-schema.md), **awaiting review**.
-   Three open points remain inside it: how `sessionId` works for a push that is
-   not from an MCP server process, what the board shows when a push names a
-   feature it has not scanned, and how the MCP server discovers the app's port.
+   All three of its original open points are now decided (23, 22, and 24
+   respectively). What is left is review, not unknowns.
 2. **Packaging and distribution** per platform, including code signing.
    Sharpened by decision 6: Claude Code *spawns* the MCP server as its own child
    process, so an Electron app has to ship a separately-spawnable Node entry

@@ -13,6 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   body { background: #efe4d2; }
+  @keyframes sessionRowIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes sessionTint { 0% { background: #1e2630; } 100% { background: transparent; } }
   a { color: #37bda9; }
   a:hover { color: #2a9c8c; }
 </style>
@@ -28,11 +30,28 @@
         <span style="width:11px; height:11px; border-radius:999px; background:#37bda9; margin-left:-3.5px"></span>
       </div>
       <span style="font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; letter-spacing:-.03em; color:#eff3f4">CoCoPilot</span>
-      <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">· feat/session-hook</span>
-      <span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600; margin-left:auto; display:inline-flex; align-items:center; gap:6px"><span style="width:5px; height:5px; border-radius:999px; background:#37bda9"></span>Watching</span>
-      <span style="width:22px; height:22px; border-radius:999px; color:#948a7f; display:inline-flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer" style-hover="background:#1a1817; color:#eff3f4">⋯</span>
+      <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">· feat/session-hook</span></sc-if>
+      <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; margin-left:auto; white-space:nowrap; flex:none">heard 40s ago</span></sc-if>
+      <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}"><span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; flex:none"><span style="width:5px; height:5px; border-radius:999px; background:#37bda9"></span>Watching</span></sc-if>
+      <sc-if value="{{ isEmpty }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; margin-left:auto; white-space:nowrap">nothing heard yet</span></sc-if>
+      <span style="width:22px; height:22px; border-radius:999px; color:#948a7f; display:inline-flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer; flex:none" style-hover="background:#1a1817; color:#eff3f4">⋯</span>
     </div>
 
+    <sc-if value="{{ multiSession }}">
+      <div style="display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid #2b2724; overflow-x:auto; animation:sessionRowIn 220ms ease-out">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; flex:none; padding-left:4px">Sessions</span>
+        <sc-for list="{{ sessionPills }}" as="p" hint-placeholder-count="2">
+          <div onClick="{{ p.select }}" style="{{ p.style }}">
+            <span style="{{ p.dotStyle }}"></span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#eff3f4; white-space:nowrap">{{ p.repo }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; white-space:nowrap">{{ p.branch }}</span>
+            <span onClick="{{ p.dismiss }}" title="Dismiss this session" style="width:16px; height:16px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; color:#948a7f; cursor:pointer" style-hover="background:#2b2724; color:#eff3f4">×</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex; gap:2px; padding:0 8px; border-bottom:1px solid #2b2724">
       <div onClick="{{ goOverview }}" style="padding:9px 12px 8px; cursor:pointer; display:flex; flex-direction:column; gap:8px; align-items:center">
         <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px; font-weight:600; color:#eff3f4">Overview</span></sc-if>
@@ -58,8 +77,27 @@
         <span style="width:22px; height:22px; border-radius:6px; color:#948a7f; display:inline-flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer" style-hover="background:#1a1817; color:#eff3f4">+</span>
       </div>
     </div>
+    </sc-if>
 
-    <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ isEmpty }}">
+      <div style="padding:64px 32px 60px; display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center">
+        <div style="display:flex; align-items:center; opacity:.5">
+          <span style="width:22px; height:22px; border-radius:999px; background:#7fb2e8"></span>
+          <span style="width:22px; height:22px; border-radius:999px; background:#37bda9; margin-left:-7px"></span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:7px; max-width:300px">
+          <div style="font-size:15px; font-weight:700; color:#eff3f4">Waiting for an agent</div>
+          <div style="font-size:13px; line-height:1.6; color:#c9c3bb">Nothing has been reported yet. Start Claude Code in a Spec-Kit repository and this board fills in as it works.</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; background:#1a1817; border:1px solid #2b2724; border-radius:999px; padding:6px 14px">
+          <span style="width:6px; height:6px; border-radius:999px; background:#948a7f"></span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">listening · nothing heard yet</span>
+        </div>
+        <div style="font-size:12.5px; line-height:1.6; color:#948a7f; max-width:300px">The agent supplies the repository, branch and spec. There is nothing to set up here.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ true }}">
     <div style="display:flex; flex-direction:column">
 
       <div style="padding:14px 14px 12px">
@@ -200,7 +238,7 @@
             <div style="display:flex; align-items:center; gap:8px">
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9">US-002</span>
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">P1</span>
-              <span style="background:#1c2a28; color:#37bda9; border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; margin-left:auto">Active</span>
+              <span style="background:#1a1817; color:#948a7f; border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; margin-left:auto">Open</span>
             </div>
             <div style="font-size:13.5px; font-weight:700; color:#eff3f4">Share one session fetch across routes</div>
             <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">specs/002-session-hook/spec.md</div>
@@ -216,10 +254,11 @@
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; flex:none">T-012</span>
               <span style="font-size:12.5px; color:#948a7f; flex:1">Define the hook signature</span>
             </div>
-            <div style="display:flex; align-items:center; gap:9px; padding:5px 2px">
-              <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #7fb2e8; box-sizing:border-box; flex:none; display:inline-flex; align-items:center; justify-content:center"><span style="width:5px; height:5px; border-radius:999px; background:#7fb2e8"></span></span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7fb2e8; flex:none">T-013</span>
+            <div style="display:flex; align-items:center; gap:9px; padding:5px 2px 5px 6px; border-left:2px solid #37bda9; margin-left:-8px">
+              <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #3d3833; box-sizing:border-box; flex:none"></span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; flex:none">T-013</span>
               <span style="font-size:12.5px; font-weight:600; color:#eff3f4; flex:1">Implement useSession</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9">now</span>
             </div>
             <div style="display:flex; align-items:center; gap:9px; padding:5px 2px">
               <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #2b2724; box-sizing:border-box; flex:none"></span>
@@ -300,8 +339,30 @@
     </div>
     </sc-if>
 
-    <sc-if value="{{ isStories }}">
-    <div style="display:flex; align-items:stretch; min-height:540px">
+    <sc-if value="{{ showStories }}">
+    <div style="{{ splitStyle }}">
+      <sc-if value="{{ isNarrow }}">
+        <div style="padding:12px 14px; border-bottom:1px solid #2b2724; position:relative">
+          <div onClick="{{ toggleDrop }}" style="background:#1a1817; border:1px solid #2b2724; border-radius:8px; padding:8px 11px; display:flex; align-items:center; gap:9px; cursor:pointer" style-hover="border-color:#3d3833">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9; white-space:nowrap; flex:none">{{ story.id }}</span>
+            <span style="font-size:13px; color:#eff3f4; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ story.title }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; white-space:nowrap; flex:none">{{ story.taskSummary }}</span>
+            <span style="font-size:9px; color:#948a7f">▼</span>
+          </div>
+          <sc-if value="{{ dropOpen }}">
+            <div style="position:absolute; left:14px; right:14px; top:52px; z-index:5; background:#1a1817; border:1px solid #3d3833; border-radius:12px; box-shadow:0 14px 34px rgba(0,0,0,.55); padding:4px; display:flex; flex-direction:column">
+              <sc-for list="{{ storyRows }}" as="row" hint-placeholder-count="5">
+                <div onClick="{{ row.select }}" style="{{ row.optionStyle }}">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:{{ row.idColor }}; white-space:nowrap; flex:none">{{ row.id }}</span>
+                  <span style="font-size:12.5px; color:#eff3f4; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ row.title }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ row.taskSummary }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isWide }}">
       <div style="width:268px; border-right:1px solid #2b2724; display:flex; flex-direction:column; flex:none">
         <div style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px">
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Stories</span>
@@ -310,23 +371,27 @@
         <sc-for list="{{ storyRows }}" as="row" hint-placeholder-count="5">
           <div onClick="{{ row.select }}" style="{{ row.rowStyle }}">
             <div style="display:flex; align-items:center; gap:8px">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:{{ row.idColor }}">{{ row.id }}</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ row.priority }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:{{ row.idColor }}; white-space:nowrap; flex:none">{{ row.id }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ row.priority }}</span>
               <span style="{{ row.chipStyle }}">{{ row.status }}</span>
             </div>
             <div style="font-size:12.5px; line-height:1.45; color:#eff3f4">{{ row.title }}</div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ row.taskSummary }}</div>
+            <div style="display:flex; align-items:center; gap:7px">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ row.taskSummary }}</span>
+              <sc-if value="{{ row.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9">· now</span></sc-if>
+            </div>
           </div>
         </sc-for>
       </div>
+      </sc-if>
 
       <div style="flex:1; display:flex; flex-direction:column; gap:14px; padding:14px 16px 18px; min-width:0">
         <div style="display:flex; flex-direction:column; gap:7px">
           <div style="display:flex; align-items:center; gap:8px">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9">{{ story.id }}</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ story.priority }}</span>
-            <span style="background:#1a1817; color:#948a7f; border-radius:999px; padding:2px 9px; font-size:10.5px; font-weight:600">{{ story.status }}</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; margin-left:auto">{{ story.spec }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9; white-space:nowrap; flex:none">{{ story.id }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ story.priority }}</span>
+            <span style="background:#1a1817; color:#948a7f; border-radius:999px; padding:2px 9px; font-size:10.5px; font-weight:600; white-space:nowrap; flex:none">{{ story.status }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; margin-left:auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ story.spec }}</span>
           </div>
           <div style="font-size:16px; font-weight:700; letter-spacing:-.01em; color:#eff3f4">{{ story.title }}</div>
         </div>
@@ -350,11 +415,12 @@
         <div style="display:flex; flex-direction:column; gap:8px">
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Tasks</div>
           <sc-for list="{{ story.tasks }}" as="t" hint-placeholder-count="4">
-            <div style="display:flex; align-items:center; gap:9px; padding:3px 0">
+            <div style="{{ t.rowStyle }}">
               <span style="{{ t.dotStyle }}"></span>
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; flex:none">{{ t.id }}</span>
-              <span style="font-size:12.5px; color:#c9c3bb; flex:1">{{ t.title }}</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ t.status }}</span>
+              <span style="font-size:12.5px; color:{{ t.titleColor }}; flex:1">{{ t.title }}</span>
+              <sc-if value="{{ t.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap">now</span></sc-if>
+              <sc-if value="{{ t.notFocus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ t.statusColor }}; white-space:nowrap">{{ t.status }}</span></sc-if>
             </div>
           </sc-for>
         </div>
@@ -367,38 +433,39 @@
     </div>
     </sc-if>
 
-    <sc-if value="{{ isTasks }}">
+    <sc-if value="{{ showTasks }}">
     <div style="display:flex; flex-direction:column">
       <div style="padding:12px 14px; border-bottom:1px solid #2b2724; position:relative">
         <div onClick="{{ toggleDrop }}" style="background:#1a1817; border:1px solid #2b2724; border-radius:8px; padding:8px 11px; display:flex; align-items:center; gap:9px; cursor:pointer" style-hover="border-color:#3d3833">
-          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9">{{ story.id }}</span>
-          <span style="font-size:13px; color:#eff3f4; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ story.title }}</span>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f">{{ story.taskSummary }}</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#37bda9; white-space:nowrap; flex:none">{{ story.id }}</span>
+          <span style="font-size:13px; color:#eff3f4; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ story.title }}</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; white-space:nowrap; flex:none">{{ story.taskSummary }}</span>
           <span style="font-size:9px; color:#948a7f">▼</span>
         </div>
         <sc-if value="{{ dropOpen }}">
           <div style="position:absolute; left:14px; right:14px; top:52px; z-index:5; background:#1a1817; border:1px solid #3d3833; border-radius:12px; box-shadow:0 14px 34px rgba(0,0,0,.55); padding:4px; display:flex; flex-direction:column">
             <sc-for list="{{ storyRows }}" as="row" hint-placeholder-count="5">
               <div onClick="{{ row.select }}" style="{{ row.optionStyle }}">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:{{ row.idColor }}">{{ row.id }}</span>
-                <span style="font-size:12.5px; color:#eff3f4; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ row.title }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ row.taskSummary }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:{{ row.idColor }}; white-space:nowrap; flex:none">{{ row.id }}</span>
+                <span style="font-size:12.5px; color:#eff3f4; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ row.title }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ row.taskSummary }}</span>
               </div>
             </sc-for>
           </div>
         </sc-if>
       </div>
 
-      <div style="display:flex; align-items:stretch; min-height:476px">
-        <div style="width:268px; border-right:1px solid #2b2724; display:flex; flex-direction:column; flex:none">
+      <div style="{{ splitStyle }}">
+        <div style="{{ taskListStyle }}">
           <div style="padding:12px 14px 8px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Tasks</div>
           <sc-for list="{{ taskRows }}" as="row" hint-placeholder-count="4">
             <div onClick="{{ row.select }}" style="{{ row.rowStyle }}">
               <span style="{{ row.dotStyle }}"></span>
               <div style="display:flex; flex-direction:column; gap:2px; min-width:0; flex:1">
                 <div style="display:flex; align-items:center; gap:7px">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">{{ row.id }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ row.statusColor }}">{{ row.status }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ row.id }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ row.statusColor }}; white-space:nowrap; flex:none">{{ row.status }}</span>
+                  <sc-if value="{{ row.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap; flex:none">· now</span></sc-if>
                 </div>
                 <div style="font-size:12.5px; line-height:1.4; color:#eff3f4">{{ row.title }}</div>
               </div>
@@ -409,11 +476,12 @@
         <div style="flex:1; display:flex; flex-direction:column; gap:14px; padding:14px 16px 18px; min-width:0">
           <div style="display:flex; flex-direction:column; gap:7px">
             <div style="display:flex; align-items:center; gap:8px">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#948a7f">{{ task.id }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#948a7f; white-space:nowrap; flex:none">{{ task.id }}</span>
               <span style="{{ task.chipStyle }}">{{ task.status }}</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; margin-left:auto">{{ task.updated }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; margin-left:auto; white-space:nowrap; flex:none">{{ task.updated }}</span>
             </div>
             <div style="font-size:16px; font-weight:700; letter-spacing:-.01em; color:#eff3f4">{{ task.title }}</div>
+            <sc-if value="{{ task.focus }}"><div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#37bda9">reported now · editing src/hooks/useSession.ts</div></sc-if>
             <div style="font-size:13px; line-height:1.6; color:#c9c3bb">{{ task.detail }}</div>
           </div>
 
@@ -441,21 +509,145 @@
     </div>
     </sc-if>
 
-    <sc-if value="{{ isNotes }}">
-      <div style="padding:56px 24px; display:flex; flex-direction:column; align-items:center; gap:8px">
-        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Not designed yet</span>
-        <span style="font-size:13px; color:#948a7f; text-align:center">Tell me what Notes should hold and I'll build it.</span>
+    <sc-if value="{{ showNotes }}">
+    <div style="display:flex; flex-direction:column; min-height:520px">
+
+      <div style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">This session</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; margin-left:auto">12 notes · since 09:14</span>
       </div>
+
+      <div style="display:flex; flex-direction:column">
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">2m</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#37bda9"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">The refresh race guard in the old code only worked because the routes mounted in a fixed order. The hook cannot rely on that.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">noticed while editing</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">src/hooks/useSession.ts</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">9m</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#948a7f"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">You asked me to remember: settings.tsx is being rewritten on another branch, so keep the edit there to the fetch call and nothing else.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">you asked</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">US-002</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">24m</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#948a7f"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">api/client.ts changed on disk between my read and my write. I stopped rather than overwrite it.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#f6a06b">worth knowing</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">src/api/client.ts</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">41m</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#948a7f"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">The three call sites differed in one place only: index.tsx swallowed the 401 instead of rethrowing it. I kept the rethrow.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">noticed while reading</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">T-011</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">1h</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#948a7f"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">You asked me to remember: no new dependencies for this story.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">you asked</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; padding:9px 14px; border-top:1px solid #2b2724" style-hover="background:#1a1817">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:44px">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">1h</span>
+            <span style="width:5px; height:5px; border-radius:999px; background:#948a7f"></span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0">
+            <div style="font-size:13px; line-height:1.55; color:#eff3f4">The session suite takes about four minutes on this machine. Long silences during T-014 are normal.</div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f">noticed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:auto; border-top:1px dashed #2b2724; padding:11px 14px; display:flex; align-items:center; gap:9px">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; line-height:1.5">Notes live in this window only. Closing it clears all twelve — ask the agent to write anything worth keeping into the repository.</span>
+      </div>
+    </div>
     </sc-if>
 
   </div>
 
-  <div style="width:300px; display:flex; flex-direction:column; gap:14px; padding-top:6px; color:#3c372f">
-    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Overview tab</div>
-    <p style="margin:0; font-size:13.5px; line-height:1.6">Five subdivisions inside one window, each a rule plus an 11px caps label. Every header is a click target — collapse a section and the ones below it move up, so a short panel can still show git.</p>
-    <p style="margin:0; font-size:13.5px; line-height:1.6">Section headers carry their own summary on the right (count, token total, step, diff stat), so a collapsed panel still answers the question.</p>
-    <p style="margin:0; font-size:13.5px; line-height:1.6">Read-only. Nothing here talks back to the agent — the only controls collapse a section, expand a past prompt, or copy one to the clipboard. Teal marks live data, blue what the agent is doing now, ember the conflict.</p>
-    <p style="margin:0; font-size:13.5px; line-height:1.6">The tab strip is where subdivisions become panels. The <strong>+</strong> at its right tears the active view into its own window.</p>
+  <div style="width:320px; display:flex; flex-direction:column; gap:18px; padding-top:6px; color:#3c372f">
+
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Scenario</div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-size:12.5px; color:#645c50; width:64px">Width</span>
+          <div style="display:flex; gap:6px">
+            <span onClick="{{ w452 }}" style="{{ w452Style }}">452</span>
+            <span onClick="{{ w640 }}" style="{{ w640Style }}">640</span>
+            <span onClick="{{ w880 }}" style="{{ w880Style }}">880</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-size:12.5px; color:#645c50; width:64px">Sessions</span>
+          <div style="display:flex; gap:6px">
+            <span onClick="{{ s1 }}" style="{{ s1Style }}">1</span>
+            <span onClick="{{ s2 }}" style="{{ s2Style }}">2</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-size:12.5px; color:#645c50; width:64px">Board</span>
+          <div style="display:flex; gap:6px">
+            <span onClick="{{ live }}" style="{{ liveStyle }}">Reporting</span>
+            <span onClick="{{ empty }}" style="{{ emptyStyle }}">Nothing yet</span>
+          </div>
+        </div>
+      </div>
+      <p style="margin:0; font-size:12.5px; line-height:1.6; color:#645c50">These three switches stand in for things the design cannot control: how wide the user dragged the window, how many agents are reporting, and whether anything has been heard yet.</p>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; border-top:1px solid rgba(32,30,29,.14); padding-top:16px">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Round 2</div>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Two task states.</strong> A task is done or not done. The "which one is being worked on" signal moved off the checkbox and onto a teal left rule plus a mono <em>now</em> tag — sourced from the agent's prose, not from the file.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Width is the user's.</strong> The window never resizes itself. Below 640px the story list becomes a picker and the detail takes the full width; the task list stacks above its detail.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Sessions.</strong> Absent at one. A second declaring itself slides a row in under the title bar and tints it blue for a beat; dismissing drops the board's copy only.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>No verdicts.</strong> The title bar reports elapsed time — <em>heard 40s ago</em> — and never calls the agent stuck.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Notes accumulate and then vanish.</strong> Newest first, no cards, no pin, no save. The dashed footer says out loud that closing the window clears them.</p>
+    </div>
   </div>
 
 </div>
@@ -463,7 +655,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { tab: 'overview', open: { history: true, context: true, spec: true, plan: true, git: true }, rows: {}, copied: null, story: 1, task: 2, drop: false };
+  state = { tab: 'overview', open: { history: true, context: true, spec: true, plan: true, git: true }, rows: {}, copied: null, story: 1, task: 2, drop: false, width: 452, sessions: 1, session: 0, boardEmpty: false };
 
   stories = [
     { id: 'US-001', priority: 'P1', status: 'Done', title: 'See what the agent is working on without asking',
@@ -471,13 +663,13 @@ class Component extends DCLogic {
       asA: 'developer with the agent running in another window,',
       want: 'a panel that shows the current step and the files being read,',
       soThat: "I can tell whether it is stuck without interrupting it.",
-      criteria: ['Panel shows the active step within 500ms of the agent starting it.', 'Files being read appear in the context list while they are open.', 'A stalled step older than 60s is marked as needing attention.'],
+      criteria: ['Panel shows the active step within 500ms of the agent starting it.', 'Files being read appear in the context list while they are open.', 'Time since the last report is always visible.'],
       files: 'src/panel/StatusBar.tsx\nsrc/ipc/agentEvents.ts',
       tasks: [
         { id: 'T-001', title: 'Subscribe to the agent event stream', status: 'done', updated: 'yesterday', detail: 'Open a read-only socket to the agent process and normalise its events into the panel store.', checks: ['Reconnects after the agent restarts.', 'Dropped events are backfilled on reconnect.'], files: 'src/ipc/agentEvents.ts' },
         { id: 'T-002', title: 'Render the status chip', status: 'done', updated: 'yesterday', detail: 'One chip, top right, driven by the last event received.', checks: ['Idle, watching, thinking and needs-you all render.', 'Chip never shows two states at once.'], files: 'src/panel/StatusBar.tsx' }
       ] },
-    { id: 'US-002', priority: 'P1', status: 'Active', title: 'Share one session fetch across routes',
+    { id: 'US-002', priority: 'P1', status: 'Open', title: 'Share one session fetch across routes',
       spec: 'specs/002-session-hook/spec.md',
       asA: 'developer reading the diff the agent produced,',
       want: 'the repeated session fetch pulled into a single hook,',
@@ -487,10 +679,10 @@ class Component extends DCLogic {
       tasks: [
         { id: 'T-011', title: 'Audit the three call sites', status: 'done', updated: '38m', detail: 'List every difference between the three copies before consolidating anything.', checks: ['Differences recorded in the spec.', 'Error paths compared line by line.'], files: 'specs/002-session-hook/research.md' },
         { id: 'T-012', title: 'Define the hook signature', status: 'done', updated: '22m', detail: 'Agree the return shape so the routes need no local state.', checks: ['Returns data, error and a refresh function.', 'No route keeps its own loading flag.'], files: 'src/hooks/useSession.ts' },
-        { id: 'T-013', title: 'Implement useSession', status: 'active', updated: 'now', detail: 'Write the hook with the existing error handling moved across unchanged, including the refresh race guard.', checks: ['Refresh race guard carried over.', 'Logout during refresh still clears the store.', 'Tests from T-014 pass.'], files: 'src/hooks/useSession.ts' },
+        { id: 'T-013', title: 'Implement useSession', status: 'todo', focus: true, updated: 'now', detail: 'Write the hook with the existing error handling moved across unchanged, including the refresh race guard.', checks: ['Refresh race guard carried over.', 'Logout during refresh still clears the store.', 'Tests from T-014 pass.'], files: 'src/hooks/useSession.ts' },
         { id: 'T-014', title: 'Swap the call sites and run tests', status: 'todo', updated: '—', detail: 'Replace the three inline fetches and run the session suite.', checks: ['Three call sites replaced.', 'Session suite green.'], files: 'src/routes/index.tsx\nsrc/routes/settings.tsx' }
       ] },
-    { id: 'US-003', priority: 'P2', status: 'Blocked', title: 'Keep the panel readable over any editor theme',
+    { id: 'US-003', priority: 'P2', status: 'Open', title: 'Keep the panel readable over any editor theme',
       spec: 'specs/003-panel-contrast/spec.md',
       asA: 'developer with a light editor theme,',
       want: 'the panel to hold its own contrast,',
@@ -498,9 +690,9 @@ class Component extends DCLogic {
       criteria: ['Panel ground stays fixed regardless of host theme.', 'All text meets 4.5:1 against its own background.'],
       files: 'src/panel/tokens.ts',
       tasks: [
-        { id: 'T-021', title: 'Audit contrast of every text style', status: 'blocked', updated: '2h', detail: 'Blocked on the conflict in api/client.ts — the token file imports from it.', checks: ['Every sub-13px style measured.', 'Failures listed with a replacement step.'], files: 'src/panel/tokens.ts' }
+        { id: 'T-021', title: 'Audit contrast of every text style', status: 'todo', updated: '2h', detail: 'Not started. The agent noted that the token file imports from api/client.ts, which has an unresolved conflict.', checks: ['Every sub-13px style measured.', 'Failures listed with a replacement step.'], files: 'src/panel/tokens.ts' }
       ] },
-    { id: 'US-004', priority: 'P2', status: 'Todo', title: 'Read the prompt history without leaving the panel',
+    { id: 'US-004', priority: 'P2', status: 'Open', title: 'Read the prompt history without leaving the panel',
       spec: 'specs/004-prompt-history/spec.md',
       asA: 'developer picking a thread back up,',
       want: 'past prompts expandable in place and copyable,',
@@ -511,7 +703,7 @@ class Component extends DCLogic {
         { id: 'T-031', title: 'Expandable history rows', status: 'todo', updated: '—', detail: 'Row expands in place; only the chevron and the row text toggle it.', checks: ['Expanded row shows the untruncated prompt.'], files: 'src/panel/History.tsx' },
         { id: 'T-032', title: 'Copy to clipboard', status: 'todo', updated: '—', detail: 'Copy button writes the raw prompt and confirms for about a second.', checks: ['Confirmation clears itself.'], files: 'src/panel/History.tsx' }
       ] },
-    { id: 'US-005', priority: 'P3', status: 'Todo', title: 'Tear a section off into its own window',
+    { id: 'US-005', priority: 'P3', status: 'Open', title: 'Tear a section off into its own window',
       spec: 'specs/005-tear-off/spec.md',
       asA: 'developer with a second monitor,',
       want: 'any subdivision to become a standalone panel,',
@@ -523,13 +715,18 @@ class Component extends DCLogic {
       ] }
   ];
 
-  statusColor(s) { return s === 'active' ? '#7fb2e8' : s === 'blocked' ? '#f6a06b' : s === 'done' ? '#37bda9' : '#948a7f'; }
+  statusColor(s) { return s === 'done' ? '#37bda9' : '#948a7f'; }
+  statusText(s) { return s === 'done' ? 'done' : 'not done'; }
   dot(s) {
-    const c = this.statusColor(s);
-    if (s === 'done') return 'width:12px; height:12px; border-radius:999px; background:#1c2a28; border:1.5px solid ' + c + '; box-sizing:border-box; flex:none; margin-top:3px';
-    if (s === 'active') return 'width:12px; height:12px; border-radius:999px; background:' + c + '; flex:none; margin-top:3px';
-    return 'width:12px; height:12px; border-radius:999px; border:1.5px solid ' + (s === 'blocked' ? c : '#3d3833') + '; box-sizing:border-box; flex:none; margin-top:3px';
+    if (s === 'done') return 'width:12px; height:12px; border-radius:999px; background:#1c2a28; border:1.5px solid #37bda9; box-sizing:border-box; flex:none; margin-top:3px';
+    return 'width:12px; height:12px; border-radius:999px; border:1.5px solid #3d3833; box-sizing:border-box; flex:none; margin-top:3px';
   }
+  pick(k, v) { return () => this.setState({ [k]: v }); }
+  segStyle(on) {
+    return 'font-family:\'JetBrains Mono\',monospace; font-size:11.5px; font-weight:600; padding:4px 11px; border-radius:999px; cursor:pointer; border:1px solid ' +
+      (on ? '#201e1d' : 'rgba(32,30,29,.2)') + '; background:' + (on ? '#201e1d' : 'transparent') + '; color:' + (on ? '#f5ead8' : '#645c50');
+  }
+  dismissSession(i) { return (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState(st => ({ sessions: Math.max(1, st.sessions - 1), session: 0 })); }; }
   selectStory(i) { return () => this.setState({ story: i, task: 0, drop: false }); }
   selectTask(i) { return () => this.setState({ task: i }); }
   prompts = [
@@ -555,6 +752,36 @@ class Component extends DCLogic {
     const t = this.state.tab, o = this.state.open;
     return {
       isOverview: t === 'overview', notOverview: t !== 'overview',
+      isEmpty: this.state.boardEmpty, notEmpty: !this.state.boardEmpty,
+      showOverview: t === 'overview' && !this.state.boardEmpty,
+      showStories: t === 'stories' && !this.state.boardEmpty,
+      showTasks: t === 'tasks' && !this.state.boardEmpty,
+      showNotes: t === 'notes' && !this.state.boardEmpty,
+      isNarrow: this.state.width < 640, isWide: this.state.width >= 640,
+      splitStyle: this.state.width >= 640
+        ? 'display:flex; align-items:stretch; min-height:520px'
+        : 'display:flex; flex-direction:column; min-height:520px',
+      taskListStyle: this.state.width >= 640
+        ? 'width:268px; border-right:1px solid #2b2724; display:flex; flex-direction:column; flex:none'
+        : 'border-bottom:1px solid #2b2724; display:flex; flex-direction:column',
+      multiSession: this.state.sessions > 1,
+      sessionPills: Array.from({ length: this.state.sessions }, (_, i) => {
+        const meta = [{ repo: 'acme/console', branch: 'feat/session-hook' }, { repo: 'acme/api', branch: 'main' }][i] || { repo: 'acme/tools', branch: 'main' };
+        const on = i === this.state.session;
+        return {
+          repo: meta.repo, branch: meta.branch,
+          select: this.pick('session', i),
+          dismiss: this.dismissSession(i),
+          style: 'display:flex; align-items:center; gap:8px; padding:4px 6px 4px 10px; border-radius:999px; cursor:pointer; flex:none; border:1px solid ' + (on ? '#3d3833' : 'transparent') + '; background:' + (on ? '#1a1817' : 'transparent') + (i === this.state.sessions - 1 && i > 0 ? '; animation:sessionTint 1600ms ease-out' : ''),
+          dotStyle: 'width:6px; height:6px; border-radius:999px; flex:none; background:' + (on ? '#37bda9' : '#948a7f')
+        };
+      }),
+      w452: this.pick('width', 452), w640: this.pick('width', 640), w880: this.pick('width', 880),
+      w452Style: this.segStyle(this.state.width === 452), w640Style: this.segStyle(this.state.width === 640), w880Style: this.segStyle(this.state.width === 880),
+      s1: this.pick('sessions', 1), s2: this.pick('sessions', 2),
+      s1Style: this.segStyle(this.state.sessions === 1), s2Style: this.segStyle(this.state.sessions === 2),
+      live: this.pick('boardEmpty', false), empty: this.pick('boardEmpty', true),
+      liveStyle: this.segStyle(!this.state.boardEmpty), emptyStyle: this.segStyle(this.state.boardEmpty),
       isStories: t === 'stories', notStories: t !== 'stories',
       isTasks: t === 'tasks', notTasks: t !== 'tasks',
       isNotes: t === 'notes', notNotes: t !== 'notes',
@@ -577,7 +804,7 @@ class Component extends DCLogic {
       copied2: this.state.copied === 2, uncopied2: this.state.copied !== 2,
       copied3: this.state.copied === 3, uncopied3: this.state.copied !== 3,
       specOpen: o.spec, specClosed: !o.spec, toggleSpec: this.toggle('spec'),
-      panelWidth: t === 'overview' || t === 'notes' ? '452px' : '880px',
+      panelWidth: this.state.width + 'px',
       dropOpen: this.state.drop,
       toggleDrop: () => this.setState(s => ({ drop: !s.drop })),
       storyRows: this.stories.map((st, i) => {
@@ -585,12 +812,13 @@ class Component extends DCLogic {
         const done = st.tasks.filter(x => x.status === 'done').length;
         return {
           id: st.id, title: st.title, priority: st.priority, status: st.status,
+          focus: st.tasks.some(x => x.focus),
           taskSummary: done + '/' + st.tasks.length + ' tasks',
           idColor: sel ? '#37bda9' : '#948a7f',
           select: this.selectStory(i),
           rowStyle: 'display:flex; flex-direction:column; gap:4px; padding:9px 14px; cursor:pointer; border-left:2px solid ' + (sel ? '#37bda9' : 'transparent') + '; background:' + (sel ? '#1a1817' : 'transparent'),
           optionStyle: 'display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:8px; cursor:pointer; background:' + (sel ? '#221f1d' : 'transparent'),
-          chipStyle: 'background:#1a1817; color:' + this.statusColor(st.status.toLowerCase()) + '; border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; margin-left:auto'
+          chipStyle: 'background:#1a1817; color:' + (st.status === 'Done' ? '#37bda9' : '#948a7f') + '; border-radius:999px; padding:2px 8px; font-size:10.5px; font-weight:600; margin-left:auto; white-space:nowrap; flex:none'
         };
       }),
       story: (() => {
@@ -600,11 +828,19 @@ class Component extends DCLogic {
           ...st,
           taskSummary: done + '/' + st.tasks.length + ' tasks',
           criteria: st.criteria.map((text, n) => ({ n: n + 1, text })),
-          tasks: st.tasks.map(x => ({ id: x.id, title: x.title, status: x.status, dotStyle: this.dot(x.status) }))
+          tasks: st.tasks.map(x => ({
+            id: x.id, title: x.title,
+            status: this.statusText(x.status),
+            statusColor: this.statusColor(x.status),
+            focus: !!x.focus, notFocus: !x.focus,
+            titleColor: x.focus ? '#eff3f4' : '#c9c3bb',
+            dotStyle: this.dot(x.status).replace('margin-top:3px', 'margin-top:0'),
+            rowStyle: 'display:flex; align-items:center; gap:9px; padding:3px 0 3px 6px; margin-left:-8px; border-left:2px solid ' + (x.focus ? '#37bda9' : 'transparent')
+          }))
         };
       })(),
       taskRows: this.stories[this.state.story].tasks.map((x, i) => ({
-        id: x.id, title: x.title, status: x.status,
+        id: x.id, title: x.title, status: this.statusText(x.status), focus: !!x.focus,
         statusColor: this.statusColor(x.status),
         dotStyle: this.dot(x.status),
         select: this.selectTask(i),
@@ -615,8 +851,10 @@ class Component extends DCLogic {
         const x = list[Math.min(this.state.task, list.length - 1)];
         return {
           ...x,
+          focus: !!x.focus,
+          status: this.statusText(x.status),
           checks: x.checks.map(text => ({ text, dotStyle: 'width:5px; height:5px; border-radius:999px; background:#948a7f; flex:none; margin-top:7px' })),
-          chipStyle: 'background:#1a1817; color:' + this.statusColor(x.status) + '; border-radius:999px; padding:2px 9px; font-size:10.5px; font-weight:600'
+          chipStyle: 'background:#1a1817; color:' + this.statusColor(x.status) + '; border-radius:999px; padding:2px 9px; font-size:10.5px; font-weight:600; white-space:nowrap; flex:none'
         };
       })()
     };
