@@ -79,7 +79,7 @@ project's state.
 ### Stack packs (`stacks/`) — repo-local framework conventions
 | Path | Read before |
 |---|---|
-| _(none yet)_ | The stack is undecided — add a pack once the design picks one |
+| _(none yet)_ | Stack is Vite + React + Electron — `stacks/vite-react.md` and `stacks/electron.md` are owed before framework code |
 | `stacks/README.md` | Adding a new stack pack (shape: defaults → where things go → don't → verify) |
 
 These travel with the repo (unlike session-level plugin skills), so the

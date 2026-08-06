@@ -7,11 +7,16 @@ live in `@AGENTS.md` — read them; they govern how to work here.
 
 ## What this project is
 
-**skmc — Spec-Kit Mission Control**: an MCP server + live web board for working
-with GitHub Spec-Kit repositories, so a human can watch a board while an AI
-agent implements tasks. `resources/designprompt.md` is the brief; design docs
-land in `docs/design/`; prior design output sits in `resources/`. The stack is
-not yet chosen — that's an open decision in the design.
+**CoCoPilot** (as in *Co-Copilot*): an MCP server + HTTP API + CLI + desktop
+board for working with GitHub Spec-Kit repositories, so a human can watch a
+board while an AI agent implements tasks — the tool that keeps the information
+straight that the developer would otherwise track in their head. The stack is
+Vite + React, wrapped in Electron for Windows, macOS and Linux.
+
+Design restarted 2026-08-06: `resources/` was emptied and a new round of design
+prompts is being written; the architecture is deliberately reopened. Read
+[STATUS.md](STATUS.md) first — it holds what is settled, what survived the
+restart, and the open questions. Design docs land in `docs/design/`.
 
 Note the recursion: this repo *uses* Spec-Kit (`.specify/`, `specs/`) and is
 also *about* Spec-Kit. Our own spec state is real project state and is tracked
@@ -38,9 +43,9 @@ asset, its trigger, and how to invoke it); the highlights:
   `speckit-specify → speckit-plan → speckit-tasks → speckit-implement`. The
   cheat sheet + these rules are the realistic path when there isn't.
 - **Stack packs** (`stacks/`): repo-local conventions for specific frameworks.
-  None yet — the stack is undecided. Add `stacks/<framework>.md` (shape per
-  `stacks/README.md`) once the architecture doc picks one, and read it before
-  writing framework code.
+  None written yet, but the stack is now known — `stacks/vite-react.md` and
+  `stacks/electron.md` are owed (shape per `stacks/README.md`) before any
+  framework code gets written. Read them first once they exist.
 
 ## Default posture
 
