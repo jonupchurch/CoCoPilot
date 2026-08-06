@@ -132,6 +132,13 @@ this project is pre-release and not yet versioned.
   superseded: it ran before the no-repo-reads and free-string-status calls, so
   task-state rendering owes a round 3. Its `focus`-versus-status split survives
   and is now load-bearing.
+- **Architecture doc written** — `docs/design/architecture.md`, the synthesis of
+  all 27 decisions for someone who has not read them. Leads with the defining
+  property, that the app reads nothing from the repo, writes nothing anywhere
+  and owns no durable state, and tabulates what that removes from the build
+  against what it costs. Covers the four processes and the lifetime mismatch
+  that shapes them, the two information sources, the state model, and a failure
+  table naming what each way of going wrong actually looks like.
 - **Design round 3 landed**, delivering all three revisions plus the optional
   overflow work. A vocabulary map takes the four recognised statuses and their
   synonyms to the round 1 colours and everything else to neutral, truncated with

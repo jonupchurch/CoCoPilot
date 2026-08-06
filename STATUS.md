@@ -27,7 +27,7 @@ should be written until the design docs exist and are reviewed.
 | Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
 | Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against all 27 decisions; canon per decision 8 |
 | Design revisions owed | ✅ None outstanding |
-| Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
+| Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
 
