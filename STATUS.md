@@ -15,7 +15,7 @@ should be written until the design docs exist and are reviewed.
 | Area | State |
 |---|---|
 | Repo scaffolding | ✅ Toolkit from `../ai-tools`, engine dry-run verified |
-| Git | ✅ `main`, pushed to `jonupchurch/skmc` (private) — **repo name is now stale** |
+| Git | ✅ `main`, pushed to [`jonupchurch/CoCoPilot`](https://github.com/jonupchurch/CoCoPilot) (public) |
 | Grounding in real Spec-Kit formats | ✅ Done against `../LMNTLZ` — survives the restart (see below) |
 | Product definition | ✅ Unchanged from the previous round: the live Spec-Kit board |
 | Stack | ✅ Vite + React, Electron-wrapped, cross-platform (Windows / macOS / Linux) |
@@ -37,8 +37,11 @@ their head across a long agent session.
 
 ## Decisions settled (2026-08-06)
 
-1. **Name: CoCoPilot.** The repo directory and GitHub remote are still `skmc`;
-   renaming both is outstanding and is a user action.
+1. **Name: CoCoPilot.** Published to a new **public** repo,
+   `jonupchurch/CoCoPilot`, on 2026-08-06. The previous private `jonupchurch/skmc`
+   repo is retained untouched and is still wired up as the `skmc-old` git remote;
+   deleting it is a pending user action. Note that the round 1 design exports
+   deleted in this restart remain in the now-public git history.
 2. **Vite + React** for the UI. *Cost:* a SPA, so any deep-link/routing story is
    ours to build.
 3. **Electron** as the desktop wrapper, targeting Windows, macOS and Linux.

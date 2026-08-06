@@ -12,7 +12,10 @@ this project is pre-release and not yet versioned.
   wireframes and versioned design prompts from the previous round are gone, and
   a new round is being written. The product itself is unchanged.
 - **Renamed to CoCoPilot** (as in *Co-Copilot*), from "skmc — Spec-Kit Mission
-  Control". The repo directory and the GitHub remote are still `skmc`.
+  Control", and republished to a new public repo,
+  [`jonupchurch/CoCoPilot`](https://github.com/jonupchurch/CoCoPilot). The
+  previous private `jonupchurch/skmc` repo is untouched and remains wired up as
+  the `skmc-old` remote.
 - **Stack decided:** Vite + React, wrapped in Electron for Windows, macOS and
   Linux. Electron over Tauri so the MCP server, HTTP API and file watching all
   run in the Node main process — one TypeScript codebase, no sidecar.
