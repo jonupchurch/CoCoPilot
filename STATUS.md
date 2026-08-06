@@ -8,7 +8,7 @@ on, a human watches.
 **Phase:** Design, **restarted 2026-08-06**. No implementation code, and none
 should be written until the design docs exist and are reviewed.
 
-**Last updated:** 2026-08-06
+**Last updated:** 2026-08-06 (state ownership and push model settled)
 
 ## Where things stand
 
@@ -20,7 +20,9 @@ should be written until the design docs exist and are reviewed.
 | Product definition | ✅ Unchanged from the previous round: the live Spec-Kit board |
 | Stack | ✅ Vite + React, Electron-wrapped, cross-platform (Windows / macOS / Linux) |
 | Interface surfaces | ✅ MCP server + HTTP API + CLI |
-| Architecture | ⬜ **Deliberately reopened** — the prior round's decisions are not binding |
+| Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
+| Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
+| Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
 | Design prompts / wireframes (`resources/`) | ⬜ Emptied 2026-08-06; new round being written |
 | Design docs (`docs/design/`) | ⬜ Not started |
 | Feature specs (`specs/`) | ⬜ None |
@@ -55,9 +57,43 @@ their head across a long agent session.
    non-MCP client get HTTP. *Cost:* three front doors must resolve to one
    contract or they will drift — this is the main thing the architecture doc has
    to pin down.
-5. **Architecture is open.** The previous round's controller+windows model,
-   two-layer data model, and never-writes-to-the-repo constraint are all
-   re-decidable. They are recorded below as *inputs*, not as settled state.
+5. **Architecture is open**, except where decisions 6 and 7 close it. The
+   previous round's controller+windows model, two-layer data model, and
+   never-writes-to-the-repo constraint are all re-decidable. They are recorded
+   below as *inputs*, not as settled state.
+6. **State lives in the desktop app process, in memory, and is volatile.**
+   Two kinds of state, and only one is ours: the Spec-Kit repo files
+   (`tasks.md`, `specs/`, `.specify/feature.json`) are truth on disk, re-read on
+   demand and never stored by us; agent narration is push-only and held in
+   memory by the Electron main process. The MCP server, the CLI and any non-MCP
+   client are thin clients of the local HTTP API. There is no daemon, no
+   buffering and no auto-spawn: when the app is not running, none of the three
+   surfaces respond.
+   - *Rationale:* the always-on daemon existed only to survive the window
+     closing. If narration is disposable, that justification goes away. The app
+     process is also the merge point for concurrent Claude Code sessions, which
+     each spawn their own MCP server child and cannot see each other.
+   - *Required implementation detail:* Claude Code discovers an MCP server's
+     tool list **once, at session start**. Our MCP server must therefore start
+     cleanly whether or not the app is up, and connect to the HTTP API lazily
+     per call — otherwise the tools are missing for the whole session even after
+     the board is opened. A failed call returns copy along the lines of
+     *"CoCoPilot board is not running — continue working, no need to retry,"* so
+     a monitoring tool never derails the work it monitors.
+   - *Cost:* restarting the app loses the narrative history; the board is still
+     correct after a re-scan, just without the story. Accepted.
+   - *Build order:* the HTTP API is the one internal service and gets built
+     first; the MCP server and CLI are thin adapters over it and come second.
+     Cutting MCP entirely was considered and rejected — without it, model-authored
+     prose has to arrive by the agent shelling out to the CLI, which costs
+     PowerShell quoting on every multi-line note and a permission prompt per call.
+7. **Agents push typed facts plus prose.** The schema fixes the skeleton — which
+   task, what state — and carries a free-text field the agent writes for the
+   human to read. The board owns layout and placement; agents never specify
+   presentation. *Rationale:* one contract across all three surfaces, while
+   still letting an agent say things a status enum cannot express (*why* T042 is
+   blocked). *Cost:* the prose field is unvalidatable by construction — see open
+   question 6.
 
 ## What survives the restart
 
@@ -86,27 +122,43 @@ wireframes and design prompts are gone, and a new round is being written.
 
 Ordered roughly by how much downstream work each one blocks.
 
-1. **Where does state live, and what owns it?** Claude Code spawns stdio MCP
-   servers as its *own* child processes, so the MCP server is not naturally the
-   same process as the Electron app. Either (a) the MCP server is a thin client
-   of the local HTTP API and the desktop app must be running, or (b) state lives
-   in a separate always-on headless daemon that the app, the MCP server and the
-   CLI all talk to. *Recommended default:* (b) — it is the only one where
-   closing the window doesn't drop the session.
-2. **Does CoCoPilot ever write to the user's repo?** The previous round said
+1. **Does CoCoPilot ever write to the user's repo?** The previous round said
    never, which is what made "add-on, not source of truth" honest. Now open. If
    it may write, the whole conflict/ownership story has to be designed.
-3. **One instance watching N repos, or one per repo?**
-4. **Is the HTTP API localhost-only, or does it serve remote windows too?** The
+2. **One instance watching N repos, or one per repo?**
+3. **Is the HTTP API localhost-only, or does it serve remote windows too?** The
    previous round wanted "local-first, remote-ready" off one seam.
-5. **How do three ingest paths stay one contract?** Shared schema package,
-   generated clients, or a single internal service the three surfaces wrap.
-6. **Liveness thresholds.** Carried forward as an unsolved problem: a healthy
-   agent goes quiet for minutes during a typecheck, so the previous round's
-   45s/3m guesses were too aggressive.
-7. **Keeping the MCP tool surface honest** — what stops an agent from marking
-   everything "editorial"?
-8. **Packaging and distribution** per platform, including code signing.
+4. **What is actually in the push schema?** Decision 7 fixed the *shape* (typed
+   facts + prose) and decision 6 fixed the *mechanism* (one internal service,
+   three surfaces wrapping it), so the remaining work is the field list itself:
+   which states exist, what identifies a task across repos, and how a push
+   references a feature the board hasn't scanned yet.
+5. **Liveness display.** Narrowed by decision 6 rather than solved: a volatile,
+   push-driven board does not have to adjudicate "dead" at all — showing "last
+   heard from 4m ago" and letting the human judge is consistent with a tool that
+   keeps information straight rather than rendering verdicts. That sidesteps the
+   previous round's too-aggressive 45s/3m thresholds, but the display rules are
+   still unwritten. **Not explicitly confirmed** — flagged for review.
+6. **Keeping the MCP tool surface honest** — what stops an agent from marking
+   everything "editorial"? Decision 7's free-text field sharpens this: prose is
+   unvalidatable by construction, so whatever honesty mechanism exists has to
+   live in the typed part or in how the board presents unverified claims.
+   - *Candidate answer, not yet decided:* Claude Code **hooks** emit mechanical
+     facts — which files changed, which tools ran, session start/stop — with zero
+     agent cooperation, so unlike a self-reported status they cannot be gamed by
+     the agent. Pairing hook-observed facts with agent-claimed prose would let
+     the board distinguish **observed** from **claimed** in the UI. Hooks can
+     never replace the prose (they fire on events; they cannot author *why* a
+     task is blocked), so this is additive.
+   - *Consequence if adopted:* hooks become a **fourth ingest path** and have to
+     fold into the same contract as the other three — see open question 4.
+7. **Packaging and distribution** per platform, including code signing.
+   Sharpened by decision 6: Claude Code *spawns* the MCP server as its own child
+   process, so an Electron app has to ship a separately-spawnable Node entry
+   point that lives outside the app bundle and starts with the app closed.
+   Whether that is an npx-able package, a small per-platform binary, or a
+   documented path into the installed app is open, and it collides with macOS
+   signing and notarization.
 
 ## Notable wrinkle
 

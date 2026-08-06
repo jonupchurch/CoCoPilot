@@ -23,6 +23,15 @@ this project is pre-release and not yet versioned.
 - **Architecture deliberately reopened.** The previous round's controller+windows
   model, two-layer data model, and never-writes-to-the-repo constraint are
   inputs to the new design, not settled state. See [STATUS.md](STATUS.md).
+- **State ownership decided:** the Electron main process owns all state and it
+  is volatile and in-memory. Repo files stay truth on disk and are re-read, not
+  stored; agent narration is push-only and lost on restart. No always-on daemon,
+  no buffering, no auto-spawn — when the app is not running, the MCP server, the
+  CLI and the HTTP API simply do not respond. The MCP server must still start
+  cleanly with the app down and connect lazily per call, because Claude Code
+  discovers an MCP tool list only once, at session start.
+- **Push model decided:** agents push typed facts plus a free-text field for the
+  human; the board owns layout. Agents never specify presentation.
 - **Spec-Kit format grounding retained.** The findings verified against
   `../LMNTLZ` (21 features, 1,076 task lines, Spec-Kit 0.12.12.dev0) are
   empirical and survive the restart — notably `- [x]` ×554 vs `- [X]` ×341
