@@ -132,6 +132,16 @@ this project is pre-release and not yet versioned.
   superseded: it ran before the no-repo-reads and free-string-status calls, so
   task-state rendering owes a round 3. Its `focus`-versus-status split survives
   and is now load-bearing.
+- **Design round 3 landed**, delivering all three revisions plus the optional
+  overflow work. A vocabulary map takes the four recognised statuses and their
+  synonyms to the round 1 colours and everything else to neutral, truncated with
+  the full string on hover; the focus tag counts elapsed time in place with no
+  threshold or fade; session pills carry their own chip and elapsed time, with
+  the branch dropping off unselected pills past two sessions and the state label
+  showing only when selected or attention-seeking — a better answer to the
+  density problem than the brief asked for. At 500px the body scrolls under
+  sticky section headers. **The Overview Panel is now current against every
+  recorded decision, and no design revisions are outstanding.**
 - **Distribution decided:** the MCP server ships as an npx-able npm package,
   with the CLI alongside it. The point is code signing — Claude Code has to
   spawn the server independently of the app, and shipping that as JavaScript

@@ -25,8 +25,8 @@ should be written until the design docs exist and are reviewed.
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ✅ Settled across decisions 1–27; no open design questions remain |
 | Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
-| Design exports (`resources/`) | ✅ Round 2 landed — Brand, Design System, Overview Panel (revised), Round 2 decisions doc; canon per decision 8 |
-| Design round 3 owed | 🟡 Brief written — [`resources/designprompt3.md`](resources/designprompt3.md); needs a Claude Design run |
+| Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against all 27 decisions; canon per decision 8 |
+| Design revisions owed | ✅ None outstanding |
 | Design docs (`docs/design/`) | 🟡 `push-schema.md` drafted, awaiting review; nothing else written |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
@@ -502,13 +502,50 @@ Three defaults accepted as written, two changed:
    imply an inbox to zero out, and notes clear themselves when the window
    closes.
 
-### Not designed yet, per round 2
+## Design round 3
 
-The torn-off window beyond the `+` affordance; overflow and scrolling anywhere,
-including sticky section headers and five open sections in a 500px-tall window;
-long sessions, where "Show all 18" has no destination and Notes is drawn at six
-entries rather than forty; and the agent going away mid-session — process exit
-or socket drop — as distinct from merely being quiet.
+Landed 2026-08-06 against [`resources/designprompt3.md`](resources/designprompt3.md).
+Delivered all three revisions, plus the optional item. **The Overview Panel is
+now current against every decision in this file.**
+
+- **Status is a string.** A `vocabulary` map takes `done`, `active`, `blocked`
+  and `todo` plus synonyms (`wip`, `in progress`, `stuck`, `shipped`, `not
+  started`…) to the round 1 colours; `kindOf()` returns `other` for anything
+  else, which renders neutral grey, truncated at 104px with the full string on
+  hover. Exactly the shape decision 25 asked for. The fixture carries
+  `waiting on CI` as a live example of the fallback.
+- **The tag counts.** `now` while the agent's latest report names that task,
+  then `4m`, `2h` — same slot, tabular figures, right-aligned, no threshold and
+  no fade.
+- **Pills carry state,** and the density problem got a better answer than the
+  brief asked for: past two sessions the branch drops off unselected pills, and
+  the state label shows only when a pill is selected *or* needs attention. An
+  unselected `needs you` takes an ember dot, border and tint, with no motion and
+  no reordering.
+- **Overflow,** taken up though it was optional: at 500px the body scrolls under
+  sticky section headers, so a section's label and summary stay legible while
+  its contents pass behind.
+
+Two small notes, neither worth a round of its own:
+
+1. `statusText()` lowercases the status for display, so `Waiting on CI` renders
+   as `waiting on ci`. Defensible as visual consistency in a mono column, but it
+   is a small deviation from decision 25's "shown as-is". Live with it unless
+   an agent's casing turns out to carry meaning.
+2. The fixture still uses hyphenated `T-011` and `US-002`. Already governed by
+   decision 8 — real files carry bare `T001` and bold `**T001**` — so this is a
+   note for whoever builds it, not a design change.
+
+**No separate decisions doc this round;** the annotations live in the panel
+margin instead. Fine for a round this size, but it means round 3 produced no new
+open questions and no "not designed yet" list of its own.
+
+### Still not designed, carried from round 2
+
+Overflow is now done. What remains: the torn-off window beyond the `+`
+affordance; long sessions, where "Show all 18" has no destination and Notes is
+drawn at six entries rather than forty; and the agent going away mid-session —
+process exit or socket drop — as distinct from merely being quiet.
 
 ## Open questions
 

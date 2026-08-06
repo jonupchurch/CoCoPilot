@@ -22,7 +22,7 @@
 
 <div style="font-family:'Figtree', system-ui, sans-serif; padding:48px; display:flex; gap:36px; align-items:flex-start">
 
-  <div style="width:{{ panelWidth }}; background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 20px 56px rgba(32,30,29,.34); overflow:hidden; display:flex; flex-direction:column">
+  <div style="width:{{ panelWidth }}; height:{{ panelHeight }}; background:#0e0d0c; border:1px solid #2b2724; border-radius:16px; box-shadow:0 20px 56px rgba(32,30,29,.34); overflow:hidden; display:flex; flex-direction:column">
 
     <div style="display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid #2b2724">
       <div style="display:flex; align-items:center; flex:none">
@@ -38,14 +38,16 @@
     </div>
 
     <sc-if value="{{ multiSession }}">
-      <div style="display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid #2b2724; overflow-x:auto; animation:sessionRowIn 220ms ease-out">
+      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:8px 10px; border-bottom:1px solid #2b2724; animation:sessionRowIn 220ms ease-out">
         <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f; flex:none; padding-left:4px">Sessions</span>
         <sc-for list="{{ sessionPills }}" as="p" hint-placeholder-count="2">
-          <div onClick="{{ p.select }}" style="{{ p.style }}">
+          <div onClick="{{ p.select }}" title="{{ p.title }}" style="{{ p.style }}">
             <span style="{{ p.dotStyle }}"></span>
             <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#eff3f4; white-space:nowrap">{{ p.repo }}</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; white-space:nowrap">{{ p.branch }}</span>
-            <span onClick="{{ p.dismiss }}" title="Dismiss this session" style="width:16px; height:16px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; color:#948a7f; cursor:pointer" style-hover="background:#2b2724; color:#eff3f4">×</span>
+            <sc-if value="{{ p.showBranch }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#948a7f; white-space:nowrap">{{ p.branch }}</span></sc-if>
+            <sc-if value="{{ p.showState }}"><span style="{{ p.stateStyle }}">{{ p.state }}</span></sc-if>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; font-variant-numeric:tabular-nums">{{ p.heard }}</span>
+            <span onClick="{{ p.dismiss }}" title="Dismiss — clears this board's copy" style="width:16px; height:16px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; color:#948a7f; cursor:pointer; flex:none" style-hover="background:#2b2724; color:#eff3f4">×</span>
           </div>
         </sc-for>
       </div>
@@ -98,7 +100,7 @@
     </sc-if>
 
     <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ true }}">
-    <div style="display:flex; flex-direction:column">
+    <div style="{{ scrollStyle }}">
 
       <div style="padding:14px 14px 12px">
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:9px">
@@ -114,7 +116,7 @@
       </div>
 
       <div style="border-top:1px solid #2b2724">
-        <div onClick="{{ toggleHistory }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer">
+        <div onClick="{{ toggleHistory }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer; position:sticky; top:0; z-index:2; background:#0e0d0c">
           <sc-if value="{{ historyOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px; color:#948a7f">▼</span></sc-if>
           <sc-if value="{{ historyClosed }}"><span style="font-size:9px; color:#948a7f">▶</span></sc-if>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">History</span>
@@ -193,7 +195,7 @@
       </div>
 
       <div style="border-top:1px solid #2b2724">
-        <div onClick="{{ toggleContext }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer">
+        <div onClick="{{ toggleContext }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer; position:sticky; top:0; z-index:2; background:#0e0d0c">
           <sc-if value="{{ contextOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px; color:#948a7f">▼</span></sc-if>
           <sc-if value="{{ contextClosed }}"><span style="font-size:9px; color:#948a7f">▶</span></sc-if>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">In context</span>
@@ -226,7 +228,7 @@
       </div>
 
       <div style="border-top:1px solid #2b2724">
-        <div onClick="{{ toggleSpec }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer">
+        <div onClick="{{ toggleSpec }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer; position:sticky; top:0; z-index:2; background:#0e0d0c">
           <sc-if value="{{ specOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px; color:#948a7f">▼</span></sc-if>
           <sc-if value="{{ specClosed }}"><span style="font-size:9px; color:#948a7f">▶</span></sc-if>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Spec</span>
@@ -255,10 +257,11 @@
               <span style="font-size:12.5px; color:#948a7f; flex:1">Define the hook signature</span>
             </div>
             <div style="display:flex; align-items:center; gap:9px; padding:5px 2px 5px 6px; border-left:2px solid #37bda9; margin-left:-8px">
-              <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #3d3833; box-sizing:border-box; flex:none"></span>
+              <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #7fb2e8; box-sizing:border-box; flex:none; display:inline-flex; align-items:center; justify-content:center"><span style="width:5px; height:5px; border-radius:999px; background:#7fb2e8"></span></span>
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; flex:none">T-013</span>
-              <span style="font-size:12.5px; font-weight:600; color:#eff3f4; flex:1">Implement useSession</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9">now</span>
+              <span style="font-size:12.5px; font-weight:600; color:#eff3f4; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">Implement useSession</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7fb2e8; white-space:nowrap; flex:none">active</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap; flex:none; font-variant-numeric:tabular-nums; min-width:24px; text-align:right">now</span>
             </div>
             <div style="display:flex; align-items:center; gap:9px; padding:5px 2px">
               <span style="width:14px; height:14px; border-radius:999px; border:1.5px solid #2b2724; box-sizing:border-box; flex:none"></span>
@@ -271,7 +274,7 @@
       </div>
 
       <div style="border-top:1px solid #2b2724">
-        <div onClick="{{ togglePlan }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer">
+        <div onClick="{{ togglePlan }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer; position:sticky; top:0; z-index:2; background:#0e0d0c">
           <sc-if value="{{ planOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px; color:#948a7f">▼</span></sc-if>
           <sc-if value="{{ planClosed }}"><span style="font-size:9px; color:#948a7f">▶</span></sc-if>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Plan</span>
@@ -304,7 +307,7 @@
       </div>
 
       <div style="border-top:1px solid #2b2724">
-        <div onClick="{{ toggleGit }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer">
+        <div onClick="{{ toggleGit }}" style="display:flex; align-items:center; gap:8px; padding:12px 14px 10px; cursor:pointer; position:sticky; top:0; z-index:2; background:#0e0d0c">
           <sc-if value="{{ gitOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px; color:#948a7f">▼</span></sc-if>
           <sc-if value="{{ gitClosed }}"><span style="font-size:9px; color:#948a7f">▶</span></sc-if>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#948a7f">Changed files</span>
@@ -419,8 +422,8 @@
               <span style="{{ t.dotStyle }}"></span>
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; flex:none">{{ t.id }}</span>
               <span style="font-size:12.5px; color:{{ t.titleColor }}; flex:1">{{ t.title }}</span>
-              <sc-if value="{{ t.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap">now</span></sc-if>
-              <sc-if value="{{ t.notFocus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ t.statusColor }}; white-space:nowrap">{{ t.status }}</span></sc-if>
+              <span title="{{ t.status }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ t.statusColor }}; white-space:nowrap; flex:none; max-width:104px; overflow:hidden; text-overflow:ellipsis">{{ t.status }}</span>
+              <sc-if value="{{ t.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap; flex:none; font-variant-numeric:tabular-nums; min-width:24px; text-align:right">{{ t.focusTag }}</span></sc-if>
             </div>
           </sc-for>
         </div>
@@ -464,8 +467,8 @@
               <div style="display:flex; flex-direction:column; gap:2px; min-width:0; flex:1">
                 <div style="display:flex; align-items:center; gap:7px">
                   <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; white-space:nowrap; flex:none">{{ row.id }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ row.statusColor }}; white-space:nowrap; flex:none">{{ row.status }}</span>
-                  <sc-if value="{{ row.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap; flex:none">· now</span></sc-if>
+                  <span title="{{ row.status }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ row.statusColor }}; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ row.status }}</span>
+                  <sc-if value="{{ row.focus }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#37bda9; white-space:nowrap; flex:none; font-variant-numeric:tabular-nums">{{ row.focusTag }}</span></sc-if>
                 </div>
                 <div style="font-size:12.5px; line-height:1.4; color:#eff3f4">{{ row.title }}</div>
               </div>
@@ -481,7 +484,7 @@
               <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#948a7f; margin-left:auto; white-space:nowrap; flex:none">{{ task.updated }}</span>
             </div>
             <div style="font-size:16px; font-weight:700; letter-spacing:-.01em; color:#eff3f4">{{ task.title }}</div>
-            <sc-if value="{{ task.focus }}"><div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#37bda9">reported now · editing src/hooks/useSession.ts</div></sc-if>
+            <sc-if value="{{ task.focus }}"><div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#37bda9">{{ task.focusLine }}</div></sc-if>
             <div style="font-size:13px; line-height:1.6; color:#c9c3bb">{{ task.detail }}</div>
           </div>
 
@@ -627,6 +630,15 @@
           <div style="display:flex; gap:6px">
             <span onClick="{{ s1 }}" style="{{ s1Style }}">1</span>
             <span onClick="{{ s2 }}" style="{{ s2Style }}">2</span>
+            <span onClick="{{ s3 }}" style="{{ s3Style }}">3</span>
+            <span onClick="{{ s4 }}" style="{{ s4Style }}">4</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <span style="font-size:12.5px; color:#645c50; width:64px">Height</span>
+          <div style="display:flex; gap:6px">
+            <span onClick="{{ hTall }}" style="{{ hTallStyle }}">Tall</span>
+            <span onClick="{{ hShort }}" style="{{ hShortStyle }}">500px</span>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px">
@@ -641,7 +653,12 @@
     </div>
 
     <div style="display:flex; flex-direction:column; gap:10px; border-top:1px solid rgba(32,30,29,.14); padding-top:16px">
-      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Round 2</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50">Round 3</div>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Status is a string.</strong> <em>todo, active, blocked, done</em> and their synonyms keep their treatments; anything else prints as-is in muted mono, truncated at 104px with the full text on hover.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>The tag counts.</strong> The teal marker reads <em>now</em> while the agent's last report names that task, then <em>4m</em>, <em>2h</em> — same slot, tabular, right-aligned, no threshold and no fade.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Pills carry state.</strong> Each session shows its own chip and elapsed time; the branch drops off unselected pills past two sessions. An unselected <em>needs you</em> takes an ember dot, border and tint — no motion, no reordering.</p>
+      <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Short window.</strong> At 500px the body scrolls under sticky section headers, so the label and its summary stay legible while its contents pass behind.</p>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#645c50; padding-top:6px">Round 2</div>
       <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Two task states.</strong> A task is done or not done. The "which one is being worked on" signal moved off the checkbox and onto a teal left rule plus a mono <em>now</em> tag — sourced from the agent's prose, not from the file.</p>
       <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Width is the user's.</strong> The window never resizes itself. Below 640px the story list becomes a picker and the detail takes the full width; the task list stacks above its detail.</p>
       <p style="margin:0; font-size:13.5px; line-height:1.6"><strong>Sessions.</strong> Absent at one. A second declaring itself slides a row in under the title bar and tints it blue for a beat; dismissing drops the board's copy only.</p>
@@ -655,7 +672,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { tab: 'overview', open: { history: true, context: true, spec: true, plan: true, git: true }, rows: {}, copied: null, story: 1, task: 2, drop: false, width: 452, sessions: 1, session: 0, boardEmpty: false };
+  state = { tab: 'overview', open: { history: true, context: true, spec: true, plan: true, git: true }, rows: {}, copied: null, story: 1, task: 2, drop: false, width: 452, sessions: 1, session: 0, boardEmpty: false, short: false };
 
   stories = [
     { id: 'US-001', priority: 'P1', status: 'Done', title: 'See what the agent is working on without asking',
@@ -679,7 +696,7 @@ class Component extends DCLogic {
       tasks: [
         { id: 'T-011', title: 'Audit the three call sites', status: 'done', updated: '38m', detail: 'List every difference between the three copies before consolidating anything.', checks: ['Differences recorded in the spec.', 'Error paths compared line by line.'], files: 'specs/002-session-hook/research.md' },
         { id: 'T-012', title: 'Define the hook signature', status: 'done', updated: '22m', detail: 'Agree the return shape so the routes need no local state.', checks: ['Returns data, error and a refresh function.', 'No route keeps its own loading flag.'], files: 'src/hooks/useSession.ts' },
-        { id: 'T-013', title: 'Implement useSession', status: 'todo', focus: true, updated: 'now', detail: 'Write the hook with the existing error handling moved across unchanged, including the refresh race guard.', checks: ['Refresh race guard carried over.', 'Logout during refresh still clears the store.', 'Tests from T-014 pass.'], files: 'src/hooks/useSession.ts' },
+        { id: 'T-013', title: 'Implement useSession', status: 'active', focus: true, focusAge: 'now', updated: 'now', detail: 'Write the hook with the existing error handling moved across unchanged, including the refresh race guard.', checks: ['Refresh race guard carried over.', 'Logout during refresh still clears the store.', 'Tests from T-014 pass.'], files: 'src/hooks/useSession.ts' },
         { id: 'T-014', title: 'Swap the call sites and run tests', status: 'todo', updated: '—', detail: 'Replace the three inline fetches and run the session suite.', checks: ['Three call sites replaced.', 'Session suite green.'], files: 'src/routes/index.tsx\nsrc/routes/settings.tsx' }
       ] },
     { id: 'US-003', priority: 'P2', status: 'Open', title: 'Keep the panel readable over any editor theme',
@@ -690,7 +707,7 @@ class Component extends DCLogic {
       criteria: ['Panel ground stays fixed regardless of host theme.', 'All text meets 4.5:1 against its own background.'],
       files: 'src/panel/tokens.ts',
       tasks: [
-        { id: 'T-021', title: 'Audit contrast of every text style', status: 'todo', updated: '2h', detail: 'Not started. The agent noted that the token file imports from api/client.ts, which has an unresolved conflict.', checks: ['Every sub-13px style measured.', 'Failures listed with a replacement step.'], files: 'src/panel/tokens.ts' }
+        { id: 'T-021', title: 'Audit contrast of every text style', status: 'blocked', updated: '2h', detail: 'Not started. The agent noted that the token file imports from api/client.ts, which has an unresolved conflict.', checks: ['Every sub-13px style measured.', 'Failures listed with a replacement step.'], files: 'src/panel/tokens.ts' }
       ] },
     { id: 'US-004', priority: 'P2', status: 'Open', title: 'Read the prompt history without leaving the panel',
       spec: 'specs/004-prompt-history/spec.md',
@@ -700,8 +717,8 @@ class Component extends DCLogic {
       criteria: ['Each entry expands to its full text.', 'Copy puts the exact prompt on the clipboard.'],
       files: 'src/panel/History.tsx',
       tasks: [
-        { id: 'T-031', title: 'Expandable history rows', status: 'todo', updated: '—', detail: 'Row expands in place; only the chevron and the row text toggle it.', checks: ['Expanded row shows the untruncated prompt.'], files: 'src/panel/History.tsx' },
-        { id: 'T-032', title: 'Copy to clipboard', status: 'todo', updated: '—', detail: 'Copy button writes the raw prompt and confirms for about a second.', checks: ['Confirmation clears itself.'], files: 'src/panel/History.tsx' }
+        { id: 'T-031', title: 'Expandable history rows', status: 'needs review', focus: true, focusAge: '12m', updated: '12m', detail: 'Row expands in place; only the chevron and the row text toggle it.', checks: ['Expanded row shows the untruncated prompt.'], files: 'src/panel/History.tsx' },
+        { id: 'T-032', title: 'Copy to clipboard', status: 'deferred', updated: '—', detail: 'Copy button writes the raw prompt and confirms for about a second.', checks: ['Confirmation clears itself.'], files: 'src/panel/History.tsx' }
       ] },
     { id: 'US-005', priority: 'P3', status: 'Open', title: 'Tear a section off into its own window',
       spec: 'specs/005-tear-off/spec.md',
@@ -711,19 +728,37 @@ class Component extends DCLogic {
       criteria: ['A torn-off section keeps its own status chip.', 'Closing it returns the section to the parent panel.'],
       files: 'src/panel/WindowManager.ts',
       tasks: [
-        { id: 'T-041', title: 'Window manager for detached panels', status: 'todo', updated: '—', detail: 'Track detached sections and restore them on close.', checks: ['Section returns to its original position.'], files: 'src/panel/WindowManager.ts' }
+        { id: 'T-041', title: 'Window manager for detached panels', status: 'waiting on CI', updated: '—', detail: 'Track detached sections and restore them on close.', checks: ['Section returns to its original position.'], files: 'src/panel/WindowManager.ts' }
       ] }
   ];
 
-  statusColor(s) { return s === 'done' ? '#37bda9' : '#948a7f'; }
-  statusText(s) { return s === 'done' ? 'done' : 'not done'; }
-  dot(s) {
-    if (s === 'done') return 'width:12px; height:12px; border-radius:999px; background:#1c2a28; border:1.5px solid #37bda9; box-sizing:border-box; flex:none; margin-top:3px';
-    return 'width:12px; height:12px; border-radius:999px; border:1.5px solid #3d3833; box-sizing:border-box; flex:none; margin-top:3px';
+  // Recognised statuses and their synonyms. Anything else stays neutral and prints as-is.
+  vocabulary = {
+    done: ['done', 'complete', 'completed', 'finished', 'merged', 'shipped'],
+    active: ['active', 'in progress', 'in-progress', 'working', 'started', 'wip'],
+    blocked: ['blocked', 'blocker', 'stuck'],
+    todo: ['todo', 'to do', 'to-do', 'not started', 'pending', 'unstarted']
+  };
+  kindOf(raw) {
+    const v = String(raw || '').trim().toLowerCase();
+    for (const k of Object.keys(this.vocabulary)) if (this.vocabulary[k].indexOf(v) >= 0) return k;
+    return 'other';
+  }
+  statusColor(raw) {
+    const k = this.kindOf(raw);
+    return k === 'done' ? '#37bda9' : k === 'active' ? '#7fb2e8' : k === 'blocked' ? '#f6a06b' : '#948a7f';
+  }
+  statusText(raw) { return String(raw || '').trim().toLowerCase(); }
+  dot(raw) {
+    const k = this.kindOf(raw), base = 'width:12px; height:12px; border-radius:999px; box-sizing:border-box; flex:none; margin-top:3px; ';
+    if (k === 'done') return base + 'background:#1c2a28; border:1.5px solid #37bda9';
+    if (k === 'active') return base + 'border:1.5px solid #7fb2e8; background:#1e2630';
+    if (k === 'blocked') return base + 'border:1.5px solid #f6a06b';
+    return base + 'border:1.5px solid #3d3833';
   }
   pick(k, v) { return () => this.setState({ [k]: v }); }
   segStyle(on) {
-    return 'font-family:\'JetBrains Mono\',monospace; font-size:11.5px; font-weight:600; padding:4px 11px; border-radius:999px; cursor:pointer; border:1px solid ' +
+    return 'font-family:\'JetBrains Mono\',monospace; font-size:11.5px; font-weight:600; padding:4px 11px; border-radius:999px; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; border:1px solid ' +
       (on ? '#201e1d' : 'rgba(32,30,29,.2)') + '; background:' + (on ? '#201e1d' : 'transparent') + '; color:' + (on ? '#f5ead8' : '#645c50');
   }
   dismissSession(i) { return (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState(st => ({ sessions: Math.max(1, st.sessions - 1), session: 0 })); }; }
@@ -764,18 +799,42 @@ class Component extends DCLogic {
       taskListStyle: this.state.width >= 640
         ? 'width:268px; border-right:1px solid #2b2724; display:flex; flex-direction:column; flex:none'
         : 'border-bottom:1px solid #2b2724; display:flex; flex-direction:column',
-      multiSession: this.state.sessions > 1,
+      multiSession: this.state.sessions > 1 && !this.state.boardEmpty,
       sessionPills: Array.from({ length: this.state.sessions }, (_, i) => {
-        const meta = [{ repo: 'acme/console', branch: 'feat/session-hook' }, { repo: 'acme/api', branch: 'main' }][i] || { repo: 'acme/tools', branch: 'main' };
+        const meta = [
+          { repo: 'acme/console', branch: 'feat/session-hook', state: 'Watching', heard: '40s' },
+          { repo: 'acme/api', branch: 'main', state: 'Needs you', heard: '3m' },
+          { repo: 'acme/tools', branch: 'main', state: 'Thinking', heard: '12s' },
+          { repo: 'acme/docs', branch: 'main', state: 'Idle', heard: '18m' }
+        ][i];
         const on = i === this.state.session;
+        const attention = meta.state === 'Needs you';
+        const c = attention ? '#f6a06b' : meta.state === 'Thinking' ? '#7fb2e8' : meta.state === 'Watching' ? '#37bda9' : '#948a7f';
+        const tint = attention ? '#2a2119' : meta.state === 'Thinking' ? '#1e2630' : '#1c2a28';
+        const dense = this.state.sessions > 2;
         return {
-          repo: meta.repo, branch: meta.branch,
+          repo: meta.repo, branch: meta.branch, state: meta.state, heard: meta.heard,
+          title: meta.repo + ' · ' + meta.branch + ' · ' + meta.state.toLowerCase() + ' · heard ' + meta.heard + ' ago',
+          showBranch: !dense || on,
+          showState: attention || on,
           select: this.pick('session', i),
           dismiss: this.dismissSession(i),
-          style: 'display:flex; align-items:center; gap:8px; padding:4px 6px 4px 10px; border-radius:999px; cursor:pointer; flex:none; border:1px solid ' + (on ? '#3d3833' : 'transparent') + '; background:' + (on ? '#1a1817' : 'transparent') + (i === this.state.sessions - 1 && i > 0 ? '; animation:sessionTint 1600ms ease-out' : ''),
-          dotStyle: 'width:6px; height:6px; border-radius:999px; flex:none; background:' + (on ? '#37bda9' : '#948a7f')
+          style: 'display:flex; align-items:center; gap:8px; padding:4px 6px 4px 10px; border-radius:999px; cursor:pointer; flex:none; border:1px solid ' +
+            (attention && !on ? '#4a3a29' : on ? '#3d3833' : 'transparent') + '; background:' +
+            (attention && !on ? '#2a2119' : on ? '#1a1817' : 'transparent') +
+            (i === this.state.sessions - 1 && i > 0 ? '; animation:sessionTint 1600ms ease-out' : ''),
+          stateStyle: 'font-family:\'JetBrains Mono\',monospace; font-size:10.5px; font-weight:600; white-space:nowrap; padding:2px 7px; border-radius:999px; color:' + c + '; background:' + tint,
+          dotStyle: 'width:6px; height:6px; border-radius:999px; flex:none; background:' + c
         };
       }),
+      s3: this.pick('sessions', 3), s4: this.pick('sessions', 4),
+      s3Style: this.segStyle(this.state.sessions === 3), s4Style: this.segStyle(this.state.sessions === 4),
+      hTall: this.pick('short', false), hShort: this.pick('short', true),
+      hTallStyle: this.segStyle(!this.state.short), hShortStyle: this.segStyle(this.state.short),
+      panelHeight: this.state.short ? '500px' : 'auto',
+      scrollStyle: this.state.short
+        ? 'display:flex; flex-direction:column; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#3d3833 transparent'
+        : 'display:flex; flex-direction:column',
       w452: this.pick('width', 452), w640: this.pick('width', 640), w880: this.pick('width', 880),
       w452Style: this.segStyle(this.state.width === 452), w640Style: this.segStyle(this.state.width === 640), w880Style: this.segStyle(this.state.width === 880),
       s1: this.pick('sessions', 1), s2: this.pick('sessions', 2),
@@ -832,7 +891,7 @@ class Component extends DCLogic {
             id: x.id, title: x.title,
             status: this.statusText(x.status),
             statusColor: this.statusColor(x.status),
-            focus: !!x.focus, notFocus: !x.focus,
+            focus: !!x.focus, notFocus: !x.focus, focusTag: x.focusAge || 'now',
             titleColor: x.focus ? '#eff3f4' : '#c9c3bb',
             dotStyle: this.dot(x.status).replace('margin-top:3px', 'margin-top:0'),
             rowStyle: 'display:flex; align-items:center; gap:9px; padding:3px 0 3px 6px; margin-left:-8px; border-left:2px solid ' + (x.focus ? '#37bda9' : 'transparent')
@@ -840,7 +899,7 @@ class Component extends DCLogic {
         };
       })(),
       taskRows: this.stories[this.state.story].tasks.map((x, i) => ({
-        id: x.id, title: x.title, status: this.statusText(x.status), focus: !!x.focus,
+        id: x.id, title: x.title, status: this.statusText(x.status), focus: !!x.focus, focusTag: x.focusAge || 'now',
         statusColor: this.statusColor(x.status),
         dotStyle: this.dot(x.status),
         select: this.selectTask(i),
@@ -852,6 +911,9 @@ class Component extends DCLogic {
         return {
           ...x,
           focus: !!x.focus,
+          focusLine: x.focusAge === 'now' || !x.focusAge
+            ? 'now · editing ' + String(x.files).split('\n')[0]
+            : 'last reported ' + x.focusAge + ' ago · ' + String(x.files).split('\n')[0],
           status: this.statusText(x.status),
           checks: x.checks.map(text => ({ text, dotStyle: 'width:5px; height:5px; border-radius:999px; background:#948a7f; flex:none; margin-top:7px' })),
           chipStyle: 'background:#1a1817; color:' + this.statusColor(x.status) + '; border-radius:999px; padding:2px 9px; font-size:10.5px; font-weight:600; white-space:nowrap; flex:none'
