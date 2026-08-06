@@ -19,11 +19,13 @@ should be written until the design docs exist and are reviewed.
 | Grounding in real Spec-Kit formats | ✅ Done against `../LMNTLZ` — survives the restart (see below) |
 | Product definition | ✅ Unchanged from the previous round: the live Spec-Kit board |
 | Stack | ✅ Vite + React, Electron-wrapped, cross-platform (Windows / macOS / Linux) |
-| Interface surfaces | ✅ MCP server + HTTP API + CLI |
+| Interface surfaces | ✅ MCP server + HTTP API + CLI, plus a transcript reader (decision 10) |
+| Direction of flow | ✅ One-way, agent → board. Never writes to the user's repo (decision 11) |
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ⬜ Still open — the prior round's decisions are not binding |
-| Design prompts / wireframes (`resources/`) | ⬜ Emptied 2026-08-06; new round being written |
+| Design exports (`resources/`) | ✅ Round 1 landed — Brand, Design System, Overview Panel (4 tabs); canon for look and feel per decision 8 |
+| Design revisions owed | ⬜ Narrow-width Stories/Tasks; the session switcher + dismiss; two-state tasks (decision 19); the empty state before anything is pushed; the Notes tab, which the design leaves undesigned |
 | Design docs (`docs/design/`) | ⬜ Not started |
 | Feature specs (`specs/`) | ⬜ None |
 | Implementation | ⬜ Blocked on design review |
@@ -93,7 +95,201 @@ their head across a long agent session.
    presentation. *Rationale:* one contract across all three surfaces, while
    still letting an agent say things a status enum cannot express (*why* T042 is
    blocked). *Cost:* the prose field is unvalidatable by construction — see open
-   question 6.
+   question 5.
+8. **The `resources/` designs are canon for look and feel; this repo's docs win
+   on everything else.** Palette, type scale, spacing, radius, elevation, panel
+   chrome, layout and component shapes come from the design exports and are
+   followed as given — that is the whole point of having them. Where a design's
+   *incidental content* — sample IDs, sample thresholds, fixture text — conflicts
+   with the grounding and decisions recorded here, the documentation wins and
+   that part of the design is read as illustrative rather than prescriptive.
+   - *Resolved by this rule, out of the 2026-08-06 design review:* the mock's
+     hyphenated `T-011` / `US-002` IDs give way to the real bare and bold `T001`
+     forms in the grounding above; the "stalled step older than 60s" acceptance
+     criterion gives way to decision 15, which rejects thresholds entirely;
+     and the fixture's mixing of CoCoPilot's own features with a generic sample
+     app gets separated per the notable wrinkle below.
+   - *Not resolved by this rule:* cases where two design files contradict each
+     other, or where a design shows data that no decided source can supply. The
+     rule cannot arbitrate those, because the conflict is not between a design
+     and the docs. Both instances raised by the design review were settled
+     directly instead — decisions 10 and 11.
+9. **Panel width is stable and user-owned.** The window keeps its width when the
+   user switches tabs; only a deliberate resize changes it. The mock's jump
+   between 452px on Overview/Notes and 880px on Stories/Tasks is mock
+   convenience, not intended behaviour.
+   - *Consequence:* Stories and Tasks are drawn as master–detail at 880px, so
+     they need a defined behaviour at narrow widths — detail stacks under the
+     list, or the list collapses to a picker. The designs do not cover this yet
+     and owe a revision.
+10. **Claude Code's own session transcripts are the source for prompt, history
+    and context.** The app tails `~/.claude/projects/<slug>/*.jsonl`, which
+    Claude Code already writes per project directory, to feed the Overview tab's
+    *Last prompt*, *History* and *In context* sections. This is observed data,
+    not agent-claimed, so it also does most of the work of the honesty question
+    below.
+    - *Fits decision 6 rather than fighting it:* transcripts join repo files as
+      truth on disk that we re-read and never store. History therefore survives
+      an app restart, which removes the "Show all 18 but the list is empty"
+      dishonesty the design review flagged, and the board can show what happened
+      while it was closed, because the transcripts were being written anyway.
+    - *Free consequence:* the transcript directory is named from a slug of the
+      project path, so a pushed repo path resolves to exactly one transcript
+      folder with no configuration. Decision 13 supplies the path.
+    - *Cost:* the format is undocumented and can change without notice, so the
+      reader has to be defensive and degrade to "no transcript data" rather than
+      break the board. Prompt text is also the most sensitive thing on screen —
+      a privacy surface we did not previously have.
+    - *Does not replace the push.* A transcript is raw conversation; the push is
+      the agent deliberately curating a status for a human. Decision 6's build
+      order stands.
+    - *Tailing is live and continuous*, and this is consistent with decision 12
+      rather than an exception to it — the app follows the file the AI writes,
+      and never watches the repository or git. See decision 12.
+11. **Data flows one way: agent → board. The board never talks back.** Nothing
+    in the UI sends anything to the agent or writes to the user's repository.
+    - *Removes from scope:* the Design System's "Ask about this file…" input,
+      Apply / Skip, Re-read / Discard, and "Open in Claude". Those controls stay
+      in the design as the visual reference for button, input and chip styling —
+      decision 8 still governs look and feel — but no product surface uses them.
+    - *Closes the older question* of whether CoCoPilot ever writes to the user's
+      repo: it does not, which restores the "add-on, not source of truth"
+      honesty the previous round had.
+    - *Still allowed,* because none of it reaches the agent: collapsing a
+      section, expanding a past prompt, copying one to the clipboard, resizing,
+      and tearing a view into its own window.
+12. **The AI drives updates. The window never refreshes itself.** The board does
+    not poll, does not watch the repository for changes, and does not re-scan on
+    a timer. What is on screen changes because the agent caused it to change.
+    - *Consequence:* the screen is explicitly a snapshot as of the last update,
+      not a live mirror of the working tree. Editing a file by hand, or running
+      git outside the agent, does not move the board. That is a feature — it
+      shows what the *agent* believes and did — but it makes decision 15
+      load-bearing, because the human needs to see how stale the picture is.
+    - *Consequence:* the design's fine-grained activity — a progress bar,
+      "reading src/api/client.ts", "editing src/hooks/useSession.ts" — is only as
+      fresh as the last update. Either the agent updates often enough to sustain
+      it, or those elements need to read as last-known rather than live.
+    - *Supersedes* the file-watching mentioned in passing in decision 3's
+      rationale. Electron's Node main process is still where this lives; it just
+      is not watching anything.
+    - *Section priority, stated 2026-08-06:* **Changed files matters least** of
+      the Overview sections. That conveniently defuses most of the staleness
+      cost above — the git-derived section is the one that would most want
+      watching, and it is the one we care about least. Weight *Last prompt*,
+      *History*, *In context*, *Spec* and *Plan* above it when they compete for
+      space or for effort.
+    - *Resolved:* following the transcript **counts as the AI updating the
+      board**, not as the window refreshing itself, because the transcript is
+      written by Claude Code. The distinction that matters is *whose* file the
+      app follows: the one the AI writes, yes; the repository and git, no. So
+      the Overview activity sections stay live without requiring a push per tool
+      call, which would otherwise be the only way to sustain the design's
+      "reading src/api/client.ts" state.
+13. **No user-facing repo selection. The board follows what the AI declares.** A
+    push carries its own repo and branch, and the board renders whatever it is
+    told about. There is no folder picker, no watch list, and no per-repo
+    configuration step.
+    - *Consistent with decision 12* — the AI drives the board, including what
+      the board is even looking at.
+    - *Consequence:* the design's title bar, showing a repo and
+      `feat/session-hook` beside the Watching chip, is pushed data rather than
+      user-chosen state. It changes when the agent says it changed.
+    - *Consequence:* this supplies the trigger decision 10 was missing. The
+      pushed repo path resolves to the transcript directory by slug, so the
+      board knows which transcript to follow without being told separately.
+    - *Consequence:* a board with nothing pushed to it yet has no repo and
+      nothing to show, so an empty state is now a real screen the designs do not
+      cover. Added to the revisions owed.
+14. **One window. A session switcher appears only once a second session
+    declares itself.** The board holds every declared session. With one — the
+    common case — the chrome is exactly as designed and there is no picker at
+    all. A second declared repo makes a switcher appear.
+    - *Not a contradiction of decision 13:* the user is not choosing what to
+      watch, only which of the sessions the AI already declared to look at.
+    - *Settles the shape:* one process, one main window. The tear-off `+` still
+      spawns extra windows for individual sections, which is a separate axis and
+      unaffected.
+    - *Design revision owed:* the switcher chrome does not exist in the exports,
+      and by construction it has to be invisible at one session and present at
+      two, which is not a state the designs currently show.
+15. **Liveness is elapsed time. The board never renders a verdict.** It shows
+    "last heard from 4m ago" and nothing more — no thresholds, no automatic
+    state change, no colour shift. A healthy agent goes quiet for minutes during
+    a typecheck, so any threshold is a guess about work the board cannot see.
+    Elapsed time is a fact; "stuck" is a guess.
+    - *Kills outright* the previous round's 45s/3m thresholds and the design
+      fixture's "stalled step older than 60s" criterion, which decision 8 had
+      only deferred.
+    - *Consequence:* the design's four status chips — Idle, Watching, Thinking,
+      Needs you — are driven by pushes and transcript activity, never by a timer.
+      The board does not move a chip on its own. "Needs you" in particular is
+      only ever a state the agent pushes, which is the sole way it can ask for
+      attention under the one-way rule.
+    - *Cost, accepted:* a genuinely hung agent looks exactly like a slow one.
+      The human does the judging, which is the point.
+16. **The board does not reconcile the transcript against the push.** Pushed
+    status drives the task, spec and plan views; the transcript feeds only the
+    three sections it was adopted for — *Last prompt*, *History* and *In
+    context*. The two are never compared, and no disagreement between them is
+    computed or displayed.
+    - *Closes the honesty question by declining it rather than solving it.* The
+      board reflects what the agent reports. Accepted cost: the one unfakeable
+      check available to us goes unused, so an agent that reports inaccurately
+      is displayed inaccurately.
+    - *Upside, and it is a real one:* it keeps the transcript reader a narrow,
+      well-scoped component with three consumers instead of a source of truth
+      threaded through the whole app. That directly limits the blast radius of
+      decision 10's main cost — when the undocumented format shifts, three
+      display sections degrade and nothing else does.
+    - *Consistent with the product definition:* an observer that keeps
+      information straight, not an auditor that grades the agent.
+17. **Sessions clear on app restart, and the user can dismiss one.** Volatile
+    state means a restart empties the switcher for free; a dismiss control on
+    each entry handles the long working day. No timers and no automatic
+    eviction, per decision 15.
+    - *Allowed under decision 11* because dismissing touches only the board and
+      never reaches the agent.
+    - *Defined behaviour, which follows from decision 13:* dismissing is not
+      muting. If a dismissed session pushes again it reappears — the AI decides
+      what is on the board, and a dismiss that suppressed future pushes would
+      take that back.
+    - *Design revision:* folds into the switcher revision already owed, rather
+      than adding a separate one.
+18. **The HTTP API binds to `127.0.0.1` and nothing else.** No auth, no TLS, no
+    remote access. Everything decided so far is local — the app, the MCP server
+    Claude Code spawns, the CLI, the transcript files — so nothing needs a
+    network hop.
+    - *Drops* the previous round's "local-first, remote-ready" intent
+      deliberately. Watching a board from a second machine is not possible
+      without reopening this.
+    - *Localhost is not a trust boundary.* Any local process can reach the API,
+      so pushes still get validated per rule 2 of `AGENTS.md` — being on the box
+      is not authorization. The blast radius is small given decisions 11 and 16
+      (nothing is written to the repo and nothing is reconciled), but "small" is
+      not "none": the realistic abuse is putting misleading text on the board.
+19. **A task has two states, and they come from the file.** Checked or
+    unchecked, read from `tasks.md`. There is no *active* and no *blocked* in the
+    data model; the agent's prose carries what is actually happening.
+    - *This is an explicit, informed override of decision 8*, taken knowing the
+      cost: the designs render four task states, and the blue active dot and
+      ember blocked treatment in the Stories, Tasks and Spec views are dropped.
+      Those views owe a design revision down to two states. Decision 8 still
+      governs everything else about how they look.
+    - *Scope — this is about tasks only.* The panel-level status chips (Idle,
+      Watching, Thinking, Needs you) are session state, still pushed, still
+      governed by decision 15. The Plan section's live "editing …" line is
+      likewise unaffected. Do not over-apply this to them.
+    - *Consistency win:* task state now comes entirely from disk, so unlike a
+      push-supplied state it survives a restart and cannot drift from the repo.
+      That aligns tasks with decision 6's re-read-never-store pattern.
+    - *Known inaccuracy, accepted:* the grounding found struck-through,
+      explicitly-dropped tasks that are still `[X]`. Under two states those count
+      as done, so a "2 of 4 done" summary can overcount. Revisit if it bites.
+    - *Shrinks the push considerably.* With status coming from the file, a push
+      no longer carries task status at all — it carries session identity (repo,
+      branch), which task is current, the prose, and the session chip. That is
+      most of open question 1.
 
 ## What survives the restart
 
@@ -115,44 +311,23 @@ regardless of what gets built:
 Re-verify against `../LMNTLZ` rather than against the Spec-Kit templates — the
 templates do not predict what real files look like.
 
-**Nothing else.** `resources/` was emptied on 2026-08-06; the round 1–3
-wireframes and design prompts are gone, and a new round is being written.
+**Nothing else.** `resources/` was emptied on 2026-08-06. The round 1–3
+wireframes and design prompts from the previous round are gone; the exports now
+in `resources/` are the *new* round, landed the same day.
 
 ## Open questions
 
 Ordered roughly by how much downstream work each one blocks.
 
-1. **Does CoCoPilot ever write to the user's repo?** The previous round said
-   never, which is what made "add-on, not source of truth" honest. Now open. If
-   it may write, the whole conflict/ownership story has to be designed.
-2. **One instance watching N repos, or one per repo?**
-3. **Is the HTTP API localhost-only, or does it serve remote windows too?** The
-   previous round wanted "local-first, remote-ready" off one seam.
-4. **What is actually in the push schema?** Decision 7 fixed the *shape* (typed
-   facts + prose) and decision 6 fixed the *mechanism* (one internal service,
-   three surfaces wrapping it), so the remaining work is the field list itself:
-   which states exist, what identifies a task across repos, and how a push
-   references a feature the board hasn't scanned yet.
-5. **Liveness display.** Narrowed by decision 6 rather than solved: a volatile,
-   push-driven board does not have to adjudicate "dead" at all — showing "last
-   heard from 4m ago" and letting the human judge is consistent with a tool that
-   keeps information straight rather than rendering verdicts. That sidesteps the
-   previous round's too-aggressive 45s/3m thresholds, but the display rules are
-   still unwritten. **Not explicitly confirmed** — flagged for review.
-6. **Keeping the MCP tool surface honest** — what stops an agent from marking
-   everything "editorial"? Decision 7's free-text field sharpens this: prose is
-   unvalidatable by construction, so whatever honesty mechanism exists has to
-   live in the typed part or in how the board presents unverified claims.
-   - *Candidate answer, not yet decided:* Claude Code **hooks** emit mechanical
-     facts — which files changed, which tools ran, session start/stop — with zero
-     agent cooperation, so unlike a self-reported status they cannot be gamed by
-     the agent. Pairing hook-observed facts with agent-claimed prose would let
-     the board distinguish **observed** from **claimed** in the UI. Hooks can
-     never replace the prose (they fire on events; they cannot author *why* a
-     task is blocked), so this is additive.
-   - *Consequence if adopted:* hooks become a **fourth ingest path** and have to
-     fold into the same contract as the other three — see open question 4.
-7. **Packaging and distribution** per platform, including code signing.
+1. **The push schema, written down.** No longer an open decision so much as an
+   artifact owed. Decision 7 fixed the shape, decision 6 the mechanism, decision
+   13 the session identity, and decision 19 removed task status from the payload
+   entirely — leaving repo, branch, current task, prose, and session chip. What
+   remains is to write it out properly as the contract all three surfaces wrap:
+   field names, which are required, how a push references a feature the board
+   has not scanned yet, and what the API returns when the board is not running
+   (decision 6's error copy).
+2. **Packaging and distribution** per platform, including code signing.
    Sharpened by decision 6: Claude Code *spawns* the MCP server as its own child
    process, so an Electron app has to ship a separately-spawnable Node entry
    point that lives outside the app bundle and starts with the app closed.
