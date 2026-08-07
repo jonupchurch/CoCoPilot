@@ -12,6 +12,9 @@ test.afterEach(async () => {
   await board.close();
 });
 
+/** Some non-zero count of seconds — the counter has moved off `0s`. */
+const ADVANCED = /^[1-9]\d*s$/;
+
 test.describe('Focus — what the agent is doing right now', () => {
   test('shows the current task and the agent prose about it', async () => {
     const { page } = board;
@@ -76,8 +79,10 @@ test.describe('Focus — what the agent is doing right now', () => {
     });
 
     // Not a threshold test -- there are no thresholds. It asserts that the only
-    // thing which changes is the number, which is what FR-003 asks for.
-    await expect(tag).toHaveText('2s', { timeout: 5_000 });
+    // thing which changes is the number, which is what FR-003 asks for. Matched
+    // as "some non-zero count of seconds" rather than an exact tick, so a slow
+    // machine cannot miss the one-second window and fail for the wrong reason.
+    await expect(tag).toHaveText(ADVANCED, { timeout: 5_000 });
 
     const after = await tag.evaluate((el) => {
       const style = getComputedStyle(el);
@@ -92,14 +97,14 @@ test.describe('Focus — what the agent is doing right now', () => {
     const { page } = board;
 
     await board.push({ ...envelope(), focus: { task: 'T-013' } });
-    await expect(page.getByTestId('focus-elapsed')).toHaveText('2s', { timeout: 5_000 });
+    await expect(page.getByTestId('focus-elapsed')).toHaveText(ADVANCED, { timeout: 5_000 });
 
     await board.note({ ...envelope(), text: 'noticed while editing' });
 
     // The title bar heard something; the focus tag reports when the agent last
     // said what it was working on, which was not now.
     await expect(page.getByTestId('elapsed')).toHaveText('heard 0s ago');
-    await expect(page.getByTestId('focus-elapsed')).not.toHaveText('0s');
+    await expect(page.getByTestId('focus-elapsed')).toHaveText(ADVANCED);
   });
 });
 
@@ -245,5 +250,65 @@ test.describe('the status vocabulary', () => {
     await expect(neutral.locator('.disc')).toBeEmpty();
 
     await expect(page.getByTestId('task-known').locator('.disc')).not.toBeEmpty();
+  });
+});
+
+test.describe('Plan — the sequence being worked through', () => {
+  const PLAN = [
+    { text: 'Read the three call sites', status: 'done' },
+    { text: 'Write useSession with the existing error handling', status: 'active', detail: 'editing src/hooks/useSession.ts' },
+    { text: 'Replace the call sites', status: 'todo' },
+    { text: 'Run the session tests', status: 'todo' },
+  ];
+
+  test('shows the steps in the reported order and distinguishes the current one', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), plan: PLAN });
+
+    const steps = page.locator('[data-testid^="plan-step-"] .plan__label');
+    await expect(steps).toHaveText(PLAN.map((step) => step.text));
+
+    // Distinguishable from both completed and upcoming, by the disc it carries.
+    await expect(page.getByTestId('plan-step-1').locator('.disc')).toHaveAttribute(
+      'data-vocabulary',
+      'active',
+    );
+    await expect(page.getByTestId('plan-step-0').locator('.disc')).toHaveAttribute(
+      'data-vocabulary',
+      'done',
+    );
+    await expect(page.getByTestId('plan-step-1')).toContainText('editing src/hooks/useSession.ts');
+  });
+
+  test('states position in the header while a step is active', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), plan: PLAN });
+    await expect(page.getByTestId('section-summary-plan')).toHaveText('Step 2 of 4');
+  });
+
+  test('falls back to completion when no step claims to be active', async () => {
+    const { page } = board;
+
+    await board.push({
+      ...envelope(),
+      plan: [
+        { text: 'Read the call sites', status: 'done' },
+        { text: 'Something the board cannot read', status: 'halfway' },
+      ],
+    });
+
+    // "Step 2 of 2" here would claim a position no reported step supports.
+    await expect(page.getByTestId('section-summary-plan')).toHaveText('1 of 2 done');
+  });
+
+  test('is absent rather than fabricated when no plan was reported', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), tasks: [{ id: 'T-011', title: 'A task', status: 'todo' }] });
+
+    await expect(page.getByTestId('section-spec')).toBeVisible();
+    await expect(page.getByTestId('section-plan')).toHaveCount(0);
   });
 });

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
 import { FocusSection } from './FocusSection.js';
+import { PlanSection } from './PlanSection.js';
 import { SpecSection } from './SpecSection.js';
 
 import './OverviewView.css';
@@ -68,6 +69,14 @@ export function OverviewView({
         open={open.spec}
         onToggle={() => {
           toggle('spec');
+        }}
+      />
+
+      <PlanSection
+        plan={session.plan}
+        open={open.plan}
+        onToggle={() => {
+          toggle('plan');
         }}
       />
     </div>
