@@ -1,0 +1,8 @@
+/*
+ * A plain stack. Each section owns its own divider and padding, so this element
+ * exists only to hold them in order and has no business adding space of its own.
+ */
+.overview {
+  display: flex;
+  flex-direction: column;
+}
