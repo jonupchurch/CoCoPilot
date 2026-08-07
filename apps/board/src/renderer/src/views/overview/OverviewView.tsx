@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
 import { ChangedFilesSection } from './ChangedFilesSection.js';
+import { ContextSection } from './ContextSection.js';
 import { FocusSection } from './FocusSection.js';
 import { HistorySection } from './HistorySection.js';
 import { LastPromptSection } from './LastPromptSection.js';
@@ -24,7 +25,14 @@ import './OverviewView.css';
  * same tab, different source.
  */
 
-export type SectionKey = 'lastPrompt' | 'history' | 'focus' | 'spec' | 'plan' | 'changed';
+export type SectionKey =
+  | 'lastPrompt'
+  | 'history'
+  | 'context'
+  | 'focus'
+  | 'spec'
+  | 'plan'
+  | 'changed';
 
 /**
  * Component state, not persisted. It survives an arriving report because this
@@ -34,6 +42,7 @@ export type SectionKey = 'lastPrompt' | 'history' | 'focus' | 'spec' | 'plan' | 
 const ALL_OPEN: Record<SectionKey, boolean> = {
   lastPrompt: true,
   history: true,
+  context: true,
   focus: true,
   spec: true,
   plan: true,
@@ -79,6 +88,20 @@ export function OverviewView({
         open={open.history}
         onToggle={() => {
           toggle('history');
+        }}
+      />
+
+      {/*
+        Last of the three transcript-fed sections, and the last thing above what
+        the agent reported: what it was asked, what it was asked before, and what
+        it is holding while it answers.
+      */}
+      <ContextSection
+        context={session.transcript.context}
+        repo={session.repo}
+        open={open.context}
+        onToggle={() => {
+          toggle('context');
         }}
       />
 

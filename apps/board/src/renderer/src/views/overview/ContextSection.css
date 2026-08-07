@@ -1,0 +1,102 @@
+/* Rows run to the panel edge, as in Changed files and History. */
+.section[data-testid='section-context'] .section__body {
+  gap: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.context__row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px;
+}
+
+.context__row:hover {
+  background: var(--surface);
+}
+
+/*
+ * The 5px disc from the export. Muted for a file the agent is holding, blue for
+ * the one whose tool call has not returned — blue is the working colour, and
+ * this is the only thing on the board that says the agent is mid-action on a
+ * specific file.
+ *
+ * The export also shows some held files teal and others muted, with no rule
+ * visible in the composition and nothing in the transcript that would source
+ * one. Rather than pick a distinction and present it as information, every held
+ * file gets the same disc.
+ */
+.context__disc {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+}
+
+.context__row[data-active='true'] .context__disc {
+  background: var(--blue);
+}
+
+/*
+ * Ellipsised at the end, plainly, for the same reason as a changed file's path:
+ * every trick for keeping the filename and losing the directories reorders the
+ * string visually. The full path is on `title`.
+ */
+.context__path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  color: var(--ink);
+}
+
+/*
+ * What touched it, in the slot where the export draws a per-file token size.
+ * That number is not in the transcript and estimating one would be inventing
+ * content, so the slot carries something the format actually says.
+ */
+.context__action {
+  flex: none;
+  max-width: 34%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.context__row[data-active='true'] .context__action {
+  color: var(--blue);
+}
+
+.context__more {
+  align-self: flex-start;
+  margin: 6px 14px 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-meta);
+  font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+}
+
+.context__more:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+  border-radius: var(--radius-field);
+}
+
+.context__none {
+  margin: 0;
+  padding: 0 14px;
+  font-size: var(--text-body);
+  color: var(--muted);
+}

@@ -64,7 +64,7 @@ const DERIVED: readonly RegExp[] = [
   // Uppercase because that is how `innerText` reports a `text-transform` label,
   // and matching the rendered form keeps the pattern from reaching into a
   // lowercase path like `specs/002-session-hook/spec.md`.
-  /CHANGED FILES|LAST PROMPT|HISTORY|FOCUS|SPEC|PLAN/g,
+  /CHANGED FILES|LAST PROMPT|HISTORY|IN CONTEXT|FOCUS|SPEC|PLAN/g,
   /*
    * Feature 005 put sections above these whose content comes from the transcript
    * rather than from a report. The harness points the board at a home directory

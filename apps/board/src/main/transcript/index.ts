@@ -2,8 +2,9 @@ import { watch, type FSWatcher } from 'node:fs';
 import { homedir } from 'node:os';
 
 import { sessionKey, type Session, type Store } from '../store.js';
-import { fromList, unreadable, type Availability } from './availability.js';
+import { available, empty, fromList, unreadable, type Availability } from './availability.js';
 import { classify, type Prompt } from './classify.js';
+import { ContextTracker, type ContextView } from './context.js';
 import { locate } from './locate.js';
 import { TranscriptReader } from './reader.js';
 
@@ -35,13 +36,14 @@ export interface TranscriptSourceOptions {
 
 const DEBOUNCE_MS = 120;
 
-/** One session's reader, its watcher, and the prompts read so far. */
+/** One session's reader, its watcher, and everything read so far. */
 interface Tracked {
   path: string;
   reader: TranscriptReader;
   watcher: FSWatcher | null;
   timer: NodeJS.Timeout | null;
   prompts: Prompt[];
+  context: ContextTracker;
 }
 
 export class TranscriptSource {
@@ -107,7 +109,7 @@ export class TranscriptSource {
 
     const found = locate(session.repoPath, session.transcriptId, this.#home);
     if (!found.ok) {
-      this.#publish(key, unreadable(found.reason));
+      this.#publish(key, unreadable(found.reason), unreadable(found.reason));
       return;
     }
 
@@ -117,6 +119,7 @@ export class TranscriptSource {
       watcher: null,
       timer: null,
       prompts: [],
+      context: new ContextTracker(),
     };
     this.#tracked.set(key, tracked);
 
@@ -154,14 +157,17 @@ export class TranscriptSource {
     const result = tracked.reader.read();
 
     if (!result.ok) {
-      this.#publish(key, unreadable(result.reason));
+      this.#publish(key, unreadable(result.reason), unreadable(result.reason));
       return;
     }
 
     // The file was replaced or truncated, so what came back is the whole file
-    // again rather than an addition. Keeping the old list would double every
-    // prompt in it.
-    if (result.restarted) tracked.prompts = [];
+    // again rather than an addition. Keeping what we accumulated would double
+    // every prompt in it, and leave files in context that were never opened.
+    if (result.restarted) {
+      tracked.prompts = [];
+      tracked.context.reset();
+    }
 
     for (const line of result.lines) {
       let record: unknown;
@@ -174,13 +180,21 @@ export class TranscriptSource {
       }
       const verdict = classify(record);
       if (verdict.kind === 'prompt') tracked.prompts.push(verdict.prompt);
+      // Every record, not only the ones `classify` recognised: what the agent
+      // is holding is folded out of assistant turns, tool results and
+      // attachments, none of which is a prompt.
+      tracked.context.observe(record);
     }
 
-    this.#publish(key, fromList(tracked.prompts.slice()));
+    this.#publish(key, fromList(tracked.prompts.slice()), context(tracked.context.view()));
   }
 
-  #publish(key: string, prompts: Availability<readonly Prompt[]>): void {
-    this.#store.putTranscript(key, { prompts, readAt: this.#now() });
+  #publish(
+    key: string,
+    prompts: Availability<readonly Prompt[]>,
+    context: Availability<ContextView>,
+  ): void {
+    this.#store.putTranscript(key, { prompts, context, readAt: this.#now() });
   }
 
   #drop(key: string): void {
@@ -199,7 +213,21 @@ export class TranscriptSource {
   }
 }
 
+/**
+ * A read that found no file and no token count is `empty`; one that found
+ * either is `available`.
+ *
+ * Not `files.length === 0` alone: a session whose accounting is known but whose
+ * files are not is still telling the developer something, and calling it empty
+ * would throw that away.
+ */
+function context(view: ContextView): Availability<ContextView> {
+  return view.files.length === 0 && view.tokens === null ? empty() : available(view);
+}
+
 export { classify } from './classify.js';
+export { ContextTracker } from './context.js';
+export type { ContextFile, ContextView } from './context.js';
 export { locate, projectDirectory, slug } from './locate.js';
 export { TranscriptReader } from './reader.js';
 export { available, empty, fromList, unreadable } from './availability.js';

@@ -44,7 +44,15 @@ function full(taskCount = 4): Record<string, unknown> {
  * it. The harness points at a home with no transcripts, so the two transcript
  * sections summarise as unavailable here, which is still a summary.
  */
-const SECTIONS = ['last-prompt', 'history', 'focus', 'spec', 'plan', 'changed'] as const;
+const SECTIONS = [
+  'last-prompt',
+  'history',
+  'context',
+  'focus',
+  'spec',
+  'plan',
+  'changed',
+] as const;
 
 test.describe('sections collapse independently', () => {
   test('hides its content and moves the sections below it up', async () => {

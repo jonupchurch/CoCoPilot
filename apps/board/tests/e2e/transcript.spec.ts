@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +24,21 @@ let projects: string;
 function install(fixture: string, transcriptId: string): string {
   const path = join(projects, `${transcriptId}.jsonl`);
   copyFileSync(join(FIXTURES, fixture), path);
+  return path;
+}
+
+/**
+ * The same, with `REPO/` replaced by this test's temporary repository.
+ *
+ * The transcript records absolute paths, and the section shows them relative to
+ * the repository it was told about — which cannot be asserted at all unless the
+ * two actually agree. Forward slashes throughout: the comparison normalises
+ * separators, so the fixture stays readable on every platform.
+ */
+function installUnder(fixture: string, transcriptId: string): string {
+  const path = join(projects, `${transcriptId}.jsonl`);
+  const text = readFileSync(join(FIXTURES, fixture), 'utf8');
+  writeFileSync(path, text.replaceAll('REPO/', `${repo.replaceAll('\\', '/')}/`));
   return path;
 }
 
@@ -434,6 +449,242 @@ test.describe('earlier prompts', () => {
     await board.page.getByTestId('history-toggle-u0').click();
 
     await expect(board.page.getByTestId('history-full-u0')).toContainText('<script>');
+    expect(
+      await board.page.evaluate(() => (window as { __pwned?: boolean }).__pwned),
+    ).toBeUndefined();
+  });
+});
+
+test.describe('what the agent is holding', () => {
+  test('lists the files it has opened, most recent first', async () => {
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    // Relative to the reported repository, as the export draws them. The
+    // attachment sits among the tool calls, because it reached the agent the
+    // same way as far as this question is concerned.
+    await expect(board.page.locator('.context__path')).toHaveText([
+      'src/api/client.ts',
+      'src/hooks/useSession.ts',
+      'CLAUDE.md',
+      'src/routes/index.tsx',
+    ]);
+  });
+
+  test('distinguishes the one it is working on right now', async () => {
+    // The last tool call in the fixture has no result yet -- which is exactly
+    // what "actively reading" is, and the only thing in the transcript that
+    // says so.
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    const rows = board.page.locator('.context__row');
+    await expect(rows.nth(0)).toHaveAttribute('data-active', 'true');
+    for (const index of [1, 2, 3]) {
+      await expect(rows.nth(index)).toHaveAttribute('data-active', 'false');
+    }
+
+    // Visibly, not only in an attribute: the disc and the label both take the
+    // working colour, and no other row does.
+    const colour = async (n: number): Promise<string> =>
+      rows.nth(n).locator('.context__disc').evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(await colour(0)).not.toBe(await colour(1));
+  });
+
+  test('says what touched each file, since the transcript carries no per-file size', async () => {
+    // The export draws `3.1k` here. That number is nowhere in the format and
+    // estimating one would be inventing content, so the slot carries the tool.
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.context__action')).toHaveText([
+      'Read',
+      'Edit',
+      'file',
+      'Read',
+    ]);
+  });
+
+  test('summarises the count and the window in the header', async () => {
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    // 2 + 100 + 12,298 -- the sum of the three input fields. Reading
+    // `input_tokens` alone would put `2` here.
+    await expect(board.page.getByTestId('section-summary-context')).toHaveText('4 files · 12.4k');
+  });
+
+  test('keeps the header summary when the section is collapsed', async () => {
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+    await board.page.getByTestId('section-toggle-context').click();
+
+    await expect(board.page.locator('.context__row')).toHaveCount(0);
+    await expect(board.page.getByTestId('section-summary-context')).toHaveText('4 files · 12.4k');
+  });
+
+  test('keeps the full path retrievable when the row is too narrow for it', async () => {
+    installUnder('context.jsonl', 'session-1');
+    board = await launchBoard({ home });
+    await board.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setSize(380, 400);
+    });
+
+    await board.push(session());
+
+    const first = board.page.locator('.context__path').first();
+    await expect(first).toHaveAttribute('title', new RegExp('src/api/client\\.ts$'));
+
+    const overflow = await board.page.evaluate(
+      () => document.body.scrollWidth - document.body.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+
+  test('forgets everything opened before the agent compacted', async () => {
+    // `system` / `compact_boundary` is where the agent's context was actually
+    // discarded. Still listing what came before would be the board asserting
+    // something about the agent's memory that has stopped being true.
+    const call = (id: string, path: string): string =>
+      JSON.stringify({
+        type: 'assistant',
+        uuid: `a-${id}`,
+        message: {
+          role: 'assistant',
+          content: [{ type: 'tool_use', id, name: 'Read', input: { file_path: path } }],
+        },
+      });
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      [
+        call('t1', `${repo.replaceAll('\\', '/')}/src/before.ts`),
+        JSON.stringify({ type: 'system', subtype: 'compact_boundary', content: 'Compacted' }),
+        call('t2', `${repo.replaceAll('\\', '/')}/src/after.ts`),
+      ].join('\n') + '\n',
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.context__path')).toHaveText(['src/after.ts']);
+  });
+
+  test('shows a path outside the repository whole', async () => {
+    // Which is the interesting thing about it -- trimming is only a courtesy
+    // for the common prefix.
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      `${JSON.stringify({
+        type: 'assistant',
+        uuid: 'a1',
+        message: {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool_use',
+              id: 't1',
+              name: 'Read',
+              input: { file_path: '/etc/hosts' },
+            },
+          ],
+        },
+      })}\n`,
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.context__path')).toHaveText(['/etc/hosts']);
+  });
+
+  test('says the transcript is silent rather than showing zero files', async () => {
+    // FR-010's shape for this section: a transcript that read fine and carries
+    // nothing about context is not a claim that nothing is in context.
+    install('garbage.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.getByTestId('context-none')).toBeVisible();
+    await expect(board.page.getByTestId('section-summary-context')).toHaveText('nothing yet');
+    await expect(board.page.getByTestId('context-unavailable')).toHaveCount(0);
+  });
+
+  test('says unavailable when there is no transcript at all', async () => {
+    board = await launchBoard({ home });
+
+    await board.push(session('gone'));
+
+    await expect(board.page.getByTestId('context-unavailable')).toBeVisible();
+    await expect(board.page.getByTestId('context-none')).toHaveCount(0);
+  });
+
+  test('offers the rest in place when more files are open than are listed', async () => {
+    const calls = Array.from({ length: 12 }, (_, i) =>
+      JSON.stringify({
+        type: 'assistant',
+        uuid: `a${i}`,
+        message: {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool_use',
+              id: `t${i}`,
+              name: 'Read',
+              input: { file_path: `${repo.replaceAll('\\', '/')}/src/file${i}.ts` },
+            },
+          ],
+        },
+      }),
+    );
+    writeFileSync(join(projects, 'session-1.jsonl'), `${calls.join('\n')}\n`);
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.context__path')).toHaveCount(8);
+    const more = board.page.getByTestId('context-show-all');
+    await expect(more).toHaveText('Show all 12');
+
+    await more.click();
+    await expect(board.page.locator('.context__path')).toHaveCount(12);
+  });
+
+  test('renders a hostile path as visible characters', async () => {
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      `${JSON.stringify({
+        type: 'assistant',
+        uuid: 'a1',
+        message: {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool_use',
+              id: 't1',
+              name: '<img src=x onerror="window.__pwned=1">',
+              input: { file_path: '<script>window.__pwned = true</script>.ts' },
+            },
+          ],
+        },
+      })}\n`,
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.context__path')).toContainText('<script>');
+    await expect(board.page.locator('.context .img, .context img')).toHaveCount(0);
     expect(
       await board.page.evaluate(() => (window as { __pwned?: boolean }).__pwned),
     ).toBeUndefined();

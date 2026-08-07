@@ -12,6 +12,7 @@ import type {
 import type { Session, Store } from './store.js';
 import type { Availability } from './transcript/availability.js';
 import type { Prompt } from './transcript/classify.js';
+import type { ContextView } from './transcript/context.js';
 
 /**
  * What crosses the bridge.
@@ -78,10 +79,15 @@ export interface TranscriptView {
    * projection does not re-order what it read.
    */
   prompts: Availability<readonly Prompt[]>;
+  /** Least recently touched first, on the same principle. */
+  context: Availability<ContextView>;
 }
 
 /** Nothing has been read yet, which is not the same as having read nothing. */
-const NOT_YET_READ: TranscriptView = { prompts: { state: 'unreadable', reason: 'not-read' } };
+const NOT_YET_READ: TranscriptView = {
+  prompts: { state: 'unreadable', reason: 'not-read' },
+  context: { state: 'unreadable', reason: 'not-read' },
+};
 
 export interface BoardState {
   session: SessionView | null;
@@ -131,6 +137,6 @@ function toSessionView(session: Session): SessionView {
     transcript:
       session.transcript === null
         ? NOT_YET_READ
-        : { prompts: session.transcript.prompts },
+        : { prompts: session.transcript.prompts, context: session.transcript.context },
   };
 }

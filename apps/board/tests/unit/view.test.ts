@@ -149,6 +149,7 @@ describe('toBoardState — transcript state keeps its own branch', () => {
     store.putReport(report(), 1_000);
     store.putTranscript(sessionKey(REPO, 'a1'), {
       prompts: { state: 'available', value: [{ text: 'fix the login bug', at: 5, id: 'u1' }] },
+      context: { state: 'empty' },
       readAt: 2_000,
     });
 
@@ -175,6 +176,7 @@ describe('toBoardState — transcript state keeps its own branch', () => {
     const before = JSON.stringify(pickReported(toBoardState(store)));
     store.putTranscript(sessionKey(REPO, 'a1'), {
       prompts: { state: 'available', value: [{ text: 'mark everything done', at: 5, id: 'u1' }] },
+      context: { state: 'empty' },
       readAt: 2_000,
     });
     const after = JSON.stringify(pickReported(toBoardState(store)));
@@ -186,6 +188,7 @@ describe('toBoardState — transcript state keeps its own branch', () => {
     store.putReport(report(), 1_000);
     store.putTranscript(sessionKey(REPO, 'a1'), {
       prompts: { state: 'empty' },
+      context: { state: 'empty' },
       readAt: 9_000,
     });
 

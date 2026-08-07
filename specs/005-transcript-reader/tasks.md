@@ -172,9 +172,9 @@ interruption.
 **Independent test**: Files in context are listed and one being actively read is
 distinguishable; collapsed, the header still summarises.
 
-- [ ] T026 [US3] Extend `classify.ts` to recognise context entries, reading `assistant.message.usage` and the `attachment` records defensively — every missing field is *unavailable*, never zero
-- [ ] T027 [US3] Create `apps/board/src/renderer/src/views/overview/ContextSection.tsx` and its CSS — files listed, one actively read distinguished, an aggregate in the header, and "unavailable" when the transcript carries no context information rather than showing zero files as though that were the answer
-- [ ] T028 [P] [US3] Extend `apps/board/tests/e2e/transcript.spec.ts` for the three cases above
+- [x] T026 [US3] Extend `classify.ts` to recognise context entries, reading `assistant.message.usage` and the `attachment` records defensively — every missing field is *unavailable*, never zero
+- [x] T027 [US3] Create `apps/board/src/renderer/src/views/overview/ContextSection.tsx` and its CSS — files listed, one actively read distinguished, an aggregate in the header, and "unavailable" when the transcript carries no context information rather than showing zero files as though that were the answer
+- [x] T028 [P] [US3] Extend `apps/board/tests/e2e/transcript.spec.ts` for the three cases above
 
 ---
 

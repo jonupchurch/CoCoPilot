@@ -18,6 +18,7 @@ import {
 
 import type { Availability } from './transcript/availability.js';
 import type { Prompt } from './transcript/classify.js';
+import type { ContextView } from './transcript/context.js';
 
 /**
  * Everything CoCoPilot holds.
@@ -85,6 +86,8 @@ export interface Session {
  */
 export interface TranscriptState {
   prompts: Availability<readonly Prompt[]>;
+  /** Files the agent is holding, and how much of its window they take. */
+  context: Availability<ContextView>;
   /** When the reader last managed to look. Null before the first attempt. */
   readAt: number | null;
 }
