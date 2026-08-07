@@ -26,14 +26,33 @@ import './SessionSwitcher.css';
 const THRESHOLD = 2;
 
 /**
- * Past this many, the branch drops from every pill.
+ * Up to this many sessions, every pill shows its branch as well as its
+ * repository.
  *
- * Density degrades by dropping information rather than shrinking it: at four
+ * Density degrades by dropping information rather than shrinking it: past three
  * sessions in a 380px panel there is no type size at which repository *and*
  * branch are both legible, and a name too small to read is worse than one that
  * is not there.
  */
 const DETAILED_UP_TO = 3;
+
+/**
+ * ...except where the branch is the only thing telling two sessions apart.
+ *
+ * FR-005 requires every entry to be distinguishable from the others, and the
+ * plan's rule — drop the branch past two sessions — quietly breaks it for the
+ * case the spec calls out by name: two sessions in the same repository on
+ * different branches. Four sessions, two of them in `api`, and the density rule
+ * alone would draw two identical pills.
+ *
+ * So the branch survives wherever a repository name is not unique, however
+ * crowded the row is. Density is a preference; being able to tell which agent
+ * you are about to switch to is the requirement.
+ */
+function needsBranch(sessions: readonly SessionSummary[], summary: SessionSummary): boolean {
+  if (sessions.length <= DETAILED_UP_TO) return true;
+  return sessions.filter((other) => other.repoName === summary.repoName).length > 1;
+}
 
 export function SessionSwitcher({
   sessions,
@@ -61,7 +80,7 @@ export function SessionSwitcher({
           key={summary.key}
           summary={summary}
           selected={summary.key === selected}
-          detailed={sessions.length <= DETAILED_UP_TO}
+          detailed={needsBranch(sessions, summary)}
           now={now}
           onSelect={onSelect}
           onDismiss={onDismiss}

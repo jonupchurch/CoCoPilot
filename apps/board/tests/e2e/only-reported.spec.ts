@@ -395,6 +395,45 @@ test.describe('the notes tab shows only what was reported', () => {
   });
 });
 
+/**
+ * And the switcher row, which is chrome rather than a view but draws
+ * agent-composed text like everything else.
+ *
+ * Three derived values, each earning its place: the repository's *name* rather
+ * than its path, the elapsed time, and the word `script` for a push with no
+ * process behind it. Nothing else may appear — in particular no count, no
+ * ordinal, and nothing about how long is "too long".
+ */
+test.describe('the session switcher shows only what was reported', () => {
+  test('renders nothing that was not reported or declared as derived', async () => {
+    const { page } = board;
+    const repoB = `${process.cwd()}/apps`;
+
+    await board.push({ ...envelope({ sessionId: 'a1', branch: 'feat/one' }) });
+    await board.push({ ...envelope({ repo: repoB, sessionId: 'b2', branch: 'feat/two' }) });
+    await expect(page.getByTestId('session-switcher')).toBeVisible();
+
+    let remaining = (await page.getByTestId('session-switcher').innerText()).replace(/\s+/gu, ' ');
+
+    for (const pattern of [
+      /\b\d+[smhd]\b/g, // elapsed, per pill
+      /Idle|Watching|Thinking|Needs you/g, // the reported chip, in its own words
+      /\bscript\b/g, // an unattributed push, which is a fact about the sender
+      /×/g, // the dismiss control
+    ]) {
+      remaining = remaining.replace(pattern, ' ');
+    }
+
+    // The reported branches, and the repository names the board derived from
+    // the reported paths.
+    for (const value of ['feat/one', 'feat/two', 'CoCoPilot', 'apps']) {
+      remaining = remaining.split(value).join(' ');
+    }
+
+    expect(remaining.replace(/[\s·]/gu, '')).toBe('');
+  });
+});
+
 test.describe('limits and hostile content', () => {
   test('stays navigable at 500 tasks with an accurate header summary', async () => {
     const { page } = board;

@@ -73,9 +73,10 @@ describe('resolveUnread', () => {
   });
 
   it('does not treat the count going down as an arrival', () => {
-    // Impossible for one session — notes only append — but feature 008 makes
-    // the count belong to whichever session is selected. Without this the dot
-    // would appear on switching to a quieter session and never clear.
+    // Impossible within one session — notes only append — but the count
+    // belongs to whichever session is selected, and feature 008 lets the
+    // developer switch. Without this the dot appears on switching to a quieter
+    // session and never clears.
     expect(
       drive([
         { notes: 5, viewing: false },

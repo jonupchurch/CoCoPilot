@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001–007 complete and merged; 008–009 not started |
+| Implementation | 🟡 **Started** — features 001–008 complete and merged; **009 (packaging) is all that remains** |
 
 ## What this is
 
@@ -654,7 +654,19 @@ notes are asserted scrollable with the oldest still legible.
 
 What remains: the torn-off window beyond the `+` affordance; and the agent going
 away mid-session — process exit or socket drop — as distinct from merely being
-quiet.
+quiet. The second is now the more interesting of the two: with feature 008 the
+board holds several agents at once, and "gone" versus "quiet" is a distinction
+the switcher has no way to draw. It stays refused rather than guessed, which is
+the same answer the product gives everywhere else, but it is refused for more
+sessions than before.
+
+**Feature 008 corrected its own plan.** The plan's density rule — the branch
+drops from unselected pills past two sessions — breaks FR-005 for a case the
+spec names in its own edge cases: two sessions in the same repository on
+different branches become two identical pills. The branch now survives wherever
+a repository name is not unique. Worth noting as a pattern rather than an
+incident: this is the third feature running where walking the quickstart at the
+end turned up something the plan had wrong.
 
 Feature 006 closed one item that was not on this list because the export did
 not raise it: **there is no unassigned scope anywhere in the design.** The

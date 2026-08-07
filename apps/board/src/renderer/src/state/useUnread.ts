@@ -36,10 +36,12 @@ export function resolveUnread(seen: number, noteCount: number, viewing: boolean)
   /*
    * Fewer notes than were seen is not an arrival.
    *
-   * It cannot happen to a single session today — notes only ever append — but
-   * it will the moment feature 008 lets the selected session change, because
-   * the count then belongs to whichever session is shown. Catching `seen` down
-   * makes that day a non-event instead of a dot that will not clear.
+   * This cannot happen within one session — notes only ever append — but the
+   * count belongs to whichever session is *selected*, and since feature 008 the
+   * developer can switch. Switching from a session with forty notes to one with
+   * two is a drop, and without this line the dot would appear for a note nobody
+   * wrote and never clear. Written defensively before it was reachable; it is
+   * reachable now, and `sessions.spec.ts` exercises it.
    */
   if (noteCount < seen) return { seen: noteCount, unread: false };
 

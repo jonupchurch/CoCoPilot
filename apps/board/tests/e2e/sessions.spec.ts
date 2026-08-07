@@ -566,3 +566,112 @@ test.describe('many sessions, long names, and the passage of time', () => {
     expect(timers).toEqual(['transcript/index.ts']);
   });
 });
+
+test.describe('density never costs the ability to tell sessions apart', () => {
+  test('drops the branch when the row is crowded and the repository is unique', async () => {
+    const { page } = board;
+    // Four sessions, every repository name distinct.
+    for (const [repo, id] of [
+      [REPO_A, 's0'],
+      [REPO_B, 's1'],
+      [`${process.cwd()}/packages`, 's2'],
+      [`${process.cwd()}/specs`, 's3'],
+    ] as const) {
+      await declare(repo, id);
+    }
+
+    await expect(page.locator('.pill')).toHaveCount(4);
+    // The repository name alone tells them apart, so the branch is the thing
+    // that goes when space runs out.
+    await expect(page.locator('.pill__branch')).toHaveCount(0);
+    await expect(page.locator('.pill__repo')).toHaveText([
+      'CoCoPilot',
+      'apps',
+      'packages',
+      'specs',
+    ]);
+  });
+
+  test('keeps the branch on sessions that share a repository, however crowded', async () => {
+    /*
+     * FR-005 outranks the density rule, and this is the case that makes them
+     * disagree — named in the spec's own edge cases: two sessions in the same
+     * repository on different branches. The plan's rule (drop the branch past
+     * two sessions) would draw two identical pills here.
+     */
+    const { page } = board;
+    await declare(REPO_A, 's0');
+    await declare(REPO_A, 's1');
+    await declare(REPO_B, 's2');
+    await declare(`${process.cwd()}/packages`, 's3');
+
+    await expect(page.locator('.pill')).toHaveCount(4);
+    // Only the two sharing `CoCoPilot` keep theirs.
+    await expect(page.locator('.pill__branch')).toHaveText(['feat/s0', 'feat/s1']);
+
+    // And they are genuinely separable, not merely different-looking.
+    await pill(1).locator('.pill__select').click();
+    await expect(page.getByTestId('task-T-s1')).toBeVisible();
+    await expect(page.getByTestId('task-T-s0')).toHaveCount(0);
+  });
+});
+
+test('holds no session across a restart', async () => {
+  // FR-020 and SC-010. The store is in memory and the process exiting is the
+  // whole of the retention policy — the same reason notes do not survive.
+  await declare(REPO_A, 'a1');
+  await declare(REPO_B, 'b2');
+  await expect(board.page.locator('.pill')).toHaveCount(2);
+
+  await board.close();
+  board = await launchBoard();
+
+  await expect(board.page.getByTestId('session-switcher')).toHaveCount(0);
+  // Nothing held at all: the waiting state, not a board with one session left.
+  await expect(board.page.getByTestId('waiting-state')).toBeVisible();
+});
+
+test.describe('what switching does to the rest of the window', () => {
+  test('does not raise an unread mark for notes the developer never missed', async () => {
+    /*
+     * The interaction feature 007 wrote a defensive line for and could not
+     * reach: the unread rule compares the note count against what was last
+     * seen, and that count belongs to whichever session is *selected*. Switching
+     * from a busy session to a quiet one makes it drop.
+     *
+     * Without the guard the dot appears for a note nobody wrote — and worse,
+     * never clears, because visiting the tab only ever records a count that is
+     * already lower.
+     */
+    const { page } = board;
+    await declare(REPO_A, 'a1');
+    await declare(REPO_B, 'b2');
+
+    // The first session accumulates notes; the developer reads them.
+    for (let i = 0; i < 5; i += 1) {
+      await board.note({ ...envelope({ repo: REPO_A, sessionId: 'a1' }), text: `Note ${i}` });
+    }
+    await page.getByTestId('tab-notes').click();
+    await expect(page.locator('.noterow')).toHaveCount(5);
+    await page.getByTestId('tab-overview').click();
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
+
+    // Switch to the quiet one: no notes at all, so no notes tab either.
+    await pill(1).locator('.pill__select').click();
+    await expect(page.getByTestId('tab-notes')).toHaveCount(0);
+
+    // One genuine note for the quiet session, read where the developer is not.
+    await board.note({ ...envelope({ repo: REPO_B, sessionId: 'b2' }), text: 'The first here' });
+    await expect(page.getByTestId('tab-notes-unread')).toBeVisible();
+
+    // Read it, and it clears -- rather than being stuck behind a count from the
+    // other session.
+    await page.getByTestId('tab-notes').click();
+    await expect(page.locator('.noterow')).toHaveCount(1);
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
+
+    // And back to the busy session, whose five notes are still its own.
+    await pill(0).locator('.pill__select').click();
+    await expect(page.locator('.noterow')).toHaveCount(5);
+  });
+});

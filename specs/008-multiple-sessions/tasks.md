@@ -177,10 +177,10 @@ it returns if it reports again.
 - [x] T017 [P] Six sessions at the 380px floor — distinguishable, every one selectable, no horizontal scrolling (SC-007, FR-018), using the content-size resize helper from feature 006. Plus hostile and very long repository and branch names in a pill (the edge case list)
 - [x] T018 [P] Assert nothing expires — sessions left idle across a long simulated elapsed time are all still listed (FR-017, SC-008). The board has no timer that removes anything and this is what keeps it that way
 - [x] T019 Update `tests/e2e/read-only.spec.ts` deliberately for the widened bridge — the assertion becomes four named members, and the *property* it protects is restated: the window may change what it shows and still send nothing to any agent. Do not loosen it to a count
-- [ ] T020 Walk the `stacks/vite-react.md` checklist for the switcher tree, and extend `only-reported.spec.ts` if a pill draws anything derived
-- [ ] T021 Run the build, typecheck, both suites, then walk [quickstart.md](quickstart.md), correcting it where it turns out to be wrong
-- [ ] T022 [P] Update `CHANGELOG.md` and `STATUS.md`
-- [ ] T023 Read back the full diff, then merge
+- [x] T020 Walk the `stacks/vite-react.md` checklist for the switcher tree, and extend `only-reported.spec.ts` if a pill draws anything derived
+- [x] T021 Run the build, typecheck, both suites, then walk [quickstart.md](quickstart.md), correcting it where it turns out to be wrong
+- [x] T022 [P] Update `CHANGELOG.md` and `STATUS.md`
+- [x] T023 Read back the full diff, then merge
 
 ---
 
