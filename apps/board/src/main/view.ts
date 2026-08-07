@@ -6,6 +6,7 @@ import type {
   Focus,
   PlanStep,
   ReportedFeature,
+  Story,
   Task,
 } from '@cocopilot/contract';
 
@@ -54,10 +55,12 @@ export interface SessionView {
    *
    * Naming each one is the point: a field added to the store does not reach a
    * window rendering agent-composed text until someone writes it down here.
-   * `stories` is absent for exactly that reason — the User Stories tab is
-   * feature 006, and until then the renderer has no business seeing them.
+   * `stories` was absent for exactly that reason until feature 006 built the
+   * tab that reads them; it is listed now, and listed rather than spread, so
+   * the next field still has to be argued for.
    */
   feature: ReportedFeature | null;
+  stories: Story[];
   tasks: Task[];
   plan: PlanStep[];
   focus: Focus | null;
@@ -129,6 +132,7 @@ function toSessionView(session: Session): SessionView {
     feature: report?.feature ?? null,
     // Empty rather than null where the payload's own default is empty, so the
     // renderer has one absence to handle per field instead of two.
+    stories: report?.stories ?? [],
     tasks: report?.tasks ?? [],
     plan: report?.plan ?? [],
     focus: report?.focus ?? null,

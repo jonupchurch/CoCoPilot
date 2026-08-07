@@ -62,15 +62,18 @@ describe('toBoardState — the reported body crosses the bridge', () => {
   });
 
   it('projects only the fields it names', () => {
-    // `stories` is held and deliberately not projected: the User Stories tab is
-    // feature 006. If this ever fails because the shape was spread instead of
-    // listed, the renderer has quietly been given something nobody decided to
-    // give it.
+    // The whole list, asserted as a set. If this ever fails because the shape
+    // was spread instead of listed, the renderer has quietly been given
+    // something nobody decided to give it.
+    //
+    // `stories` was the standing example of a withheld field until feature 006
+    // built the tab that reads them. Its arrival is exactly what this test is
+    // for: it had to be added here, deliberately, before it could reach a
+    // window rendering agent-composed text.
     store.putReport(report({ stories: [{ id: 'S1', title: 'A story' }] }), 1_000);
 
     const { session } = toBoardState(store);
 
-    expect(session).not.toHaveProperty('stories');
     expect(session?.storyCount).toBe(1);
     expect(Object.keys(session ?? {}).sort()).toEqual([
       'attributed',
@@ -86,11 +89,39 @@ describe('toBoardState — the reported body crosses the bridge', () => {
       'repo',
       'repoName',
       'reportedAt',
+      'stories',
       'storyCount',
       'taskCount',
       'tasks',
       'transcript',
     ]);
+  });
+
+  it('carries stories in reported order', () => {
+    store.putReport(
+      report({
+        stories: [
+          { id: 'US-2', title: 'Second', criteria: ['it works'] },
+          { id: 'US-1', title: 'First' },
+        ],
+      }),
+      1_000,
+    );
+
+    const { session } = toBoardState(store);
+
+    // Not sorted by id, which is what a helpful projection would do and what
+    // FR-016 forbids.
+    expect(session?.stories.map((s) => s.id)).toEqual(['US-2', 'US-1']);
+    expect(session?.stories[0]?.criteria).toEqual(['it works']);
+  });
+
+  it('carries an empty story list rather than an absent one', () => {
+    store.appendNote(note(), 1_000);
+
+    // A session created by a note alone has no report at all; the renderer
+    // still gets one absence to handle per field instead of two.
+    expect(toBoardState(store).session?.stories).toEqual([]);
   });
 
   it('replaces the body wholesale rather than merging into it', () => {
