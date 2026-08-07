@@ -126,7 +126,7 @@ function StoryRow({
  * `2/4`, the export's summary, derived from the reported statuses.
  *
  * `isDone` comes from feature 004's vocabulary rather than a comparison here:
- * three tabs now count "done" and they must count it the same way.
+ * three tabs now count `done` and they must count it the same way.
  */
 export function taskSummary(tasks: readonly Task[]): string {
   if (tasks.length === 0) return 'no tasks';

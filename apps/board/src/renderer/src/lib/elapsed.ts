@@ -4,7 +4,7 @@
  * A **measurement**, never a verdict. The board shows "4m" and nothing more —
  * no threshold, no colour shift, no "stalled" at any duration. A healthy agent
  * goes quiet for minutes during a typecheck, so any threshold would be a guess
- * about work the board cannot see. Elapsed time is a fact; "stuck" is a guess,
+ * about work the board cannot see. Elapsed time is a fact; `stuck` is a guess,
  * and the human does the guessing.
  *
  * Derived at render and never stored: `lastHeardAt` is a timestamp, and a

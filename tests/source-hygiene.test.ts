@@ -86,3 +86,69 @@ describe('the renderer never reaches into the main process', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+/**
+ * There is one status vocabulary, and three tabs now render it.
+ *
+ * `status` is free text (decision 25), so *deciding what a string means* is a
+ * display decision made in exactly two places: `vocabulary.ts` decides, and
+ * `StatusLabel.tsx` draws. Everywhere else asks — `isDone`, `isActive`, or the
+ * components.
+ *
+ * The failure this forbids is cheap to write and expensive to see: a second
+ * comparison in a second view, agreeing with the first on the day it is written
+ * and drifting the first time a synonym is added. The symptom would be one
+ * status shown two colours on two tabs, and nobody looks at two tabs at once.
+ *
+ * Both halves are checked — an import of the classifier, and a bare literal
+ * from the table — because either one alone is a mapping this file exists to
+ * prevent.
+ */
+const DECIDES = [
+  'apps/board/src/renderer/src/lib/vocabulary.ts',
+  'apps/board/src/renderer/src/components/StatusLabel.tsx',
+];
+
+describe('the status vocabulary has exactly one definition', () => {
+  it('is neither restated nor re-classified outside the two files that own it', async () => {
+    const terms = synonyms();
+    // Guard against a vacuous pass: if the extraction below stops matching
+    // because `vocabulary.ts` was reformatted, this test would quietly assert
+    // nothing at all rather than fail.
+    expect(terms.length).toBeGreaterThan(15);
+
+    // Quoted literals only. Prose in this tree quotes code with backticks, so a
+    // comment discussing `wip` is not an offence and does not need rewording.
+    const literal = new RegExp(`['"](${terms.join('|')})['"]`, 'iu');
+    const offenders: string[] = [];
+
+    for await (const file of glob('apps/board/src/renderer/**/*.{ts,tsx}', {
+      cwd: ROOT,
+      exclude: [...IGNORED, '**/*.test.ts', '**/*.test.tsx'],
+    })) {
+      const path = file.replaceAll('\\', '/');
+      if (DECIDES.includes(path)) continue;
+
+      const source = readFileSync(`${ROOT}${file}`, 'utf8');
+
+      const term = literal.exec(source);
+      if (term !== null) offenders.push(`${path}: decides what ${term[1]} means`);
+
+      // A named import or a call — not a bare word, which would also match the
+      // transcript's unrelated `main/transcript/classify.js` in an import path.
+      const imported = /import[^;]*\{[^}]*\b(classify|SYNONYMS)\b/u.test(source);
+      const called = /\bclassify\s*\(/u.test(source);
+      if (imported || called) offenders.push(`${path}: classifies a status itself`);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+});
+
+/** The synonym table's keys, read from the table rather than restated here. */
+function synonyms(): string[] {
+  const source = readFileSync(`${ROOT}apps/board/src/renderer/src/lib/vocabulary.ts`, 'utf8');
+  const table = /new Map<string, Recognised>\(\[([\s\S]*?)\]\);/u.exec(source)?.[1] ?? '';
+
+  return [...new Set([...table.matchAll(/'([^']+)'/gu)].map((match) => match[1] ?? ''))];
+}

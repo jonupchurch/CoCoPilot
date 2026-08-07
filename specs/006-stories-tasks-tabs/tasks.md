@@ -129,8 +129,8 @@ intact.
 *Sits before US2 because both detail views render statuses and doing this once,
 first, is what stops the second view growing its own copy.*
 
-- [ ] T014 [US3] Render every status in both views through `StatusLabel`/`StatusDisc` from feature 004 — no local mapping, no second synonym table, no `status === 'done'` anywhere in this tree
-- [ ] T015 [P] [US3] Write `apps/board/tests/e2e/status-vocabulary.spec.ts` — the same status matrix asserted on the Overview, Stories and Tasks tabs in one test, so a divergence fails rather than being noticed later. Includes `donee` staying neutral, `  DONE  ` being recognised, and a 200-character status truncating with its full text on `title` (FR-009)
+- [x] T014 [US3] Render every status in both views through `StatusLabel`/`StatusDisc` from feature 004 — no local mapping, no second synonym table, no `status === 'done'` anywhere in this tree. **Enforced rather than inspected**: `tests/source-hygiene.test.ts` fails on a synonym literal or a `classify` call anywhere in the renderer outside `lib/vocabulary.ts` and `components/StatusLabel.tsx`, which is what stops the Tasks view growing its own copy in Phase 4 before it is written
+- [x] T015 [P] [US3] Write `apps/board/tests/e2e/status-vocabulary.spec.ts` — the same status matrix read from every surface that draws one and compared, so a divergence fails rather than being noticed later. Includes `donee` staying neutral, `  DONE  ` being recognised without its text being canonicalised, and a 200-character status truncating with its full text on `title` (FR-009). **Three surfaces now** — Spec tasks, Plan steps and a story's tasks; the Tasks tab joins them in T020, which is the only place it can, since the view does not exist until Phase 4
 
 ---
 
@@ -148,7 +148,7 @@ and files are shown, and changing the scoped story follows.
 - [ ] T017 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskList.tsx` and its CSS — the scoped story's tasks, each with disc, id, status and title, and the current one marked with the report's age
 - [ ] T018 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskDetail.tsx` and its CSS — header, title, the current-task line, detail, Checks, Files, and From the story. A task with no checks or no files omits those blocks rather than drawing empty headings
 - [ ] T019 [US2] Create `apps/board/src/renderer/src/views/tasks/TasksView.tsx` and replace the `tasks` placeholder in `App.tsx` — including the explicit "this story has no tasks" state (US2 scenario 5)
-- [ ] T020 [P] [US2] Write `apps/board/tests/e2e/tasks.spec.ts` — the scoped story's tasks list and one shows in full; changing scope follows in both list and detail; a story with no tasks says so; the current task is marked with its elapsed time; an orphan task is reachable through the unassigned scope and is *not* listed under a story it does not belong to
+- [ ] T020 [P] [US2] Write `apps/board/tests/e2e/tasks.spec.ts` — the scoped story's tasks list and one shows in full; changing scope follows in both list and detail; a story with no tasks says so; the current task is marked with its elapsed time; an orphan task is reachable through the unassigned scope and is *not* listed under a story it does not belong to. Also add the Tasks tab to `SURFACES` in `status-vocabulary.spec.ts`, which is the deferred half of T015
 
 ---
 
