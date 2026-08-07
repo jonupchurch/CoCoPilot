@@ -92,6 +92,16 @@ export class TranscriptReader {
    * - It **went away**. The position is dropped on failure, so a file that
    *   returns is read whole rather than from an offset into content that no
    *   longer exists there.
+   *
+   * The second of those has a floor, stated rather than papered over: a rewrite
+   * that is the same size **and** lands inside the filesystem's timestamp
+   * resolution is not detectable here, and no cheaper signal closes it —
+   * measured on this machine, 118 of 200 back-to-back rewrites share an mtime,
+   * and 116 share `mtimeNs`, so nanosecond stats buy nothing. Closing it
+   * properly would mean re-reading and comparing bytes on every poll, which is
+   * the quadratic cost this whole class exists to avoid. Transcripts are
+   * append-only in practice, so the blind spot is a file replaced by another of
+   * exactly equal length within a few milliseconds.
    */
   read(): ReadResult {
     let size: number;

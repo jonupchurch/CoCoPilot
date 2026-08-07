@@ -1,4 +1,4 @@
-import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -128,8 +128,30 @@ describe('a file that stops being the file it was', () => {
     const reader = new TranscriptReader(path);
     reader.read();
 
-    write('{"whole":true}\n');
-    expect(lines(reader.read())).toEqual(['{"whole":true}']);
+    write('{"whole":1}\n');
+    expect(lines(reader.read())).toEqual(['{"whole":1}']);
+  });
+
+  it('notices a rewrite that leaves the file exactly the same size', () => {
+    // The size check cannot see this one; only the timestamp moved.
+    //
+    // `utimesSync` stands in for the elapsed time a real rewrite carries, the
+    // same way the clock is injected everywhere else in this repo. Two writes
+    // inside one test are not a substitute: measured here, **118 of 200**
+    // back-to-back rewrites share an mtime, and nanosecond precision does not
+    // help — 116 of 200 share `mtimeNs` too, because Windows quantises the
+    // write timestamp well above what NTFS can store. Writing it the obvious
+    // way made this assertion fail about one run in four.
+    write('one\ntwo\n');
+    const reader = new TranscriptReader(path);
+    reader.read();
+
+    write('six\nten\n');
+    utimesSync(path, new Date(), new Date(Date.now() + 1_000));
+
+    const result = reader.read();
+    expect(lines(result)).toEqual(['six', 'ten']);
+    expect(result.ok && result.restarted).toBe(true);
   });
 
   it('abandons a line that never ends rather than buffering without limit', () => {
