@@ -46,6 +46,14 @@ export function NotesView({
         </span>
       </div>
 
+      {/*
+        A guard rather than a state the strip can currently produce: a tab whose
+        view would be empty is not offered (feature 003), so this tab appears
+        only once a note exists and the active tab falls back if it stops being
+        available. FR-010 is satisfied by that rule; this is what would be shown
+        if the rule ever changed, and the other two detail views hold the same
+        line for the same reason.
+      */}
       {newest.length === 0 ? (
         <p className="notes__empty" data-testid="notes-empty">
           Nothing recorded yet. Ask the agent to note something and it will appear here.
@@ -53,9 +61,17 @@ export function NotesView({
       ) : (
         <div className="notes__list" data-testid="notes-list">
           {newest.map(({ note, arrival }) => (
-            // Keyed by arrival, which never changes because notes only append.
-            // Keying by display position would renumber every row each time one
-            // arrived, remounting the list under a reader mid-sentence.
+            // An array index as a key, which `stacks/vite-react.md` forbids —
+            // and this is the one list in the product where it is right. The
+            // rule exists because these lists *reorder* when a report replaces
+            // them, so position is not identity. Notes never reorder: they only
+            // append, so a note's arrival index is fixed for the life of the
+            // window and is the only stable identifier available (`receivedAt`
+            // is not one; two notes can share a millisecond).
+            //
+            // Keying by *display* position would be the failure the rule
+            // describes: every row renumbered on each arrival, remounting the
+            // list under a reader mid-sentence.
             <NoteRow key={arrival} note={note} arrival={arrival} now={now} />
           ))}
         </div>

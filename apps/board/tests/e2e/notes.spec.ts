@@ -77,11 +77,26 @@ test.describe('reading what the agent recorded', () => {
     await expect(board.page.locator('.noterow__source')).toHaveCount(0);
   });
 
-  test('says so plainly when nothing has been recorded', async () => {
-    // FR-010. The tab only appears once a note exists, so this is reached by a
-    // note arriving and the view then being opened — but the state has to exist
-    // for the moment before the first one lands while the view is already open.
-    await record('A note');
+  test('offers no notes tab at all until there is a note', async () => {
+    /*
+     * How FR-010 is actually satisfied.
+     *
+     * The view has an explicit empty state, but nothing can currently reach it:
+     * a tab whose view would be empty is not offered (feature 003's rule, so a
+     * tab is never a dead end), and the active tab falls back if it stops being
+     * available. "The view says so when there is nothing" is therefore answered
+     * one level up — by there being no view to open.
+     *
+     * Worth asserting rather than assuming, because the alternative reading is
+     * that the empty state is dead code to be deleted.
+     */
+    await board.push({ ...envelope(), tasks: [{ id: 'T-1', title: 'A task', status: 'todo' }] });
+    await expect(board.page.getByTestId('tab-overview')).toBeVisible();
+    await expect(board.page.getByTestId('tab-notes')).toHaveCount(0);
+
+    await record('The first thing worth writing down.');
+
+    await expect(board.page.getByTestId('tab-notes')).toBeVisible();
     await openNotes();
     await expect(board.page.getByTestId('notes-list')).toBeVisible();
     await expect(board.page.getByTestId('notes-empty')).toHaveCount(0);

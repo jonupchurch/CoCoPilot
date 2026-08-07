@@ -331,6 +331,70 @@ test.describe('the tasks tab shows only what was reported', () => {
   });
 });
 
+/**
+ * And a fourth time, on the Notes tab.
+ *
+ * A fourth copy rather than a parameterised one, for the reason the second gives
+ * — and this tab makes the case best. Its board text is not chrome: the footer
+ * is a *claim*, and the header counts. Both have to be declared by someone who
+ * has read them, which a shared allowlist would let them skip.
+ */
+const NOTE_TEXTS = [
+  'The refresh race guard only worked because the routes mounted in a fixed order.',
+  'api/client.ts changed on disk between my read and my write. I stopped.',
+];
+
+/** Everything the Notes tab is allowed to draw that no agent wrote. */
+const NOTE_DERIVED: readonly RegExp[] = [
+  /THIS SESSION/g, // the section label
+  /\d+ notes? · over \d+[smhd]|none yet/g, // the header summary
+  /\b\d+[smhd]\b/g, // each note's age in the gutter
+  // The footer, in full and quoted exactly. Not a loose pattern: this sentence
+  // is the feature's central claim, and a test that matched it approximately
+  // would keep passing while it drifted into something less true.
+  /Notes live in this window only\. Closing it clears all \d+ — ask the agent to write anything worth keeping into the repository\./g,
+];
+
+test.describe('the notes tab shows only what was reported', () => {
+  test('renders nothing that was not written by an agent or declared as derived', async () => {
+    const { page } = board;
+    await board.push({ ...envelope(), tasks: [{ id: 'T-1', title: 'A task', status: 'todo' }] });
+    for (const text of NOTE_TEXTS) {
+      await board.note({ ...envelope(), text, source: 'noticed while editing' });
+    }
+
+    await page.getByTestId('tab-notes').click();
+    await expect(page.getByTestId('notes')).toBeVisible();
+
+    let remaining = (await page.getByTestId('notes').innerText()).replace(/\s+/gu, ' ');
+
+    for (const pattern of NOTE_DERIVED) remaining = remaining.replace(pattern, ' ');
+    for (const value of [...NOTE_TEXTS, 'noticed while editing'].sort(
+      (a, b) => b.length - a.length,
+    )) {
+      remaining = remaining.split(value).join(' ');
+    }
+
+    expect(remaining.replace(/[\s·]/gu, '')).toBe('');
+  });
+
+  test('does not reorder or renumber the notes it was given', async () => {
+    const { page } = board;
+    await board.push({ ...envelope(), tasks: [{ id: 'T-1', title: 'A task', status: 'todo' }] });
+    await board.note({ ...envelope(), text: 'First to arrive' });
+    await board.note({ ...envelope(), text: 'Second to arrive' });
+
+    await page.getByTestId('tab-notes').click();
+
+    // Newest first is the one ordering rule this board applies, and it is
+    // arrival reversed rather than a sort on anything.
+    await expect(page.locator('.noterow__text')).toHaveText([
+      'Second to arrive',
+      'First to arrive',
+    ]);
+  });
+});
+
 test.describe('limits and hostile content', () => {
   test('stays navigable at 500 tasks with an accurate header summary', async () => {
     const { page } = board;

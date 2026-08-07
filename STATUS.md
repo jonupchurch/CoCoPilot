@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001–006 complete and merged; 007–009 not started |
+| Implementation | 🟡 **Started** — features 001–007 complete and merged; 008–009 not started |
 
 ## What this is
 
@@ -645,10 +645,16 @@ open questions and no "not designed yet" list of its own.
 
 ### Still not designed, carried from round 2
 
-Overflow is now done. What remains: the torn-off window beyond the `+`
-affordance; **Notes drawn at six entries rather than forty**; and the agent
-going away mid-session — process exit or socket drop — as distinct from merely
-being quiet.
+Overflow is now done, and so is **Notes drawn at six entries rather than
+forty** — closed by feature 007. The answer turned out not to be a layout: the
+rows are flat and unbounded, the list scrolls with the footer pinned beneath it,
+and what makes forty survivable is the density (three lines, no container) plus
+scroll anchoring holding the reader's place as new ones land above them. 300
+notes are asserted scrollable with the oldest still legible.
+
+What remains: the torn-off window beyond the `+` affordance; and the agent going
+away mid-session — process exit or socket drop — as distinct from merely being
+quiet.
 
 Feature 006 closed one item that was not on this list because the export did
 not raise it: **there is no unassigned scope anywhere in the design.** The

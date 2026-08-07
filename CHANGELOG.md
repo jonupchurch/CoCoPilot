@@ -8,6 +8,54 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 007 — Notes.** The last of the four tabs, and the only view whose
+  content accumulates: what the agent recorded this session, newest first, with
+  how long ago and why. Flat rows rather than cards, because forty cards is
+  forty boxes to read past and forty rows is one column to read down.
+  - **The view's job is to be true, not just to list things.** A permanent
+    footer states that closing the window clears these notes and that anything
+    worth keeping belongs in the repository, and every part of the tree has to
+    agree with that sentence. A pin or a star would break no code — it would
+    falsify the footer — so the requirement is asserted as an absence, twice:
+    zero operable elements in the rendered view, and no handler or interactive
+    element anywhere in the tree's source.
+  - That source check asserts **interactivity**, not a list of words like `pin`
+    and `archive`. The word list was written first and was wrong twice over: it
+    matched the `export` keyword in every module and the prose in this tree
+    explaining why a pin is absent, and it would have missed a control named
+    something nobody listed.
+  - **An arriving note must not move the reader**, which was named up front as
+    the thing most likely to fail. Notes enter at the top of a list that may be
+    scrolled. Chromium's scroll anchoring absorbs it — and it is doing real
+    work: with `overflow-anchor: none` a single note moves the reader 45px and a
+    burst of ten moves them 447px, half a screen. The property is asserted by
+    measuring a row's position across an arrival.
+  - Newest first by **reversing arrival order**, never by sorting on
+    `receivedAt`: two notes can share a millisecond and a sort would order those
+    arbitrarily, where arrival order is a fact the store already established.
+    Keyed by arrival index — an array index, which the stack pack forbids, and
+    the one list where it is right: notes never reorder, so the index is fixed
+    for the life of the window and `receivedAt` is not an identifier.
+  - **The unread mark is a boolean and cannot become a count.** The tab strip's
+    prop admits no number, so a component that cannot receive one cannot start
+    rendering one — a count would read as an inbox with something to clear, and
+    there is nothing to clear. The mark is muted rather than teal or ember,
+    because either would make an arriving note a summons. An arrival is
+    asserted not to move, raise, focus or resize the window.
+  - Three more export bindings decided rather than transcribed: one source line
+    where the export draws two, because `NoteRequest` has one `source`; one
+    muted gutter dot, because the export's ember is reserved for `needs-you` by
+    decision 15 and its teal-on-newest says what the elapsed time already says;
+    and an elapsed span in the header where the export writes `since 09:14`,
+    because a wall clock is the one time format nothing else in this product
+    uses.
+  - The count question the spec's assumptions raised is settled explicitly: no
+    count on the tab, where a number reads as an inbox; a count in the view's
+    own header and in the footer, where `clears all 12` makes the loss concrete
+    rather than leaving the reader to guess whether it means much.
+  - 26 more Playwright tests and 11 more unit tests; 421 unit and integration
+    tests and 180 end-to-end in total.
+
 - **Feature 006 — Stories and Tasks tabs.** The two remaining detail views, and
   the last placeholder tabs except Notes. A story in full — narrative, numbered
   criteria, its tasks and the files it touches — and a task in full: detail,
