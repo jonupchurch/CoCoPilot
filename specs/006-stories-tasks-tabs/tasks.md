@@ -176,7 +176,7 @@ intact across the boundary.
 - [x] T026 Walk the `stacks/vite-react.md` checklist for both trees — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data
 - [x] T027 Run `npm run typecheck`, the full suite, the Playwright suite and a build, then walk the seven scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
 - [x] T028 [P] Update `CHANGELOG.md`, `STATUS.md` and the design-round-3 carried-forward list if this feature closes any of it
-- [ ] T029 Read back the full diff, then merge
+- [x] T029 Read back the full diff, then merge
 
 ---
 

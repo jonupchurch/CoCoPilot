@@ -32,12 +32,12 @@ export function TaskDetail({
   tag: string | null;
 }): React.JSX.Element {
   if (task === null) {
+    // Necessarily a story: the unassigned scope is only built when it has
+    // orphans to hold, so an empty scope always has a story behind it.
     return (
       <div className="taskdetail taskdetail--empty" data-testid="task-detail">
         <p data-testid="task-detail-empty">
-          {scope.story === null
-            ? 'No tasks were reported without a story.'
-            : 'This story has no tasks. Nothing was reported for it to show.'}
+          This story has no tasks. Nothing was reported for it to show.
         </p>
       </div>
     );
