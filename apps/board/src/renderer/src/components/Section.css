@@ -1,0 +1,74 @@
+/*
+ * The divider belongs to the section rather than sitting between sections, so a
+ * collapsed section still separates from its neighbours and the stack reflows
+ * without a rule left stranded.
+ */
+.section {
+  border-top: 1px solid var(--line);
+}
+
+/*
+ * A button styled as a header row. The sticky positioning lives in `App.css`,
+ * with the scroll container that makes it work.
+ */
+.section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) 14px 10px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.section__header:hover .section__label {
+  color: var(--ink);
+}
+
+.section__header:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+.section__caret {
+  flex: none;
+  font-size: 9px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.section__label {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/*
+ * Pushed right, and allowed to shrink before the label does: the label says
+ * which question this section answers, so it is the last thing worth losing.
+ */
+.section__summary {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
