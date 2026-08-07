@@ -154,6 +154,51 @@ describe('a file that stops being the file it was', () => {
     expect(result.ok && result.restarted).toBe(true);
   });
 
+  it('starts over when the file is replaced by a longer one', () => {
+    // The case every size and timestamp check misses: the size went up and the
+    // mtime moved, which is exactly what an append looks like. Continuing from
+    // the old offset would splice the tail of a different file onto the head of
+    // this one and lose everything before it, without a symptom.
+    write('one\ntwo\n');
+    const reader = new TranscriptReader(path);
+    expect(lines(reader.read())).toEqual(['one', 'two']);
+
+    write('alpha\nbeta\ngamma\ndelta\n');
+    const result = reader.read();
+
+    expect(lines(result)).toEqual(['alpha', 'beta', 'gamma', 'delta']);
+    expect(result.ok && result.restarted).toBe(true);
+  });
+
+  it('does not mistake an ordinary append for a replacement', () => {
+    // The other half of the check above: the identity is unchanged, so nothing
+    // restarts and nothing is re-read.
+    write('one\ntwo\n');
+    const reader = new TranscriptReader(path);
+    reader.read();
+
+    append('three\n');
+    const result = reader.read();
+
+    expect(lines(result)).toEqual(['three']);
+    expect(result.ok && result.restarted).toBe(false);
+  });
+
+  it('starts over when a long file is replaced by another long file', () => {
+    // The identity is the opening bytes, so a replacement is caught however far
+    // into the file the reader had got.
+    write(`${Array.from({ length: 5_000 }, (_, i) => `{"a":${i}}`).join('\n')}\n`);
+    const reader = new TranscriptReader(path);
+    expect(lines(reader.read())).toHaveLength(5_000);
+
+    write(`${Array.from({ length: 6_000 }, (_, i) => `{"b":${i}}`).join('\n')}\n`);
+    const result = reader.read();
+
+    expect(lines(result)).toHaveLength(6_000);
+    expect(lines(result)[0]).toBe('{"b":0}');
+    expect(result.ok && result.restarted).toBe(true);
+  });
+
   it('abandons a line that never ends rather than buffering without limit', () => {
     // A file that stops being line-delimited must not grow the buffer until the
     // process dies.
