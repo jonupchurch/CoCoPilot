@@ -21,6 +21,13 @@
   --surface: #1a1817;
   --raised: #221f1d;
   --line: #2b2724;
+  /*
+   * A stronger line, for a control's hover border and for the one surface that
+   * floats. From the Design System export's buttons and the Overview Panel's
+   * picker; missed by the first transcription and added when the picker was
+   * built, rather than left as a literal in one stylesheet.
+   */
+  --line-strong: #3d3833;
   --muted: #948a7f;
   --ink: #eff3f4;
   /*
@@ -63,6 +70,13 @@
 
   /* Controls. Hit targets stay 28px even where the label looks smaller. */
   --control-height: 28px;
+
+  /*
+   * The only shadow in the product, and the exception to the rule below: a menu
+   * floating over content is the one thing that genuinely leaves the surface,
+   * and the export draws it that way. Named here so it stays the only one.
+   */
+  --shadow-menu: 0 14px 34px rgb(0 0 0 / 55%);
 }
 
 * {

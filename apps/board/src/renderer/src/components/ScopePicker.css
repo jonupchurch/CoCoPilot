@@ -25,7 +25,7 @@
 }
 
 .scopepicker__current:hover {
-  border-color: #3d3833;
+  border-color: var(--line-strong);
 }
 
 .scopepicker__current:focus-visible,
@@ -35,11 +35,10 @@
 }
 
 /*
- * Above everything, and above the detail it overlaps. The shadow is the one
- * place in the product that uses one — `tokens.css` says depth is a border
- * rather than a shadow, and this is the exception the export itself draws,
- * because a menu floating over content is the one thing that genuinely leaves
- * the surface.
+ * Above everything, and above the detail it overlaps. `--shadow-menu` is the
+ * one shadow in the product — `tokens.css` says depth is a border rather than a
+ * shadow, and this is the exception the export itself draws, because a menu
+ * floating over content is the one thing that genuinely leaves the surface.
  */
 .scopepicker__options {
   position: absolute;
@@ -51,10 +50,10 @@
   flex-direction: column;
   max-height: 60vh;
   padding: 4px;
-  border: 1px solid #3d3833;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-card);
   background: var(--surface);
-  box-shadow: 0 14px 34px rgb(0 0 0 / 55%);
+  box-shadow: var(--shadow-menu);
   overflow-y: auto;
 }
 

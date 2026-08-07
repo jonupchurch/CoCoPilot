@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001–005 complete and merged; 006–009 not started |
+| Implementation | 🟡 **Started** — features 001–006 complete and merged; 007–009 not started |
 
 ## What this is
 
@@ -649,6 +649,13 @@ Overflow is now done. What remains: the torn-off window beyond the `+`
 affordance; **Notes drawn at six entries rather than forty**; and the agent
 going away mid-session — process exit or socket drop — as distinct from merely
 being quiet.
+
+Feature 006 closed one item that was not on this list because the export did
+not raise it: **there is no unassigned scope anywhere in the design.** The
+export assumes an agent's story/task graph resolves, and nothing validates that
+it does — a `storyId` may be null or name a story that was never sent. Both
+detail views now carry a real, selectable scope for those tasks, designed
+rather than transcribed.
 
 The prompt-history half of "long sessions" is closed by **decision 34**: "Show
 all N" expands the list in place, so it has a destination. Notes still does not,

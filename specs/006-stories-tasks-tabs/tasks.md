@@ -171,11 +171,11 @@ intact across the boundary.
 
 ## Phase 6: Polish
 
-- [ ] T024 [P] Write `apps/board/tests/e2e/read-only.spec.ts` — SC-008 as an absence test. Activate every control in both views, then assert **zero** outbound requests from the window. Teeth-check it by temporarily adding a `fetch` and confirming it fails
-- [ ] T025 [P] Extend `apps/board/tests/e2e/stories.spec.ts` and `tasks.spec.ts` for limits and hostile content — 200 stories and 500 tasks navigable with selection responding (SC-007), long titles/criteria/paths truncating with full text retrievable, and markup rendering as visible characters (SC-009)
-- [ ] T026 Walk the `stacks/vite-react.md` checklist for both trees — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data
-- [ ] T027 Run `npm run typecheck`, the full suite, the Playwright suite and a build, then walk the seven scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
-- [ ] T028 [P] Update `CHANGELOG.md`, `STATUS.md` and the design-round-3 carried-forward list if this feature closes any of it
+- [x] T024 [P] Write `apps/board/tests/e2e/read-only.spec.ts` — SC-008 as an absence test. Activate every control in both views, then assert **zero** outbound requests from the window. Teeth-check it by temporarily adding a `fetch` and confirming it fails
+- [x] T025 [P] Extend `apps/board/tests/e2e/stories.spec.ts` and `tasks.spec.ts` for limits and hostile content — 200 stories and 500 tasks navigable with selection responding (SC-007), long titles/criteria/paths truncating with full text retrievable, and markup rendering as visible characters (SC-009)
+- [x] T026 Walk the `stacks/vite-react.md` checklist for both trees — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data
+- [x] T027 Run `npm run typecheck`, the full suite, the Playwright suite and a build, then walk the seven scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
+- [x] T028 [P] Update `CHANGELOG.md`, `STATUS.md` and the design-round-3 carried-forward list if this feature closes any of it
 - [ ] T029 Read back the full diff, then merge
 
 ---

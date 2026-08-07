@@ -223,6 +223,100 @@ test.describe('a task belonging to no reported story', () => {
   });
 });
 
+test.describe('at the contract s ceiling and past the panel s edge', () => {
+  test('stays navigable when one story holds all 500 tasks', async () => {
+    // SC-007, and the worst arrangement of it: every task in a single scope, so
+    // the list is as long as the contract permits and the last row is the one
+    // a truncating list would lose.
+    const tasks = Array.from({ length: 500 }, (_, i) => ({
+      id: `T-${String(i).padStart(3, '0')}`,
+      title: `Task number ${i}`,
+      status: i % 3 === 0 ? 'done' : 'todo',
+      storyId: 'US-002',
+    }));
+
+    await openTasks({ ...REPORT, tasks });
+
+    const { page } = board;
+    await expect(page.locator('.tasklist__row')).toHaveCount(500);
+
+    const last = page.getByTestId('task-row-T-499');
+    await last.scrollIntoViewIfNeeded();
+    await last.click();
+    await expect(page.getByTestId('task-detail-id')).toHaveText('T-499');
+    await expect(page.getByTestId('task-detail-title')).toHaveText('Task number 499');
+  });
+
+  test('truncates long values and keeps every one of them retrievable', async () => {
+    const id = 'T-'.padEnd(200, 'I');
+    const title = 'T'.repeat(200);
+    const status = 'S'.repeat(200);
+    const check = `It ${'really '.repeat(200)}passes.`;
+    const path = `src/${'deeply/'.repeat(60)}client.ts`;
+
+    await board.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setSize(380, 320);
+    });
+    await openTasks({
+      ...REPORT,
+      stories: [{ id: 'US-002', title: 'One story' }],
+      tasks: [{ id, title, status, storyId: 'US-002', checks: [check], files: [path] }],
+      focus: { task: id, chip: 'watching' },
+    });
+
+    const { page } = board;
+    await expect(page.locator('.tasklist__id')).toHaveAttribute('title', id);
+    await expect(page.locator('.tasklist__title')).toHaveAttribute('title', title);
+    await expect(page.locator('.tasklist__row .status')).toHaveAttribute('title', status);
+    await expect(page.locator('.taskdetail__file')).toHaveAttribute('title', path);
+    // Prose wraps rather than truncating, so the assertion is that all of it is
+    // present, not that it fits.
+    await expect(page.locator('.taskdetail__check-text')).toHaveText(check);
+
+    const overflow = await page.evaluate(() => {
+      const el = document.querySelector('.app__body');
+      return {
+        body: document.body.scrollWidth - document.body.clientWidth,
+        panel: el === null ? 0 : el.scrollWidth - el.clientWidth,
+      };
+    });
+    expect(overflow.body).toBeLessThanOrEqual(0);
+    expect(overflow.panel).toBeLessThanOrEqual(0);
+  });
+
+  test('renders markup in every task field as visible characters', async () => {
+    const hostile = '<script>window.__pwned = true</script><img src=x onerror="window.__pwned=1">';
+
+    await openTasks({
+      ...REPORT,
+      stories: [{ id: 'US-002', title: hostile }],
+      tasks: [
+        {
+          id: 'T-011',
+          title: hostile,
+          status: hostile,
+          storyId: 'US-002',
+          detail: hostile,
+          checks: [hostile],
+          files: [hostile],
+        },
+      ],
+      focus: { task: 'T-011', note: hostile, chip: 'watching' },
+    });
+
+    const { page } = board;
+    await expect(page.getByTestId('task-detail-title')).toContainText('<script>');
+    await expect(page.getByTestId('task-detail-detail')).toContainText('<script>');
+    await expect(page.getByTestId('task-detail-focus')).toContainText('<script>');
+    await expect(page.locator('.taskdetail__check-text')).toContainText('<script>');
+    // Including the "From the story" line, which the board composes itself out
+    // of two agent-supplied values.
+    await expect(page.getByTestId('task-detail-from')).toContainText('<script>');
+    expect(await page.evaluate(() => (window as { __pwned?: boolean }).__pwned)).toBeUndefined();
+    await expect(page.locator('img')).toHaveCount(0);
+  });
+});
+
 test.describe('an arriving report does not move the developer', () => {
   test('keeps the selected task when it is still there', async () => {
     await openTasks();

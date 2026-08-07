@@ -145,6 +145,38 @@ describe('the status vocabulary has exactly one definition', () => {
   });
 });
 
+/**
+ * The design tokens have exactly one definition too.
+ *
+ * `tokens.css` says outright that a colour literal anywhere else in the renderer
+ * is a bug, and the `stacks/vite-react.md` checklist asks for it to be verified.
+ * Walking a checklist catches it once; this catches it every time. The Tasks
+ * tab's picker arrived carrying three literals straight out of the export, and
+ * the walk is what found them — a fortnight later it would not have.
+ */
+describe('colour lives only in tokens.css', () => {
+  it('has no colour literal anywhere else in the renderer', async () => {
+    // Hex, and the functional notations. Not `currentColor` or a keyword: those
+    // name a colour already chosen rather than choosing a new one.
+    const LITERAL = /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|color-mix)\s*\(/iu;
+    const offenders: string[] = [];
+
+    for await (const file of glob('apps/board/src/renderer/**/*.{css,ts,tsx}', {
+      cwd: ROOT,
+      exclude: IGNORED,
+    })) {
+      const path = file.replaceAll('\\', '/');
+      if (path.endsWith('/tokens.css')) continue;
+
+      const source = readFileSync(`${ROOT}${file}`, 'utf8');
+      const found = LITERAL.exec(source);
+      if (found !== null) offenders.push(`${path}: ${found[0]}`);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+});
+
 /** The synonym table's keys, read from the table rather than restated here. */
 function synonyms(): string[] {
   const source = readFileSync(`${ROOT}apps/board/src/renderer/src/lib/vocabulary.ts`, 'utf8');
