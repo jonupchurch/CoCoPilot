@@ -45,8 +45,14 @@ export interface NoteContent {
 export interface CallOptions extends SendOptions {
   /** Where to start looking for the repository. Defaults to the process cwd. */
   cwd?: string | undefined;
-  /** Stable per agent session, or the literal `unattributed` for a hook. */
-  sessionId: string;
+  /**
+   * Stable per agent session, or **null** for a hook or script.
+   *
+   * Null rather than the literal `"unattributed"`: the service assigns that id
+   * itself and derives attribution from the *absence* of one (001 FR-004), so a
+   * client spelling the string out would be recorded as an agent narrating.
+   */
+  sessionId: string | null;
 }
 
 export async function report(
