@@ -1,0 +1,40 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.chip__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: currentcolor;
+}
+
+/* One tint/ink pair per reported state. Two signals never appear in the same
+   control, so the dot inherits the label's colour rather than adding a third. */
+.chip--idle {
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.chip--watching {
+  background: var(--teal-tint);
+  color: var(--teal);
+}
+
+.chip--thinking {
+  background: var(--blue-tint);
+  color: var(--blue);
+}
+
+.chip--needs-you {
+  background: var(--ember-tint);
+  color: var(--ember);
+}

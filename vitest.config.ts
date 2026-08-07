@@ -23,8 +23,14 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['packages/*/tests/**/*.test.ts', 'apps/*/tests/unit/**/*.test.ts'],
-          exclude: [...NEVER, '**/tests/integration/**'],
+          include: [
+            'packages/*/tests/**/*.test.ts',
+            'apps/*/tests/unit/**/*.test.ts',
+            // Co-located, per the renderer stack pack: a helper's test sits
+            // beside it rather than in a parallel tree.
+            'apps/*/src/**/*.test.ts',
+          ],
+          exclude: [...NEVER, '**/tests/integration/**', '**/tests/e2e/**'],
         },
       },
       {
