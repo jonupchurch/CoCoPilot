@@ -47,3 +47,42 @@ describe('source files contain no control characters', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+/**
+ * The renderer is a window that draws text an AI agent composed, and the main
+ * process is the one with a filesystem, a listening socket and the transcript
+ * reader. The wall between them is `apps/board/src/preload`, and it holds only
+ * as long as nothing steps around it.
+ *
+ * A type is fine — it is erased before the bundle exists. A *value* imported
+ * from `main/` would pull that module and its `node:` dependencies into the
+ * renderer graph, and the first symptom would be a build error somewhere else
+ * entirely. The electron stack pack asks for this to be verified; verifying it
+ * once by hand is how it stops being true three features later.
+ */
+describe('the renderer never reaches into the main process', () => {
+  it('imports from main as types only, and never imports node:', async () => {
+    const offenders: string[] = [];
+
+    for await (const file of glob('apps/board/src/renderer/**/*.{ts,tsx}', {
+      cwd: ROOT,
+      exclude: IGNORED,
+    })) {
+      const source = readFileSync(`${ROOT}${file}`, 'utf8');
+
+      for (const match of source.matchAll(/^import\s+(type\s+)?[^;]*?from\s+'([^']+)'/gmu)) {
+        const [, typeOnly, specifier] = match;
+        if (specifier === undefined) continue;
+
+        if (specifier.startsWith('node:')) {
+          offenders.push(`${file}: imports ${specifier}`);
+        }
+        if (/(^|\/)main\//u.test(specifier) && typeOnly === undefined) {
+          offenders.push(`${file}: imports a value from ${specifier}`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+});

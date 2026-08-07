@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001–004 complete and merged; 005–009 not started |
+| Implementation | 🟡 **Started** — features 001–005 complete and merged; 006–009 not started |
 
 ## What this is
 
@@ -476,6 +476,54 @@ their head across a long agent session.
     - *Consequence:* a detached HEAD reports the abbreviated commit rather than
       the literal `HEAD` that `git rev-parse --abbrev-ref` returns, because
       `HEAD` in a board's branch slot reads as a bug rather than as information.
+32. **The envelope carries an optional `transcriptId`, derived from
+    `CLAUDE_CODE_SESSION_ID`.** Found while implementing feature 005. The
+    board's own `sessionId` is a `randomUUID()` minted by the client process; a
+    transcript's filename is *Claude Code's* session id. They are unrelated, so
+    "the transcript for the session being shown" — which FR-016 requires — could
+    not be answered at all from what the board held.
+    - *Reaches back into features 001 and 002*, which is why it was raised as a
+      decision rather than appearing in a diff. One optional field, capped as a
+      `Label`, defaulting to null, populated from the environment and never
+      model-composed — the same treatment as `repo` and `branch`.
+    - *Cost:* an agent that is not Claude Code supplies nothing, and the reader
+      falls back to the newest `.jsonl` in the project directory. That is right
+      whenever one session is running in a repository and capable of picking a
+      sibling's file when two are. Stated as the heuristic it is.
+    - *Also a trust boundary:* the contract checks only a `Label`'s length, so
+      `../../../etc/passwd` is a legal value. The id is refused unless it is
+      plainly filename-shaped, rather than sanitised — a repaired path is a
+      guess about what the caller meant.
+33. **Unavailable is a third state, not an empty one.** `available | empty |
+    unreadable`, as a discriminated union carrying the value on the first arm
+    only, from the reader all the way to the section. A section drawn as though
+    it had nothing to show, when in fact it could not read its source, presents
+    a failure as a confident answer — and it is the *worst* direction to be
+    wrong in.
+    - *Cost:* every consumer narrows before it can reach a list, and three
+      display states exist where two would have done.
+    - *Consequence:* the distinction has to survive collapsing, where the body
+      is unmounted and the header summary is the whole section. It does.
+    - *Not the ember tint.* `--ember` is attention and `needs-you` and nothing
+      else, and a transcript is unreadable for every agent that is not Claude
+      Code — tinting it would light a standing alarm for a state that is normal
+      in those sessions.
+34. **"Show all N" expands the list in place.** Design round 2 recorded that the
+    export's "Show all 18" had no destination. There is no history *view* to
+    send anyone to, and building one would be a second place to read the same
+    thing; the section is already collapsible, so a long list closes the way
+    everything else on the tab does.
+    - *Cost:* a very long history is a very long section until it is closed.
+35. **The board shows what the transcript says and estimates nothing.** The
+    design export draws a per-file token size in the In context section. That
+    number exists nowhere in the format, and the only way to produce one would
+    be to estimate it — which is inventing content (FR-016), in a section whose
+    whole value is being trustworthy about what the agent actually has.
+    - *Consequence:* the slot carries what touched the file instead, which the
+      transcript does say. The export's teal-versus-muted distinction among held
+      files goes the same way: no visible rule, no source, so every held file
+      gets the same disc and only the running one is marked.
+    - *Cost:* two visible departures from an export that is otherwise canon.
 
 ## What survives the restart
 
@@ -598,9 +646,13 @@ open questions and no "not designed yet" list of its own.
 ### Still not designed, carried from round 2
 
 Overflow is now done. What remains: the torn-off window beyond the `+`
-affordance; long sessions, where "Show all 18" has no destination and Notes is
-drawn at six entries rather than forty; and the agent going away mid-session —
-process exit or socket drop — as distinct from merely being quiet.
+affordance; **Notes drawn at six entries rather than forty**; and the agent
+going away mid-session — process exit or socket drop — as distinct from merely
+being quiet.
+
+The prompt-history half of "long sessions" is closed by **decision 34**: "Show
+all N" expands the list in place, so it has a destination. Notes still does not,
+and is feature 007's to answer.
 
 ## The initial feature set
 

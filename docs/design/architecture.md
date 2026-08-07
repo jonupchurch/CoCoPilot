@@ -115,6 +115,27 @@ source could: an agent cannot honestly self-report its own prompt history or
 token counts. The transcript directory is keyed by a slug of the project path,
 so a pushed `repo` resolves to exactly one transcript folder with no config.
 
+The slug rule is **every character that is not `[A-Za-z0-9]` becomes `-`**, case
+preserved. *Which* file inside it comes from `CLAUDE_CODE_SESSION_ID`, reported
+by the clients as one optional envelope field — the board's own `sessionId` is a
+`randomUUID()` and never matches a transcript filename. Without that field the
+reader falls back to the newest `.jsonl` in the directory, which is right
+whenever one session is running in a repository and is stated as the heuristic
+it is.
+
+Exactly one file, and never more: not the sibling session's transcript in the
+same directory, and not the `<sessionId>/subagents/` tree beneath it — an
+agent's internal delegation is not the developer's instructions. That is
+asserted rather than intended, by recording every `node:fs` call across a full
+read cycle and requiring the set of paths touched to be exactly the one located
+transcript.
+
+The format is undocumented and unstable — a ninth record type appeared between
+two samples taken a day apart — so the reader is built to degrade rather than
+break. Three states, never two: `available`, `empty` (read fine, nothing in it)
+and `unreadable` (could not read at all), drawn differently, because a section
+that failed and a section with nothing to show are different claims.
+
 Tailing counts as *the AI updating the board*, not the window refreshing itself.
 The distinction that matters is whose file we follow: the one the AI writes,
 yes; the repository and git, no (12).

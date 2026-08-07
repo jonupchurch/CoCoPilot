@@ -423,6 +423,45 @@ test.describe('earlier prompts', () => {
     await expect(board.page.getByTestId('history-full-u0')).toBeVisible();
   });
 
+  test('counts human prompts, not user records', async () => {
+    // The trap test, stated as the number in the header. Ten `user` records,
+    // three of them prompts, two of those earlier than the latest — a board
+    // counting record types would say nine here.
+    install('tool-results.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.getByTestId('section-summary-history')).toHaveText('2');
+    await expect(board.page.locator('.history__text')).toHaveText([
+      'Now run the session tests',
+      'Rename fetchUser to loadUser everywhere',
+    ]);
+  });
+
+  test('is still there after the board is closed and reopened', async () => {
+    // SC-008, and the only thing on the board that survives a restart. Held
+    // state dies with the process by design (decision 21); this does not,
+    // because it was never held state — it is on disk, and it is somebody
+    // else's file.
+    install('typical.jsonl', 'session-1');
+    board = await launchBoard({ home });
+    await board.push(session());
+    await expect(board.page.locator('.history__text')).toHaveCount(1);
+
+    await board.close();
+
+    board = await launchBoard({ home });
+    await board.push(session());
+
+    await expect(board.page.locator('.history__text')).toHaveText([
+      'Pull the repeated session fetch out of the three route components and give me a hook. Keep the existing error handling.',
+    ]);
+    await expect(board.page.getByTestId('last-prompt-text')).toHaveText(
+      'Why does the route rerender on every keystroke?',
+    );
+  });
+
   test('renders markup in an earlier prompt as visible characters', async () => {
     writeFileSync(
       join(projects, 'session-1.jsonl'),
@@ -759,6 +798,19 @@ test.describe('the blast radius stops at the transcript sections', () => {
     copyFileSync(join(FIXTURES, 'garbage.jsonl'), path);
 
     await expect(board.page.getByTestId('last-prompt-text')).toHaveCount(0);
+    await expectReportIntact(board.page);
+  });
+
+  test('when the transcript is deleted out from under a running board', async () => {
+    const path = install('typical.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push({ ...session(), ...REPORT });
+    await expect(board.page.getByTestId('last-prompt-text')).toContainText('rerender');
+
+    rmSync(path);
+    // The watcher fires on the removal; nothing here asks the board to look.
+    await expect(board.page.getByTestId('last-prompt-unavailable')).toBeVisible();
     await expectReportIntact(board.page);
   });
 

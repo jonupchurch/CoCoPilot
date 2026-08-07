@@ -180,10 +180,10 @@ distinguishable; collapsed, the header still summarises.
 
 ## Phase 6: Polish
 
-- [ ] T029 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` or add a sibling — transcript text containing `<script>` renders as visible characters (SC-009), and transcript content never alters a task status, chip or count (FR-015)
-- [ ] T030 Walk the `stacks/vite-react.md` and `stacks/electron.md` checklists, and confirm the reader never runs on the renderer side
-- [ ] T031 Run `npm run typecheck`, the full suite, the Playwright suite and a build, then walk the eight scenarios in [quickstart.md](quickstart.md)
-- [ ] T032 [P] Update `CHANGELOG.md`, `STATUS.md`, and `docs/design/architecture.md` where it describes what the board reads
+- [x] T029 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` or add a sibling — transcript text containing `<script>` renders as visible characters (SC-009), and transcript content never alters a task status, chip or count (FR-015)
+- [x] T030 Walk the `stacks/vite-react.md` and `stacks/electron.md` checklists, and confirm the reader never runs on the renderer side
+- [x] T031 Run `npm run typecheck`, the full suite, the Playwright suite and a build, then walk the eight scenarios in [quickstart.md](quickstart.md)
+- [x] T032 [P] Update `CHANGELOG.md`, `STATUS.md`, and `docs/design/architecture.md` where it describes what the board reads
 - [ ] T033 Read back the full diff, then merge
 
 ---
