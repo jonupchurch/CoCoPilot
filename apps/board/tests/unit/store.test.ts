@@ -97,6 +97,14 @@ describe('Store — a report is held', () => {
     expect(store.getSession('D:\\Codelib\\example', 'a1')?.attributed).toBe(true);
   });
 
+  it('refuses to let a client claim the reserved id as an agent', () => {
+    // Showing a hook as an agent narrating would misrepresent where the
+    // information came from, whether the client omitted the id or spelled it out.
+    store.putReport(report({ sessionId: UNATTRIBUTED }), 1);
+
+    expect(store.getSession('D:\\Codelib\\example', UNATTRIBUTED)?.attributed).toBe(false);
+  });
+
   it('records the arrival time it was given, never one from the payload', () => {
     // A client-supplied receivedAt was already stripped by the schema; the store
     // only ever sees the caller's clock.

@@ -8,6 +8,40 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 002 — MCP server and CLI.** `packages/clients`, published as
+  `@cocopilot/mcp` and fetched by `npx`, carrying both binaries. Two thin
+  clients over feature 001's contract: neither holds state, both derive
+  repository, branch and session identity themselves, and both translate every
+  failure into a value rather than a throw.
+  - **The MCP server starts offline and stays that way through initialisation.**
+    A host discovers a server's tool list once, at session start, so a server
+    that probes for the board while starting leaves an agent with no reporting
+    ability for the whole session — including after the board opens two minutes
+    later. The test asserting zero network calls during startup and `tools/list`
+    is the one worth protecting; every other test passes whether or not this
+    holds.
+  - Discovery accepts only a responder that names itself `cocopilot`, and
+    caches nothing between calls. Nothing is queued, retried, or launched.
+  - One budget per call, spent across discovery and delivery together, so five
+    ports that black-hole rather than refuse still cannot exceed two seconds.
+  - The CLI exits **0** when no board is running, deliberately: these run from
+    hooks, and a hook failing because a dashboard was closed would be a
+    monitoring tool breaking the work it monitors.
+  - 193 tests. Both protected behaviours were checked for teeth by introducing
+    the violation they exist to catch.
+
+### Fixed
+
+- **The reserved `unattributed` session id could be claimed as an agent's.** The
+  service derived attribution from the absence of a session id, so a client that
+  spelled the reserved string out was recorded as an agent narrating rather than
+  as a script. Feature 002's plan had assumed the opposite. The service now
+  refuses the claim however it arrives, and the CLI sends no id at all.
+- **A 500 from the service reported itself as `invalid_json`**, sending a caller
+  looking for a malformed field that was fine.
+
+### Added
+
 - **Feature 001 — push contract and local service.** The first product code in
   the repository. An npm-workspaces monorepo (`packages/contract`, `apps/board`)
   on TypeScript strict + Vitest, and an HTTP service bound to `127.0.0.1`

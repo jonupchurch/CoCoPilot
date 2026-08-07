@@ -213,7 +213,10 @@ export class Store {
     const created: Session = {
       repoPath,
       sessionId,
-      attributed: suppliedSessionId !== null,
+      // The reserved id cannot be claimed as an agent's, however it arrived. A
+      // client that spells it out is a hook, and showing a hook as an agent
+      // narrating would misrepresent where the information came from.
+      attributed: suppliedSessionId !== null && suppliedSessionId !== UNATTRIBUTED,
       branch,
       declaredAt: receivedAt,
       lastHeardAt: receivedAt,

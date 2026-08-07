@@ -1,0 +1,29 @@
+{
+  "name": "@cocopilot/mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "The MCP server and CLI that report to a CoCoPilot board. Fetched by npx; never needs a path to the desktop app.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "cocopilot-mcp": "dist/mcp/main.js",
+    "cocopilot": "dist/cli/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@cocopilot/contract": "0.1.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@cocopilot/board": "*"
+  }
+}
