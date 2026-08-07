@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import type { FsCall } from '../helpers/fs-calls.js';
+
 /**
  * The two guarantees the whole product rests on, asserted as absences.
  *
@@ -15,89 +17,28 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
  * itself, which is how it checks the path exists without opening it.
  */
 
-interface FsCall {
-  module: string;
-  fn: string;
-  args: unknown[];
-}
+const recorder = vi.hoisted(() => ({ calls: [] as FsCall[] }));
 
-const recorder = vi.hoisted(() => {
-  const calls: FsCall[] = [];
-  const wrap = (moduleName: string, actual: Record<string, unknown>): Record<string, unknown> => {
-    const wrapped: Record<string, unknown> = {};
-    for (const key of Object.keys(actual)) {
-      const value = actual[key];
-      wrapped[key] =
-        typeof value === 'function'
-          ? (...args: unknown[]): unknown => {
-              calls.push({ module: moduleName, fn: key, args });
-              return (value as (...a: unknown[]) => unknown)(...args);
-            }
-          : value;
-    }
-    wrapped['default'] = wrapped;
-    return wrapped;
-  };
-  return { calls, wrap };
+vi.mock('node:fs', async (importOriginal) => {
+  const { recordInto } = await import('../helpers/fs-calls.js');
+  return recordInto(recorder.calls, 'node:fs', await importOriginal<Record<string, unknown>>());
 });
 
-vi.mock('node:fs', async (importOriginal) =>
-  recorder.wrap('node:fs', await importOriginal<Record<string, unknown>>()),
-);
-
-vi.mock('node:fs/promises', async (importOriginal) =>
-  recorder.wrap('node:fs/promises', await importOriginal<Record<string, unknown>>()),
-);
+vi.mock('node:fs/promises', async (importOriginal) => {
+  const { recordInto } = await import('../helpers/fs-calls.js');
+  return recordInto(
+    recorder.calls,
+    'node:fs/promises',
+    await importOriginal<Record<string, unknown>>(),
+  );
+});
 
 const { mkdirSync, mkdtempSync, rmSync, writeFileSync } = await import('node:fs');
 const { tmpdir } = await import('node:os');
 const { join } = await import('node:path');
 
+const { normalise, pathish, WRITE_APIS } = await import('../helpers/fs-calls.js');
 const { startTestService } = await import('../helpers/service.js');
-
-/**
- * Anything that changes the filesystem. Listed by name rather than by pattern so
- * that adding a call the list does not know about fails loudly.
- */
-const WRITE_APIS = new Set([
-  'appendFile',
-  'appendFileSync',
-  'chmod',
-  'chmodSync',
-  'chown',
-  'chownSync',
-  'copyFile',
-  'copyFileSync',
-  'cp',
-  'cpSync',
-  'createWriteStream',
-  'link',
-  'linkSync',
-  'mkdir',
-  'mkdirSync',
-  'mkdtemp',
-  'mkdtempSync',
-  'rename',
-  'renameSync',
-  'rm',
-  'rmSync',
-  'rmdir',
-  'rmdirSync',
-  'symlink',
-  'symlinkSync',
-  'truncate',
-  'truncateSync',
-  'unlink',
-  'unlinkSync',
-  'utimes',
-  'utimesSync',
-  'write',
-  'writeFile',
-  'writeFileSync',
-  'writeSync',
-  'writev',
-  'writevSync',
-]);
 
 let repo: string;
 
@@ -118,29 +59,6 @@ afterAll(() => {
 
 function envelope(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return { repo, branch: 'feat/session-hook', sessionId: 'a1b2c3', ...overrides };
-}
-
-/**
- * Both separators are valid on Windows, and case is not significant there
- * either. Comparing raw strings would let a read of the very same file slip
- * past for writing `repo + '/tasks.md'` instead of `join(repo, 'tasks.md')`.
- */
-function normalise(value: string): string {
-  return value.replaceAll('\\', '/').toLowerCase();
-}
-
-/** Every argument that could name a path, flattened out of a recorded call. */
-function pathish(call: FsCall): string[] {
-  const found: string[] = [];
-  const walk = (value: unknown, depth: number): void => {
-    if (depth > 3) return;
-    if (typeof value === 'string') found.push(value);
-    else if (value instanceof URL) found.push(value.pathname);
-    else if (Buffer.isBuffer(value)) found.push(value.toString('utf8'));
-    else if (Array.isArray(value)) for (const item of value) walk(item, depth + 1);
-  };
-  for (const arg of call.args) walk(arg, 0);
-  return found;
 }
 
 describe('the service touches the filesystem exactly once, and never inside the repository', () => {
