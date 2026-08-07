@@ -88,18 +88,18 @@ apps/board/src/renderer/src/views/overview/   # three more sections
 **Purpose**: The reader, end to end, before any of it is rendered. Every module
 here is pure or filesystem-only and testable without a window.
 
-- [ ] T001 Add an optional `transcriptId` to `Envelope` in `packages/contract/src/schema.ts`, capped as a `Label` and defaulting to null, with a comment stating it is derived from `CLAUDE_CODE_SESSION_ID` and never model-composed
-- [ ] T002 Populate it in `packages/clients/src/identity.ts` from `process.env.CLAUDE_CODE_SESSION_ID`, returning null when absent, and send it from both surfaces in `packages/clients/src/client.ts`
-- [ ] T003 [P] Extend `packages/clients/tests/` to cover the field present, absent and empty — an agent that is not Claude Code must still report successfully
-- [ ] T004 Create `apps/board/src/main/transcript/locate.ts` — the slug rule (**every non-alphanumeric character becomes `-`**, case preserved), the projects directory, exact selection by `transcriptId`, and newest-`.jsonl` fallback. Regular files ending `.jsonl` at the top level only: the `<sessionId>/` directory beside them holds subagent transcripts and FR-016 forbids reading them
-- [ ] T005 [P] Write `apps/board/tests/unit/transcript/locate.test.ts` — the four awkward real paths from research (`D&D`, `fitt.d`, `t@nk.r`, `playm8z`), a POSIX-shaped path, a directory that would be chosen if entries were not filtered to files, and a missing directory resolving to unavailable rather than throwing
-- [ ] T006 Create `apps/board/src/main/transcript/availability.ts` — `available | empty | unreadable` as a discriminated union carrying the value only in the first case, so a caller cannot read a list out of an unreadable section by accident
-- [ ] T007 Create `apps/board/src/main/transcript/classify.ts` — record to `prompt | context | ignore`. Accepts `message.content` as **string or array**; requires text-only content; then rejects the four wrapper shapes. Filters `isSidechain === true` with a comment recording that it is currently inert and why it stays
-- [ ] T008 [P] Build the fixture set in `apps/board/tests/fixtures/transcripts/` — `typical.jsonl`, `tool-results.jsonl`, `wrappers.jsonl` (one record per wrapper shape), `string-content.jsonl`, `truncated.jsonl`, `unknown-types.jsonl`, `garbage.jsonl`. Trimmed from real records, with any absolute paths rewritten
-- [ ] T009 [P] Write `apps/board/tests/unit/transcript/classify.test.ts` — the counting trap stated as a number, and each wrapper shape named individually: a skill instruction payload, a `<local-command-caveat>`, a `[Request interrupted` marker and a `<command-name>` block are each **not** a prompt, while a string-content record **is**
-- [ ] T010 Create `apps/board/src/main/transcript/reader.ts` — read once, then read only the appended region on growth. A trailing partial line is buffered and retried, never reported as corruption. Every failure returns `unreadable`; nothing throws out of this module
-- [ ] T011 [P] Write `apps/board/tests/unit/transcript/reader.test.ts` — growth between reads appends without re-reading; a line split across two reads is recovered whole; a file that shrinks or is replaced is handled; a synthetic large file stays within a time bound
-- [ ] T012 Create `apps/board/src/main/transcript/index.ts` — watch the located file, publish into the store on change, and hold every failure inside this module
+- [x] T001 Add an optional `transcriptId` to `Envelope` in `packages/contract/src/schema.ts`, capped as a `Label` and defaulting to null, with a comment stating it is derived from `CLAUDE_CODE_SESSION_ID` and never model-composed
+- [x] T002 Populate it in `packages/clients/src/identity.ts` from `process.env.CLAUDE_CODE_SESSION_ID`, returning null when absent, and send it from both surfaces in `packages/clients/src/client.ts`
+- [x] T003 [P] Extend `packages/clients/tests/` to cover the field present, absent and empty — an agent that is not Claude Code must still report successfully
+- [x] T004 Create `apps/board/src/main/transcript/locate.ts` — the slug rule (**every non-alphanumeric character becomes `-`**, case preserved), the projects directory, exact selection by `transcriptId`, and newest-`.jsonl` fallback. Regular files ending `.jsonl` at the top level only: the `<sessionId>/` directory beside them holds subagent transcripts and FR-016 forbids reading them
+- [x] T005 [P] Write `apps/board/tests/unit/transcript/locate.test.ts` — the four awkward real paths from research (`D&D`, `fitt.d`, `t@nk.r`, `playm8z`), a POSIX-shaped path, a directory that would be chosen if entries were not filtered to files, and a missing directory resolving to unavailable rather than throwing
+- [x] T006 Create `apps/board/src/main/transcript/availability.ts` — `available | empty | unreadable` as a discriminated union carrying the value only in the first case, so a caller cannot read a list out of an unreadable section by accident
+- [x] T007 Create `apps/board/src/main/transcript/classify.ts` — record to `prompt | context | ignore`. Accepts `message.content` as **string or array**; requires text-only content; then rejects the four wrapper shapes. Filters `isSidechain === true` with a comment recording that it is currently inert and why it stays
+- [x] T008 [P] Build the fixture set in `apps/board/tests/fixtures/transcripts/` — `typical.jsonl`, `tool-results.jsonl`, `wrappers.jsonl` (one record per wrapper shape), `string-content.jsonl`, `truncated.jsonl`, `unknown-types.jsonl`, `garbage.jsonl`. Trimmed from real records, with any absolute paths rewritten
+- [x] T009 [P] Write `apps/board/tests/unit/transcript/classify.test.ts` — the counting trap stated as a number, and each wrapper shape named individually: a skill instruction payload, a `<local-command-caveat>`, a `[Request interrupted` marker and a `<command-name>` block are each **not** a prompt, while a string-content record **is**
+- [x] T010 Create `apps/board/src/main/transcript/reader.ts` — read once, then read only the appended region on growth. A trailing partial line is buffered and retried, never reported as corruption. Every failure returns `unreadable`; nothing throws out of this module
+- [x] T011 [P] Write `apps/board/tests/unit/transcript/reader.test.ts` — growth between reads appends without re-reading; a line split across two reads is recovered whole; a file that shrinks or is replaced is handled; a synthetic large file stays within a time bound
+- [x] T012 Create `apps/board/src/main/transcript/index.ts` — watch the located file, publish into the store on change, and hold every failure inside this module
 
 **Checkpoint**: The reader works and is proven against real-shaped fixtures, with
 no UI involved.
@@ -116,11 +116,11 @@ the board.
 **Independent test**: With a session in progress, the view shows the most recent
 prompt, matching what was typed; a new prompt appears with no developer action.
 
-- [ ] T013 [US1] Hold transcript state in `apps/board/src/main/store.ts` as its own branch of the session — never inside `report`, and with no code path that lets it reach one (FR-015)
-- [ ] T014 [US1] Project it in `apps/board/src/main/view.ts` as a separate `transcript` field carrying availability per section, listed explicitly like every other projected field
-- [ ] T015 [US1] Create `apps/board/src/renderer/src/views/overview/LastPromptSection.tsx` and its CSS — the card at the top of the Overview stack, per the export's "Last prompt" block, with the prompt as written and its full text retrievable
-- [ ] T016 [US1] Derive the latest prompt from the prompt list, **not** from `last-prompt` records — 217 of those against 57 prompts settles it
-- [ ] T017 [P] [US1] Write `apps/board/tests/e2e/transcript.spec.ts` — a fixture transcript renders its most recent prompt; appending a prompt updates the view with no interaction; a long prompt stays legible with its full text retrievable
+- [x] T013 [US1] Hold transcript state in `apps/board/src/main/store.ts` as its own branch of the session — never inside `report`, and with no code path that lets it reach one (FR-015)
+- [x] T014 [US1] Project it in `apps/board/src/main/view.ts` as a separate `transcript` field carrying availability per section, listed explicitly like every other projected field
+- [x] T015 [US1] Create `apps/board/src/renderer/src/views/overview/LastPromptSection.tsx` and its CSS — the card at the top of the Overview stack, per the export's "Last prompt" block, with the prompt as written and its full text retrievable
+- [x] T016 [US1] Derive the latest prompt from the prompt list, **not** from `last-prompt` records — 217 of those against 57 prompts settles it
+- [x] T017 [P] [US1] Write `apps/board/tests/e2e/transcript.spec.ts` — a fixture transcript renders its most recent prompt; appending a prompt updates the view with no interaction; a long prompt stays legible with its full text retrievable
 
 ---
 
@@ -135,10 +135,10 @@ format acceptable at all.
 unavailability while the task list, plan, focus, notes and title bar all keep
 working.
 
-- [ ] T018 [US4] Write `apps/board/tests/unit/transcript/degradation.test.ts` — missing file, `garbage.jsonl`, `truncated.jsonl`, `unknown-types.jsonl`, a permission error and a directory where a file was expected each yield `unreadable`, and none of them throws
-- [ ] T019 [US4] Write `apps/board/tests/integration/transcript-containment.test.ts` — the absence test for SC-004 and SC-005: spy `node:fs` across a full read cycle and assert **zero** writes anywhere and **zero** reads outside the one located transcript, including no read of the sibling `subagents/` directory
-- [ ] T020 [P] [US4] Extend `apps/board/tests/e2e/transcript.spec.ts` — with a garbage transcript, the three sections say unavailable **and** the Overview sections from feature 004 render normally. This is the blast-radius test; it is the reason the dependency is acceptable
-- [ ] T021 [US4] Make unavailable visibly distinct from empty in the renderer, and assert it (SC-006) — a section that could not read its source must never be drawn as one with nothing to show
+- [x] T018 [US4] Write `apps/board/tests/unit/transcript/degradation.test.ts` — missing file, `garbage.jsonl`, `truncated.jsonl`, `unknown-types.jsonl`, a permission error and a directory where a file was expected each yield `unreadable`, and none of them throws
+- [x] T019 [US4] Write `apps/board/tests/integration/transcript-containment.test.ts` — the absence test for SC-004 and SC-005: spy `node:fs` across a full read cycle and assert **zero** writes anywhere and **zero** reads outside the one located transcript, including no read of the sibling `subagents/` directory
+- [x] T020 [P] [US4] Extend `apps/board/tests/e2e/transcript.spec.ts` — with a garbage transcript, the three sections say unavailable **and** the Overview sections from feature 004 render normally. This is the blast-radius test; it is the reason the dependency is acceptable
+- [x] T021 [US4] Make unavailable visibly distinct from empty in the renderer, and assert it (SC-006) — a section that could not read its source must never be drawn as one with nothing to show
 
 **Checkpoint**: A bad transcript cannot take down a working board, proven rather
 than asserted.

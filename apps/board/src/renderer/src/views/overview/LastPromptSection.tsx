@@ -66,12 +66,28 @@ export function LastPromptSection({
   );
 }
 
+/**
+ * The header summary, and the reason it is sometimes an element rather than a
+ * word.
+ *
+ * Collapsed, the body is unmounted and the summary is the only thing left — so
+ * `unavailable` and `none yet` were two pieces of identical muted text in
+ * identical positions, and a section that had *failed* read exactly like one
+ * with nothing in it yet. SC-006 asks for a visible difference, not a different
+ * word, and it has to hold in both states.
+ */
 function summary(
   prompts: Availability<readonly Prompt[]>,
   latest: Prompt | null,
   now: number,
-): string {
-  if (prompts.state === 'unreadable') return 'unavailable';
+): string | React.JSX.Element {
+  if (prompts.state === 'unreadable') {
+    return (
+      <span className="prompt__summary--unavailable" data-testid="last-prompt-summary-unavailable">
+        unavailable
+      </span>
+    );
+  }
   if (latest === null) return 'none yet';
   return latest.at === null ? 'recorded' : elapsed(latest.at, now);
 }
