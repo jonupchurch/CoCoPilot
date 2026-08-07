@@ -218,7 +218,7 @@ position.
 - [x] T025 Walk the `stacks/vite-react.md` checklist — no colour literal outside `tokens.css`, no `node:` import in the renderer, no timer that fetches, stable keys, nothing derived that was stored
 - [x] T026 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged build, then walk the seven scenarios in [quickstart.md](quickstart.md)
 - [x] T027 [P] Update `CHANGELOG.md` and `STATUS.md`
-- [ ] T028 Read back the full diff, then merge
+- [x] T028 Read back the full diff, then merge
 
 ---
 
