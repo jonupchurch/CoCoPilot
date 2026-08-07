@@ -97,10 +97,10 @@ apps/board/tests/e2e/
 **Purpose**: The projection and the unread rule — everything the view needs,
 none of it rendering anything.
 
-- [ ] T001 Widen `SessionView` in `apps/board/src/main/view.ts` with `notes`, listed explicitly rather than spread, in the same block that argued for `stories` in feature 006 — and say in the comment that this is the one field whose contents accumulate rather than being replaced
-- [ ] T002 [P] Extend `apps/board/tests/unit/view.test.ts` — notes project exactly as held, in **arrival** order (the view reverses for display; the projection does not pre-sort), and a session with no notes projects `[]` rather than absent
-- [ ] T003 Create `apps/board/src/renderer/src/state/useUnread.ts` — `noteCount` is already projected, so the rule is "more notes than there were when the notes view was last on screen". Derived from the count plus one piece of state, **without** an effect watching for arrivals: the pattern feature 006 established is that reconciliation is derivation, and an effect here would be a second source of truth for something a comparison answers
-- [ ] T004 [P] Write `apps/board/src/renderer/src/state/useUnread.test.ts` — a note arriving while elsewhere sets it; arriving while the notes view is active does not; visiting clears it; **the count going *down* does not set it** (a session dismissed and returning, or a switch between sessions in feature 008, must not read as an arrival); and it never exposes a number, so no caller can render one
+- [x] T001 Widen `SessionView` in `apps/board/src/main/view.ts` with `notes`, listed explicitly rather than spread, in the same block that argued for `stories` in feature 006 — and say in the comment that this is the one field whose contents accumulate rather than being replaced
+- [x] T002 [P] Extend `apps/board/tests/unit/view.test.ts` — notes project exactly as held, in **arrival** order (the view reverses for display; the projection does not pre-sort), and a session with no notes projects `[]` rather than absent
+- [x] T003 Create `apps/board/src/renderer/src/state/useUnread.ts` — `noteCount` is already projected, so the rule is "more notes than there were when the notes view was last on screen". Derived from the count plus one piece of state, **without** an effect watching for arrivals: the pattern feature 006 established is that reconciliation is derivation, and an effect here would be a second source of truth for something a comparison answers
+- [x] T004 [P] Write `apps/board/src/renderer/src/state/useUnread.test.ts` — a note arriving while elsewhere sets it; arriving while the notes view is active does not; visiting clears it; **the count going *down* does not set it** (a session dismissed and returning, or a switch between sessions in feature 008, must not read as an arrival); and it never exposes a number, so no caller can render one
 
 **Checkpoint**: The unread rule is right with no UI involved.
 
