@@ -1,0 +1,205 @@
+.storydetail {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 16px 18px;
+  overflow-y: auto;
+}
+
+.storydetail__head {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.storydetail__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.storydetail__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.storydetail__priority {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/*
+ * The feature's spec path, pushed right as the export has it. Ellipsised at the
+ * end plainly — every trick for keeping the filename and losing the directories
+ * reorders the string visually, and this was composed by an agent. The full
+ * value, and the fact that it belongs to the *feature*, are on `title`.
+ */
+.storydetail__spec {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+.storydetail__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.storydetail__narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.storydetail__clause {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.storydetail__lead {
+  color: var(--muted);
+}
+
+.storydetail__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.storydetail__block--ruled {
+  gap: 7px;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.storydetail__heading {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.storydetail__criterion {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+/* The position in the list, not a reported value — which is why it is
+   `aria-hidden`: a screen reader reading "1" before each criterion adds a
+   number the agent did not write. */
+.storydetail__ordinal {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.storydetail__criterion-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.storydetail__task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 4px 0;
+}
+
+.storydetail__task-id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/*
+ * `flex: 1` with `min-width: 0` so the title is what gives way when the row runs
+ * out of room — the status beside it is the shorter, denser value and losing it
+ * first would cost more.
+ */
+.storydetail__task-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.storydetail__task[data-current='true'] .storydetail__task-title {
+  color: var(--teal);
+}
+
+.storydetail__task-age {
+  flex: none;
+  min-width: 24px;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.storydetail__file {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.storydetail__empty,
+.storydetail__orphans {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--muted);
+}

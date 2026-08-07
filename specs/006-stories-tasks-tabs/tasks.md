@@ -107,12 +107,12 @@ actions from the Overview tab (SC-001).
 full, with narrative, criteria, tasks and touched files, and the list marks
 which.
 
-- [ ] T008 [US1] Create `apps/board/src/renderer/src/views/stories/StoryList.tsx` and its CSS — the 268px column from the export: id, priority, status chip, title, task summary, and the `· now` marker on the story owning the current task
-- [ ] T009 [US1] Create `apps/board/src/renderer/src/views/stories/StoryDetail.tsx` and its CSS — the header row, the As a / I want / so that card, numbered acceptance criteria, the task list with per-row status, and Touches. Every absent field omitted rather than drawn empty (FR-017), since `asA`, `want`, `soThat`, `priority` and `status` are all nullable
-- [ ] T010 [US1] Create `apps/board/src/renderer/src/views/stories/StoriesView.tsx` — composes list and detail, wired to `useSelection`, and says so explicitly when no stories were reported
-- [ ] T011 [US1] Replace the `stories` placeholder in `apps/board/src/renderer/src/app/App.tsx`, threading `now` as the Overview tab already does
-- [ ] T012 [P] [US1] Write `apps/board/tests/e2e/stories.spec.ts` — stories list in reported order with all four fields; selecting one shows its full detail and marks it in the list; the narrative, criteria, tasks and files are exactly what was reported; a story with none of the optional fields renders without empty scaffolding
-- [ ] T013 [US1] Extend `apps/board/tests/e2e/only-reported.spec.ts` for this tab — the task summary and the current-task marker are derived, so declare them; anything else appearing is a finding
+- [x] T008 [US1] Create `apps/board/src/renderer/src/views/stories/StoryList.tsx` and its CSS — the 268px column from the export: id, priority, status chip, title, task summary, and the `· now` marker on the story owning the current task
+- [x] T009 [US1] Create `apps/board/src/renderer/src/views/stories/StoryDetail.tsx` and its CSS — the header row, the As a / I want / so that card, numbered acceptance criteria, the task list with per-row status, and Touches. Every absent field omitted rather than drawn empty (FR-017), since `asA`, `want`, `soThat`, `priority` and `status` are all nullable
+- [x] T010 [US1] Create `apps/board/src/renderer/src/views/stories/StoriesView.tsx` — composes list and detail, wired to `useSelection`, and says so explicitly when no stories were reported
+- [x] T011 [US1] Replace the `stories` placeholder in `apps/board/src/renderer/src/app/App.tsx`, threading `now` as the Overview tab already does
+- [x] T012 [P] [US1] Write `apps/board/tests/e2e/stories.spec.ts` — stories list in reported order with all four fields; selecting one shows its full detail and marks it in the list; the narrative, criteria, tasks and files are exactly what was reported; a story with none of the optional fields renders without empty scaffolding
+- [x] T013 [US1] Extend `apps/board/tests/e2e/only-reported.spec.ts` for this tab — the task summary and the current-task marker are derived, so declare them; anything else appearing is a finding
 
 ---
 

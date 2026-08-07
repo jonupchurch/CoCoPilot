@@ -1,0 +1,31 @@
+/*
+ * Side by side at or above 640px, and a picker above a full-width detail below
+ * it.
+ *
+ * **The Tasks tab stacks instead, and that difference is deliberate.** A story
+ * row is three lines — identifier and status, a wrapped title, a task count —
+ * so five of them stacked above the detail would push the thing the developer
+ * came for most of a narrow panel down. A story's task list is a handful of
+ * single rows and stacks for almost nothing, which is why that view keeps its
+ * list visible. Same breakpoint, different answer, on purpose: this reads as an
+ * inconsistency if you only ever see one of the two files.
+ */
+.stories {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+}
+
+.stories[data-narrow='true'] {
+  flex-direction: column;
+}
+
+.stories--empty {
+  padding: var(--space-4) 14px;
+  font-size: var(--text-body);
+  color: var(--muted);
+}
+
+.stories--empty p {
+  margin: 0;
+}

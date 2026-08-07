@@ -1,0 +1,109 @@
+.storypicker {
+  position: relative;
+  flex: none;
+  padding: var(--space-3) 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.storypicker__current {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: var(--space-2) 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.storypicker__current:hover {
+  border-color: #3d3833;
+}
+
+.storypicker__current:focus-visible,
+.storypicker__option:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+/*
+ * Above everything, and above the detail it overlaps. The shadow is the one
+ * place in the product that uses one — `tokens.css` says depth is a border
+ * rather than a shadow, and this is the exception the export itself draws,
+ * because a menu floating over content is the one thing that genuinely leaves
+ * the surface.
+ */
+.storypicker__options {
+  position: absolute;
+  z-index: 5;
+  top: 52px;
+  right: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  padding: 4px;
+  border: 1px solid #3d3833;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 55%);
+  overflow-y: auto;
+}
+
+.storypicker__option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: var(--space-2) 9px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.storypicker__option:hover {
+  background: var(--raised);
+}
+
+.storypicker__option[data-selected='true'] {
+  background: var(--raised);
+}
+
+.storypicker__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.storypicker__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.storypicker__tasks {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.storypicker__caret {
+  flex: none;
+  font-size: 9px;
+  color: var(--muted);
+}

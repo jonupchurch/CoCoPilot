@@ -133,6 +133,116 @@ test.describe('the view shows only what was reported', () => {
   });
 });
 
+/**
+ * The same subtraction, on the Stories tab.
+ *
+ * A second copy rather than a parameterised one: the two views derive different
+ * things, and a shared allowlist would let a value declared for one tab pass
+ * silently on the other. The point of this test is that each addition costs
+ * somebody a line of justification.
+ */
+const STORY_PAYLOAD = {
+  feature: { id: 'F-01', title: 'Session handling', specPath: 'specs/002/spec.md' },
+  stories: [
+    {
+      id: 'US-002',
+      title: 'Share one session fetch across routes',
+      priority: 'P1',
+      status: 'active',
+      asA: 'developer',
+      want: 'one hook that fetches the session',
+      soThat: 'the routes stop doing it themselves',
+      criteria: ['The hook is used by every route.'],
+      files: ['src/hooks/useSession.ts'],
+    },
+    { id: 'US-004', title: 'Read the prompt history', priority: 'P2', status: 'todo' },
+  ],
+  tasks: [
+    { id: 'T-011', title: 'Audit the three call sites', status: 'done', storyId: 'US-002' },
+    { id: 'T-013', title: 'Implement useSession', status: 'active', storyId: 'US-002' },
+  ],
+  focus: { task: 'T-013', chip: 'watching' },
+};
+
+const STORY_REPORTED: string[] = [
+  STORY_PAYLOAD.feature.specPath,
+  ...STORY_PAYLOAD.stories.flatMap((s) => [
+    s.id,
+    s.title,
+    ...(s.priority === undefined ? [] : [s.priority]),
+    ...(s.status === undefined ? [] : [s.status]),
+    ...(s.asA === undefined ? [] : [s.asA]),
+    ...(s.want === undefined ? [] : [s.want]),
+    ...(s.soThat === undefined ? [] : [s.soThat]),
+    ...(s.criteria ?? []),
+    ...(s.files ?? []),
+  ]),
+  ...STORY_PAYLOAD.tasks.flatMap((t) => [t.id, t.title, t.status]),
+];
+
+/** Everything the Stories tab is allowed to draw that nobody reported. */
+const STORY_DERIVED: readonly RegExp[] = [
+  /STORIES|ACCEPTANCE CRITERIA|TASKS|TOUCHES/g, // section labels
+  /As a|I want|so that/g, // the narrative's own scaffolding
+  /· current/g, // which story owns the current task
+  /\b\d+\/\d+\b|no tasks/g, // the per-story task summary
+  /\b\d+[smhd]\b|\bnow\b/g, // the current task's elapsed tag
+  /[✓!]/g, // status discs, as on the Overview tab
+  // The story count and the criteria ordinals, and *only* those: a bare `\d+`
+  // here reaches inside `US-002` and `specs/002/spec.md` and punches holes in
+  // reported values, which then survive the subtraction below as `US-P` and
+  // `specs//spec.md`. A standalone number is the narrowest thing that matches
+  // both and neither.
+  /(?<=^|\s)\d+(?=\s|$)/g,
+];
+
+test.describe('the stories tab shows only what was reported', () => {
+  /**
+   * Wide enough for the side-by-side arrangement.
+   *
+   * Not incidental: below the breakpoint this tab draws a picker with a
+   * disclosure caret and no story list at all, so a test that inherited the
+   * default window size would be subtracting from a different view than the one
+   * it names. The narrow arrangement has its own spec.
+   */
+  test.beforeEach(async () => {
+    await board.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setSize(900, 700);
+    });
+  });
+
+  test('renders nothing that was not reported or declared as derived', async () => {
+    const { page } = board;
+    await board.push({ ...envelope(), ...STORY_PAYLOAD });
+    await page.getByTestId('tab-stories').click();
+    await expect(page.getByTestId('stories')).toBeVisible();
+
+    let remaining = (await page.getByTestId('stories').innerText()).replace(/\s+/gu, ' ');
+
+    for (const pattern of STORY_DERIVED) remaining = remaining.replace(pattern, ' ');
+    for (const value of [...STORY_REPORTED].sort((a, b) => b.length - a.length)) {
+      remaining = remaining.split(value).join(' ');
+    }
+
+    expect(remaining.replace(/[\s·]/gu, '')).toBe('');
+  });
+
+  test('does not sort, group or renumber the stories it was given', async () => {
+    const { page } = board;
+    await board.push({
+      ...envelope(),
+      stories: [
+        { id: 'US-009', title: 'Ninth' },
+        { id: 'US-001', title: 'First' },
+      ],
+      tasks: [{ id: 'T-1', title: 'A task', status: 'todo', storyId: 'US-009' }],
+    });
+    await page.getByTestId('tab-stories').click();
+
+    await expect(page.locator('.storylist__id')).toHaveText(['US-009', 'US-001']);
+  });
+});
+
 test.describe('limits and hostile content', () => {
   test('stays navigable at 500 tasks with an accurate header summary', async () => {
     const { page } = board;
