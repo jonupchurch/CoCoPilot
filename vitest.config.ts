@@ -1,12 +1,19 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// The board and the contract are separate workspaces, but tests resolve the
-// contract's *source* rather than its build output so the suite runs without a
-// build step. Publishing uses the `exports` map in packages/contract.
-const contract = fileURLToPath(new URL('./packages/contract/src/index.ts', import.meta.url));
+// Workspaces resolve each other's *source* rather than their build output, so
+// the suite runs without a build step. Publishing uses each package's own
+// `exports` map.
+const resolve = (path: string): string => fileURLToPath(new URL(path, import.meta.url));
 
-const alias = { '@cocopilot/contract': contract };
+const alias = {
+  '@cocopilot/contract': resolve('./packages/contract/src/index.ts'),
+  // A devDependency of packages/clients, used only to run a real service in
+  // integration tests. It must never reach the published dependency tree.
+  '@cocopilot/board': resolve('./apps/board/src/main/index.ts'),
+};
+
+const NEVER = ['**/node_modules/**', '**/dist/**'];
 
 export default defineConfig({
   test: {
@@ -17,6 +24,7 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['packages/*/tests/**/*.test.ts', 'apps/*/tests/unit/**/*.test.ts'],
+          exclude: [...NEVER, '**/tests/integration/**'],
         },
       },
       {
@@ -24,7 +32,8 @@ export default defineConfig({
         test: {
           name: 'integration',
           environment: 'node',
-          include: ['apps/*/tests/integration/**/*.test.ts'],
+          include: ['packages/*/tests/integration/**/*.test.ts', 'apps/*/tests/integration/**/*.test.ts'],
+          exclude: NEVER,
         },
       },
     ],
