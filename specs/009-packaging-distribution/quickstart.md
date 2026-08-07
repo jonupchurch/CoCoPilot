@@ -1,94 +1,116 @@
 # Quickstart: Packaging and Distribution
 
-**Feature**: [009-packaging-distribution](spec.md) | **Date**: 2026-08-06
-
-**This feature cannot be validated on the machine that built it.** Every
-meaningful check needs a clean machine per platform. "It built" is not evidence
-that it installs.
+**Feature**: [009-packaging-distribution](spec.md) | **Re-written**: 2026-08-07
 
 ## Prerequisites
 
-- Features 001–008 implemented
-- Signing credentials: Authenticode (Windows), Developer ID (macOS)
-- Clean VMs or machines for Windows, macOS and Linux
+Features 001–008 implemented. For the release runbook below, an npm account —
+which is the one thing this repository cannot provide for itself.
 
-## Build
+## Run the checks
 
 ```bash
-npm run release -- --version 0.1.0    # all four artefacts, one version
+npm run build
+npm run typecheck
+npm test
+npm run test:e2e
+npm run pack:check   # packs, installs and launches every package
+npm run release      # every refusal, then the publish plan
 ```
+
+`npm run pack:check` is the important one and takes about a minute: it is the
+only thing standing between a mistake and a permanent one.
 
 ## Validation scenarios
 
-### 1. Install and launch (US1)
+### 1. One command runs the product (US1)
 
-On a **clean** machine of each platform:
+```bash
+npx cocopilot-board
+```
 
-| Check | Windows | macOS | Linux |
-|---|---|---|---|
-| Installs without an unknown-publisher warning | required | — | n/a |
-| Launches with no untrusted/unverified warning | required | required | n/a |
-| Opens to the waiting state | required | required | required |
-| No runtime installed by hand | required | required | required |
-| Uninstalls leaving nothing behind | required | required | required |
+- The board opens and shows its waiting state.
+- Same command on all three platforms.
+- The reporting tools arrive with it — `cocopilot` and `cocopilot-mcp` are both
+  on the path after installing the one package.
+- On Node older than 22, the failure **names the version** rather than throwing
+  from inside a dependency.
 
-The macOS row is the one that fails most often and latest — verify on a machine
-that has never seen the certificate, since a build machine trusts its own.
+**Verified locally by `pack:check`**, which installs the packed tarballs into a
+clean directory and starts the board from them. What it cannot verify is a
+genuinely clean machine, a different platform, or npm's own resolution — those
+are true tests only after publishing.
 
-### 2. The configuration entry (US2)
+### 2. The reporting tools stay small (US2)
 
-On each clean machine, with the desktop application **not installed**:
+- Installing `@cocopilot/mcp` alone brings **no** Electron, Chromium or
+  Playwright — asserted over the installed tree, not the manifest.
+- The CLI runs with no board and says so softly, exiting 0.
+- The configuration entry is unchanged from previous versions and names no path.
 
-- Add the documented entry to an agent configuration.
-- Start a session: both tools are present.
-- Calling one returns the board-absent message — present and failing soft, not
-  missing.
-- Install the board, report again: it arrives.
-- Confirm the entry text contains **no** filesystem path, and is byte-identical
-  across all three platforms.
+### 3. A release refuses before it ruins (US3)
 
-### 3. Missing prerequisite
+Each of these should stop the release, naming the cause:
 
-On a machine without the runtime the clients need:
+| Sabotage | Refusal |
+|---|---|
+| Uncommitted changes | Lists them; nothing is built |
+| Version bumped in one manifest only | Prints all three versions side by side |
+| A pin naming a different version | Names the pin and the release version |
+| `publishConfig.access` removed | Names the package |
+| `prepublishOnly` removed | Names the package |
 
-- The failure names the missing prerequisite.
-- It does not present as "the tools are broken".
+All five verified by doing them. The first is the one that fires most often in
+practice, and it fired for real during this feature.
 
-### 4. Release integrity (US3)
+### 4. Nothing is published
 
-- One command produced three installers and the client package.
-- All four carry the same version.
-- A matching board and client report no version disagreement.
-- A deliberately mismatched pair **does** report one, plainly, through the health
-  endpoint — not as odd behaviour.
+`npm run release --publish` prints the same plan and publishes nothing. That is
+deliberate, not unfinished: see the runbook.
 
-### 5. Upgrade and coexistence
+## The release runbook
 
-- Installing a newer version over an older one succeeds with no migration step
-  and no data loss. Trivially true — nothing is stored — but verify it is true
-  rather than assumed.
-- Launching a second instance while one runs: the second claims another port in
-  the range or declines to start a duplicate. It does not disturb the first.
+**Everything up to this point is reversible. Nothing past it is.** A published
+version cannot be replaced, and unpublishing is limited to 72 hours.
 
-### 6. Offline first use
-
-With no network, on a machine where the client package has never been fetched:
-
-- The failure names the cause.
-- It is distinguishable from "the tools are broken".
-
-### 7. Package size
-
-- Inspect the published client package contents against its `files` allowlist.
-- Nothing from the Electron app is present in its dependency tree.
+1. **Create an npm account** and enable 2FA. Public packages are free.
+2. **Settle the naming**, which is the one open decision. `cocopilot` unscoped
+   is an npm *security holding package* and cannot be had, so `npx cocopilot` is
+   unavailable whatever else is chosen.
+   - Check whether the **`@cocopilot` organisation** can be created. If it can,
+     nothing changes: publish as-is.
+   - If it cannot, rename the two scoped packages to `cocopilot-contract` and
+     `cocopilot-mcp` — both confirmed free. It is a find-and-replace across 52
+     files that the typechecker verifies completely, plus one assertion in
+     `packaging.test.ts`, one line in the client README and the pin in
+     `packages/runner`. `cocopilot-board` is unscoped already and unaffected.
+3. **`npm login`** on the release machine, or mint a granular token for CI.
+4. **`npm run release`** and read every line. It builds from scratch and
+   rehearses the install.
+5. **Publish in the printed order** — contract, then client, then runner. Out of
+   order leaves a published package pointing at one that does not exist, and
+   that cannot be taken back.
+6. **Install it somewhere clean and run it**, from the registry rather than from
+   a tarball. This is the first moment the real thing is testable.
 
 ## Expected outcome
 
-All checks pass on all three platforms, or any that cannot are **documented**
-with what a user will see — per FR-016. An undocumented signing gap is a
-failure; a documented one is a known limitation.
+All pass, and the interesting failure already happened during implementation.
+
+`pack:check` verified that every file was present, both binaries resolved, and
+the package installed — while the published command opened a window onto a
+file-not-found. Electron had been handed the entry *file* rather than the
+package directory, so `app.getAppPath()` came back one level too deep and the
+renderer was looked for inside `out/main/`. The process stayed up. Only the
+window was wrong.
+
+So the check now **starts the installed board and fails if it cannot load
+itself**, and the lesson generalises past this feature: a package that installs
+is not a package that runs, and everything short of running it is a proxy.
 
 ## Not validated here
 
-- Automatic updates, telemetry, crash reporting, store distribution — all out of
-  scope by design.
+- A genuinely clean machine, or any platform other than the one this was built
+  on. Both need a real publish first.
+- The desktop installers — specified in [spec.md](spec.md) as FR-018 through
+  FR-024 and deferred until there are signing credentials to test against.

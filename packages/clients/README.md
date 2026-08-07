@@ -104,3 +104,13 @@ Nothing else, anywhere. Writes nothing, anywhere.
 ## Requirements
 
 Node 22 or newer.
+
+## Just the tools, or the whole product?
+
+This package is the reporting tools on their own — an MCP server, a CLI, and
+nothing that pulls in a browser runtime. It is what an agent needs, and it is
+around 21 KB.
+
+If you also want the board itself, the window that displays what your agent
+reports, run `npx cocopilot-board` instead. That package brings these tools with
+it, so you never need both.

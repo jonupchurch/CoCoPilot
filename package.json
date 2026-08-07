@@ -18,7 +18,9 @@
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "typecheck": "tsc -p tsconfig.root.json --noEmit && npm run typecheck --workspaces --if-present",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "pack:check": "node scripts/pack-check.mjs",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

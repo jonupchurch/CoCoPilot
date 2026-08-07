@@ -30,3 +30,7 @@ coverage/
 test-results/
 playwright-report/
 .playwright/
+
+# Staged copy of the board's build, produced by packages/runner/scripts/stage.mjs.
+# One build feeds both distribution routes; this is the copy, not the source.
+packages/runner/out/

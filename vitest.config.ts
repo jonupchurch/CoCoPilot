@@ -40,7 +40,7 @@ export default defineConfig({
         test: {
           name: 'repo',
           environment: 'node',
-          include: ['tests/**/*.test.ts'],
+          include: ['tests/**/*.test.ts', 'scripts/tests/**/*.test.ts'],
           exclude: NEVER,
         },
       },

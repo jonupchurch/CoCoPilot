@@ -1,99 +1,133 @@
 # Implementation Plan: Packaging and Distribution
 
-**Branch**: `009-packaging-distribution` | **Date**: 2026-08-06 | **Spec**: [spec.md](spec.md)
+**Branch**: `009-packaging-distribution` | **Date**: 2026-08-06 |
+**Re-planned**: 2026-08-07 | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/009-packaging-distribution/spec.md`
 
 ## Summary
 
-Installers for three platforms, the client package published to npm, and one
-path-free configuration entry that works everywhere. Signing where credentials
-exist; documented honestly where they do not.
+Two distribution routes over one build. Three npm packages so the product runs
+from a single `npx`, and — later, behind credentials — signed installers for
+three platforms.
 
 ## Technical Context
 
-Inherits [001/research.md](../001-push-contract-service/research.md).
+**Primary Dependencies**: `electron-builder` for the installer route only.
+Nothing new for the npm route.
 
-**Primary Dependencies**: `electron-builder` for the three installers; npm for
-the client package.
-
-**Signing**: An Authenticode certificate for Windows; an Apple Developer ID plus
-notarisation for macOS; Linux unsigned, which is normal for that platform.
-
-**Constraints**: The client package must stay light — it is fetched on first use
-in every session. Nothing to migrate between versions, because nothing is
-stored.
+**Constraints**: One application build feeds both routes; published packages
+carry build output only; a release publishes in dependency order or not at all.
 
 ## Constitution Check
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. Clarify before building | **Pass** | Three stories, no clarification markers |
-| II. Validated trust boundaries | **Pass** | Platform signing *is* the trust boundary here, and is a requirement rather than an aspiration |
-| III. Match existing conventions | **Pass** | `electron-builder` is the stack's standard; npm publishing is conventional |
-| IV. Scope discipline | **Pass** | No auto-update, telemetry, crash reporting or store distribution |
-| V. Verify before done | **Pass** | [quickstart.md](quickstart.md) validates on clean machines, not developer machines |
+| I. Clarify before building | **Pass** | Four stories; the re-spec resolved the one real ambiguity — whether installers were the only route |
+| II. Validated trust boundaries | **Pass** | No new input surface. The release script is maintainer-run, not user-facing |
+| III. Match existing conventions | **Pass** | Same workspace layout, same build, same test projects |
+| IV. Scope discipline | **Pass** | No auto-update, no telemetry, no store submission, no installer work before certificates exist |
+| V. Verify before done | **Pass** | [quickstart.md](quickstart.md); the packaging tests already assert the client's shape |
 | VI. Narrate the reasoning | **Pass** | Design notes below |
-| VII. Plan whole set first | **Pass** | Plan 9 of 9 — the set is now planned |
-| VIII. Test at the right level | **Pass** | Unit tests add no signal here; validation is installing on clean machines, deliberately rather than silently |
+| VII. Plan whole set first | **Pass** | Plan 9 of 9 |
+| VIII. Test at the right level | **Pass** | Unit for manifest shape and release ordering; a real pack-and-install for the published artefact |
 | IX. Atomic commits, branch | **Deferred** | As 001 |
 
-**No violations.** Principle VIII's "skip deliberately, not silently" is invoked
-explicitly: a unit test of an installer configuration asserts that a file says
-what it says. The real check is a clean machine.
+**No violations.**
 
 ## Project Structure
 
 ```text
-electron-builder.yml            # three targets, signing config
-.github/workflows/release.yml   # build all four artefacts from one procedure
-packages/clients/package.json   # published; bin entries; files allowlist
-docs/install.md                 # the configuration entry, and platform caveats
+packages/
+├── contract/          # published, unchanged
+├── clients/           # published, unchanged  →  the MCP + CLI
+└── runner/            # NEW. The published board: bin, electron dep, out/
+apps/
+└── board/             # stays private; electron stays a devDependency
 scripts/
-└── release.ts                  # version stamping across all packages
+└── release.mjs        # NEW. Version, build, verify, publish in order
 ```
 
-**Structure Decision**: One release procedure produces all four artefacts —
-three installers and the client package — from a single version input. Separate
-procedures per artefact is how a board and a client ship with mismatched
-versions, which is the exact failure the health endpoint's version field exists
-to report.
+**Structure Decision**: the runnable board is a **separate package** rather than
+`apps/board` un-privated, and the reason is a hard constraint rather than a
+preference: `electron-builder` requires `electron` to be a devDependency,
+because it bundles the runtime itself; the npm route requires the opposite, so
+that `npm install` fetches it. One manifest cannot be both. `packages/runner`
+declares `electron` as a real dependency and ships the built `out/`, leaving
+`apps/board` exactly as it is and able to feed the installer route unchanged.
 
 ## Design notes
 
-**The clients being fetched on demand is why signing is tractable.** Decision 27
-put the spawnable piece outside the signed artefact entirely, so only the
-Electron app faces platform trust. That was the point of the decision, and it is
-worth restating here where the cost would otherwise land.
+**The cheap route goes first.** The npm route needs no certificates, no
+developer account and no per-platform CI. It is the difference between the
+product being available this week and being available after a purchase.
 
-**A first-launch security warning is a defect.** For a tool that watches an AI
-agent work inside your repository, the operating system saying it cannot verify
-the publisher is the worst available first impression. FR-003 and FR-004 treat
-it as a requirement rather than a nicety, because otherwise it is deferred
-indefinitely.
+**One build, two packagings.** `electron-vite build` produces `out/`, and both
+routes consume it. FR-025 exists so nobody solves a packaging problem by
+changing the application.
 
-**Where signing is unavailable, document what the user will see** (FR-016).
-Credentials have to be obtained and may not be, per platform. The honest failure
-is a documented caveat; the dishonest one is silence and a confused user.
+**Publishing is irreversible, so the release script's job is refusal.** A
+version cannot be replaced once published and unpublishing is time-limited, so
+the design goal is not recoverability — it is making a bad publish hard. That
+means: refuse a dirty working tree, refuse a version that disagrees across
+manifests, build from scratch rather than trusting `dist/`, verify the packed
+contents, and publish in dependency order so a half-finished release never
+leaves a package pointing at one that does not exist.
 
-**Version stamping is mechanical and shared.** All four artefacts take the same
-version from one place. A client and board that disagree say so through the
-health endpoint — the mechanism already exists, and this feature is what makes
-disagreement possible in the first place, since the two are distributed
-separately.
+**Naming is the one decision this feature does not make.** The unscoped name
+`cocopilot` is an npm security holding package and cannot be had, so `npx
+cocopilot` is unavailable whatever else is decided. Beyond that there are two
+shapes, and the choice is irreversible in the way publishing is:
 
-**The client package needs a `files` allowlist.** Published packages default to
-including more than intended, and this one is downloaded on first use in every
-session. Keeping it small is a user-facing latency concern, not tidiness.
+| | Scoped — keep `@cocopilot/*` | Unscoped — `cocopilot-*` |
+|---|---|---|
+| Entry point | `npx @cocopilot/board` | `npx cocopilot-board` |
+| Needs an npm organisation | **Yes**, and its availability could not be verified without a login | No |
+| Churn to adopt | None | 52 files import `@cocopilot/contract` |
 
-**Nothing to migrate, and that is worth noticing.** Installing over a previous
-version cannot lose data because there is no data. This is the one place the
-no-durable-state decision does not merely simplify a job — it deletes migration,
-versioned storage and recovery paths outright.
+**Nothing here is built against that choice.** The runner package, the release
+script, the manifest hygiene and the tests are all name-agnostic, and the new
+package takes the unscoped `cocopilot-board` because it is a new name with
+nothing to rename and is confirmed free. The existing two keep their names until
+someone checks whether the organisation can be claimed — which is the first step
+of the release runbook, not a build task.
+
+If the organisation turns out to be taken, the fallback is a mechanical rename
+to `cocopilot-contract` / `cocopilot-mcp`: a find-and-replace across 52 files
+that the typechecker verifies completely, plus one assertion in
+`packaging.test.ts` and one line in the client README. Recorded so that
+discovering it at publish time is an inconvenience rather than a redesign.
+
+**The three packages are not equals.** `contract` is an implementation detail
+that exists because two other packages must agree; `clients` is what an agent
+fetches and must stay small and runtime-free; `runner` is what a human fetches
+and is allowed to be large. FR-004 and SC-003 exist to stop the third
+contaminating the second — the existing `packaging.test.ts` already holds that
+line and gains a case.
+
+**Nothing is published by this feature.** The work ends at a release script that
+would publish, verified by packing and installing locally. The publish itself
+needs an account, is irreversible, and is the maintainer's to run.
 
 ## Post-design Constitution re-check
 
-Still passing. Principle V is the operative one: this feature cannot be verified
-on the machine that built it. Every meaningful check requires a clean machine per
-platform, which is stated in the quickstart rather than left as an assumption
-that "it built, so it installs".
+Still passing. The interesting one is principle IV: the temptation here is to do
+the installer work "while we are in the packaging headspace", when it is gated
+on credentials nobody has yet and would be untested against the real signing
+path. It is specified and left.
+
+## Phase 0 findings
+
+Recorded rather than researched afresh, because they were established by direct
+check on 2026-08-07:
+
+- `cocopilot` on npm is a **security holding package** (`0.0.1-security`, no
+  maintainer). Unavailable.
+- `cocopilot-board`, `cocopilot-mcp`, `cocopilot-contract`, `cocopilot-app`,
+  `cocopilot-cli` and `co-copilot` are all free.
+- `@cocopilot/mcp` does not exist; whether the `@cocopilot` **organisation** is
+  free could not be determined without an authenticated session.
+- `@cocopilot/mcp` packs to 21.4 kB over 46 files and installs cleanly with both
+  binaries working — but only alongside `@cocopilot/contract`, which is pinned
+  exactly and unpublished, so installing the client alone fails with a 404.
+- No npm credentials are present on the development machine.

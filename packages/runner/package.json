@@ -1,0 +1,42 @@
+{
+  "name": "cocopilot-board",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Run the CoCoPilot board with one command. Brings the MCP server and CLI with it.",
+  "license": "MIT",
+  "main": "out/main/app.cjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "cocopilot-board": "bin/cocopilot-board.mjs"
+  },
+  "files": [
+    "bin",
+    "out"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonupchurch/CoCoPilot.git",
+    "directory": "packages/runner"
+  },
+  "homepage": "https://github.com/jonupchurch/CoCoPilot#readme",
+  "bugs": "https://github.com/jonupchurch/CoCoPilot/issues",
+  "keywords": [
+    "cocopilot",
+    "spec-kit",
+    "ai-agent",
+    "mcp"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/stage.mjs",
+    "prepublishOnly": "npm run build --workspace @cocopilot/board && npm run build"
+  },
+  "dependencies": {
+    "@cocopilot/mcp": "0.1.0",
+    "electron": "^43.3.0"
+  }
+}

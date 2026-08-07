@@ -9,5 +9,10 @@
    * editor's default project for every file that has no closer one, which would
    * quietly re-cover the workspaces with the wrong settings.
    */
-  "include": ["tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"]
+  "include": [
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
 }

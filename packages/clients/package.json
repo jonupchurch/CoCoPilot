@@ -14,8 +14,26 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonupchurch/CoCoPilot.git",
+    "directory": "packages/clients"
+  },
+  "homepage": "https://github.com/jonupchurch/CoCoPilot#readme",
+  "bugs": "https://github.com/jonupchurch/CoCoPilot/issues",
+  "keywords": [
+    "cocopilot",
+    "mcp",
+    "model-context-protocol",
+    "spec-kit",
+    "ai-agent"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
