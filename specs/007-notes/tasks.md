@@ -150,9 +150,9 @@ implying durability, and is empty after a restart.
 **Independent test**: With another view active, a note arrives; a muted countless
 dot appears on the notes tab and clears when the view is opened.
 
-- [ ] T014 [US3] Add the dot to `apps/board/src/renderer/src/app/TabStrip.tsx` and its CSS — one optional boolean prop, muted, `aria-hidden` with the state carried in the tab's accessible name instead, and **no number anywhere in the markup** so there is nothing for a future change to start rendering
-- [ ] T015 [US3] Wire it in `App.tsx` from `useUnread` — the strip is told whether to draw it and knows nothing about notes
-- [ ] T016 [P] [US3] Write `apps/board/tests/e2e/unread.spec.ts` — appears when a note arrives while elsewhere; carries no count (asserted on the *text* of the tab, not just the absence of a badge element); clears on visiting; never appears when already on the tab; and **nothing steals focus or raises the window** (FR-014), asserted on the window's focus and always-on-top state before and after
+- [x] T014 [US3] Add the dot to `apps/board/src/renderer/src/app/TabStrip.tsx` and its CSS — one optional boolean prop, muted, `aria-hidden` with the state carried in the tab's accessible name instead, and **no number anywhere in the markup** so there is nothing for a future change to start rendering
+- [x] T015 [US3] Wire it in `App.tsx` from `useUnread` — the strip is told whether to draw it and knows nothing about notes
+- [x] T016 [P] [US3] Write `apps/board/tests/e2e/unread.spec.ts` — appears when a note arrives while elsewhere; carries no count (asserted on the *text* of the tab, not just the absence of a badge element); clears on visiting; never appears when already on the tab; and **nothing steals focus or raises the window** (FR-014), asserted on the window's focus and always-on-top state before and after
 
 ---
 
