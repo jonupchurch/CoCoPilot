@@ -10,6 +10,8 @@ import type {
 } from '@cocopilot/contract';
 
 import type { Session, Store } from './store.js';
+import type { Availability } from './transcript/availability.js';
+import type { Prompt } from './transcript/classify.js';
 
 /**
  * What crosses the bridge.
@@ -59,7 +61,27 @@ export interface SessionView {
   plan: PlanStep[];
   focus: Focus | null;
   changedFiles: ChangedFile[];
+
+  /**
+   * Read from the AI tool's transcript, and kept in its own branch here for the
+   * same reason it has its own branch in the store: FR-015 forbids it from
+   * altering, correcting or contradicting anything an agent reported. A
+   * renderer that had to unpick which of two sources a value came from would be
+   * one refactor away from letting a transcript move a task's status.
+   */
+  transcript: TranscriptView;
 }
+
+export interface TranscriptView {
+  /**
+   * Oldest first, as the file has them. The view reverses for display; the
+   * projection does not re-order what it read.
+   */
+  prompts: Availability<readonly Prompt[]>;
+}
+
+/** Nothing has been read yet, which is not the same as having read nothing. */
+const NOT_YET_READ: TranscriptView = { prompts: { state: 'unreadable', reason: 'not-read' } };
 
 export interface BoardState {
   session: SessionView | null;
@@ -105,5 +127,10 @@ function toSessionView(session: Session): SessionView {
     plan: report?.plan ?? [],
     focus: report?.focus ?? null,
     changedFiles: report?.changedFiles ?? [],
+
+    transcript:
+      session.transcript === null
+        ? NOT_YET_READ
+        : { prompts: session.transcript.prompts },
   };
 }

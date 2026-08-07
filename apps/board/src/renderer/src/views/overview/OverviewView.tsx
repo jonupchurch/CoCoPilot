@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { SessionView } from '../../../../main/view.js';
 import { ChangedFilesSection } from './ChangedFilesSection.js';
 import { FocusSection } from './FocusSection.js';
+import { LastPromptSection } from './LastPromptSection.js';
 import { PlanSection } from './PlanSection.js';
 import { SpecSection } from './SpecSection.js';
 
@@ -22,7 +23,7 @@ import './OverviewView.css';
  * same tab, different source.
  */
 
-export type SectionKey = 'focus' | 'spec' | 'plan' | 'changed';
+export type SectionKey = 'lastPrompt' | 'focus' | 'spec' | 'plan' | 'changed';
 
 /**
  * Component state, not persisted. It survives an arriving report because this
@@ -30,6 +31,7 @@ export type SectionKey = 'focus' | 'spec' | 'plan' | 'changed';
  * true of everything else in the product.
  */
 const ALL_OPEN: Record<SectionKey, boolean> = {
+  lastPrompt: true,
   focus: true,
   spec: true,
   plan: true,
@@ -51,6 +53,20 @@ export function OverviewView({
 
   return (
     <div className="overview" data-testid="overview">
+      {/*
+        Above the reported sections, as the export has it: what was *asked*
+        frames everything the agent then said it was doing. Read from the
+        transcript rather than pushed, and unable to affect anything below it.
+      */}
+      <LastPromptSection
+        prompts={session.transcript.prompts}
+        now={now}
+        open={open.lastPrompt}
+        onToggle={() => {
+          toggle('lastPrompt');
+        }}
+      />
+
       <FocusSection
         focus={session.focus}
         reportedAt={session.reportedAt}

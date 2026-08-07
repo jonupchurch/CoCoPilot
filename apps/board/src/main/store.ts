@@ -16,6 +16,9 @@ import {
   type Task,
 } from '@cocopilot/contract';
 
+import type { Availability } from './transcript/availability.js';
+import type { Prompt } from './transcript/classify.js';
+
 /**
  * Everything CoCoPilot holds.
  *
@@ -63,11 +66,33 @@ export interface Session {
   /** Null when only notes have arrived. Distinct from an empty report. */
   report: Report | null;
   notes: Note[];
+  /**
+   * Read from disk, never reported. Null until the reader has looked at all,
+   * which is distinct from having looked and found nothing.
+   */
+  transcript: TranscriptState | null;
+}
+
+/**
+ * What the transcript reader contributes, held in its own branch of the session.
+ *
+ * Deliberately not folded into `Report`, and there is no code path anywhere that
+ * merges the two (FR-015). A task's status, a chip, a count — none of them may
+ * ever be influenced by a transcript, however tempting the extra signal. The
+ * whole justification for depending on an undocumented, externally-owned format
+ * is that when it changes, three display sections degrade and nothing else in
+ * the product notices; a merge would spend that guarantee immediately.
+ */
+export interface TranscriptState {
+  prompts: Availability<readonly Prompt[]>;
+  /** When the reader last managed to look. Null before the first attempt. */
+  readAt: number | null;
 }
 
 export type StoreChange =
   | { type: 'report'; key: string }
   | { type: 'note'; key: string }
+  | { type: 'transcript'; key: string }
   | { type: 'dismiss'; key: string };
 
 export type StoreResult<T> = { ok: true; value: T } | { ok: false; rejection: Rejection };
@@ -157,6 +182,25 @@ export class Store {
     return { ok: true, value: session };
   }
 
+  /**
+   * Record what the transcript reader found for one session.
+   *
+   * Assigned to its own field and nothing else. This method exists rather than
+   * letting the reader touch `Session` directly so that the one place
+   * transcript data enters held state is a single, greppable line.
+   */
+  putTranscript(key: string, state: TranscriptState): boolean {
+    const session = this.#sessions.get(key);
+    if (session === undefined) return false;
+
+    session.transcript = state;
+    // Deliberately does *not* move `lastHeardAt`. That is how long since the
+    // agent said something; another program writing to a file it owns is not
+    // the agent saying anything.
+    this.#announce({ type: 'transcript', key });
+    return true;
+  }
+
   getSession(repoPath: string, sessionId: string): Session | undefined {
     return this.#sessions.get(sessionKey(repoPath, sessionId));
   }
@@ -229,6 +273,7 @@ export class Store {
       lastHeardAt: receivedAt,
       report: null,
       notes: [],
+      transcript: null,
     };
     this.#sessions.set(key, created);
     return { ok: true, value: created };
