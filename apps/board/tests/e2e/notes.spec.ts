@@ -190,6 +190,97 @@ test.describe('the view says what it does, and does what it says', () => {
   });
 });
 
+test.describe('a long session, a long note, and hostile content', () => {
+  test('stays scrollable and legible at 300 notes', async () => {
+    // SC-006. The last one is what matters: a list that quietly stopped
+    // rendering past some limit would look perfect at the top.
+    for (let i = 0; i < 300; i += 1) await record(`Note number ${i}`);
+    await openNotes();
+
+    const { page } = board;
+    await expect(page.locator('.noterow')).toHaveCount(300);
+    // Newest first, so note 299 is at the top and note 0 needs scrolling to.
+    await expect(page.locator('.noterow__text').first()).toHaveText('Note number 299');
+
+    const oldest = page.getByTestId('note-0');
+    await oldest.scrollIntoViewIfNeeded();
+    await expect(oldest).toBeInViewport();
+    await expect(oldest.locator('.noterow__text')).toHaveText('Note number 0');
+    await expect(page.getByTestId('notes-summary')).toContainText('300 notes');
+  });
+
+  test('shows a note at the contract cap whole, and a one-character note too', async () => {
+    // 4,000 is MAX_TEXT. A note is the agent's entire thought and FR-002 says
+    // it is shown as written — an ellipsis in the middle of one would hide
+    // exactly the part that mattered, so this wraps rather than truncating.
+    const long = `Start ${'and it continues '.repeat(230)}end.`.slice(0, 4_000);
+
+    await record('x');
+    await record(long);
+    await openNotes();
+
+    const { page } = board;
+    await expect(page.getByTestId('note-1').locator('.noterow__text')).toHaveText(long);
+    await expect(page.getByTestId('note-0').locator('.noterow__text')).toHaveText('x');
+
+    // Wrapped, not clipped: the element is as tall as its content.
+    const clipped = await page
+      .getByTestId('note-1')
+      .locator('.noterow__text')
+      .evaluate((el) => el.scrollHeight > el.clientHeight + 1);
+    expect(clipped).toBe(false);
+  });
+
+  test('renders markup as visible characters', async () => {
+    // SC-009. Note text is the most freely-composed field in the whole
+    // contract — it is whatever the agent felt like writing.
+    const hostile = '<script>window.__pwned = true</script><img src=x onerror="window.__pwned=1">';
+
+    await record(hostile, hostile);
+    await openNotes();
+
+    const { page } = board;
+    await expect(page.locator('.noterow__text')).toContainText('<script>');
+    await expect(page.locator('.noterow__source')).toContainText('<script>');
+    expect(await page.evaluate(() => (window as { __pwned?: boolean }).__pwned)).toBeUndefined();
+    await expect(page.locator('img')).toHaveCount(0);
+  });
+
+  test('never scrolls sideways at the narrowest the panel goes', async () => {
+    // FR-016 and SC-008, at the 380px floor. An unbroken 200-character token is
+    // the case that actually pushes a row past the panel edge.
+    const unbroken = 'A'.repeat(200);
+
+    await record(`A note containing ${unbroken} and a path src/${'deeply/'.repeat(40)}client.ts`);
+    await record('A short one.', unbroken);
+    await openNotes();
+
+    const applied = await board.app.evaluate(({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      window?.setContentSize(380, 320);
+      return window?.getContentSize()[0] ?? 0;
+    });
+    // Asserted rather than assumed, as feature 006's breakpoint spec found the
+    // hard way: a resize that silently lands elsewhere tests the wrong width.
+    expect(applied).toBe(380);
+    await board.page.waitForFunction(() => window.innerWidth === 380, undefined, { timeout: 5_000 });
+
+    const overflow = await board.page.evaluate(() => {
+      const list = document.querySelector('[data-testid="notes-list"]');
+      const panel = document.querySelector('.app__body');
+      return {
+        body: document.body.scrollWidth - document.body.clientWidth,
+        panel: panel === null ? 0 : panel.scrollWidth - panel.clientWidth,
+        list: list === null ? 0 : list.scrollWidth - list.clientWidth,
+      };
+    });
+
+    expect(overflow.body).toBeLessThanOrEqual(0);
+    expect(overflow.panel).toBeLessThanOrEqual(0);
+    expect(overflow.list).toBeLessThanOrEqual(0);
+  });
+});
+
 test.describe('a note arriving while the view is open', () => {
   test('appears at the top without any action', async () => {
     await record('First');

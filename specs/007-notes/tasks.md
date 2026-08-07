@@ -165,7 +165,7 @@ dot appears on the notes tab and clears when the view is opened.
 **Independent test**: 300 notes remain scrollable and individually legible at the
 minimum width with no horizontal scrolling.
 
-- [ ] T017 [P] [US4] Extend `notes.spec.ts` for scale and hostile content — 300 notes all reachable with the last one legible; a note at the 4,000-character cap displayed without truncation obscuring its point; a single-character note; markup as visible characters (SC-009); and no horizontal scroll at the 380px floor, using the content-size resize helper feature 006 wrote rather than a bare `setSize`
+- [x] T017 [P] [US4] Extend `notes.spec.ts` for scale and hostile content — 300 notes all reachable with the last one legible; a note at the 4,000-character cap displayed without truncation obscuring its point; a single-character note; markup as visible characters (SC-009); and no horizontal scroll at the 380px floor, using the content-size resize helper feature 006 wrote rather than a bare `setSize`
 
 ---
 
