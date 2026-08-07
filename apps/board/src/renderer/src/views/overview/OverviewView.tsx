@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
 import { FocusSection } from './FocusSection.js';
+import { SpecSection } from './SpecSection.js';
 
 import './OverviewView.css';
 
@@ -55,6 +56,18 @@ export function OverviewView({
         open={open.focus}
         onToggle={() => {
           toggle('focus');
+        }}
+      />
+
+      <SpecSection
+        feature={session.feature}
+        tasks={session.tasks}
+        focus={session.focus}
+        reportedAt={session.reportedAt}
+        now={now}
+        open={open.spec}
+        onToggle={() => {
+          toggle('spec');
         }}
       />
     </div>

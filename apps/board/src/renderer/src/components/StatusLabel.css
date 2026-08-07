@@ -1,0 +1,87 @@
+/*
+ * The disc. Size arrives as an inline width/height because the export uses 14px
+ * in task rows and 16px in plan steps -- a dimension, not a colour, so it is not
+ * a token violation.
+ */
+.disc {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: var(--radius-pill);
+  font-size: 9px;
+  line-height: 1;
+}
+
+.disc--done {
+  background: var(--teal-tint);
+  color: var(--teal);
+}
+
+.disc--active {
+  border: 1.5px solid var(--blue);
+}
+
+.disc__pip {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--blue);
+}
+
+.disc--blocked {
+  background: var(--ember-tint);
+  color: var(--ember);
+  font-weight: 700;
+}
+
+.disc--todo {
+  border: 1.5px solid var(--line);
+}
+
+/*
+ * Nothing drawn, and the width still reserved by the inline size. An outline
+ * circle here would say "not started" about a status the board cannot read.
+ */
+.disc--unrecognised {
+  border: 0;
+  background: none;
+}
+
+/*
+ * The status text. Truncates with the full string on `title`, because a 200
+ * character status is legal and the panel is narrow.
+ */
+.status {
+  flex: none;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+}
+
+.status--done {
+  color: var(--teal);
+}
+
+.status--active {
+  color: var(--blue);
+}
+
+.status--blocked {
+  color: var(--ember);
+}
+
+/*
+ * Grey, and identical to `todo` on purpose. Teal, blue and ember each mean
+ * something specific; grey claims nothing, which is exactly what the board knows
+ * about a status it does not recognise. What separates the two is the disc --
+ * todo draws one, unrecognised draws nothing.
+ */
+.status--todo,
+.status--unrecognised {
+  color: var(--muted);
+}
