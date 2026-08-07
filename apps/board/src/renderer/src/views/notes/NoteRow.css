@@ -1,0 +1,76 @@
+/*
+ * A row, not a card. The rule above it is the only separation, which is what
+ * lets forty of them read as one column.
+ */
+.noterow {
+  display: flex;
+  gap: 10px;
+  padding: 9px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.noterow:hover {
+  background: var(--surface);
+}
+
+/* Fixed width so every note's text starts on the same column, however long the
+   elapsed value gets. `4m` and `13h` must not indent their notes differently. */
+.noterow__gutter {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 44px;
+}
+
+.noterow__age {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Muted, and the same on every row. See NoteRow.tsx for why it is neither the
+   export's teal nor its ember. */
+.noterow__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+}
+
+.noterow__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/*
+ * Wraps, never truncates. A note is the agent's whole thought and the point of
+ * FR-002 is that it is shown as written; an ellipsis in the middle of one would
+ * hide the part that mattered. `anywhere` because an agent may paste an
+ * unbroken path or identifier into it.
+ */
+.noterow__text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.noterow__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.noterow__source {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

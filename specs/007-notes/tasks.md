@@ -116,13 +116,13 @@ long ago and why.
 **Independent test**: Record several notes with and without a `source`; they list
 newest first with relative times, sources where supplied and nothing where not.
 
-- [ ] T005 [US1] Create `apps/board/src/renderer/src/views/notes/NoteRow.tsx` and its CSS — the export's row: a 44px gutter carrying the relative time and the dot, and a body carrying the text and the source line. Flat, no card: three lines at 13px with no container, because forty boxes is unreadable and forty rows is a column. A note with no `source` omits the line rather than placeholding it (FR-004)
-- [ ] T006 [US1] Decide the dot in `NoteRow.tsx` per gap 2 above, and write the reason in the file — whatever is chosen, it must not be ember, and it must not claim a thing the row does not know
-- [ ] T007 [US1] Create `apps/board/src/renderer/src/views/notes/NotesView.tsx` and its CSS — newest first by **reversing arrival order**, not by sorting on `receivedAt` (equal timestamps are ordinary at this resolution, and a sort makes their order arbitrary where arrival order is a fact). Keys from arrival index, which is stable because notes only ever append. Explicit empty state (FR-010)
-- [ ] T008 [US1] Replace the `notes` placeholder in `apps/board/src/renderer/src/app/App.tsx`, threading `now` as the other three tabs do, and delete the placeholder branch entirely — with `notes` filled in there is no tab left for it to serve
-- [ ] T009 [US1] Decide the header per gap 4 above — `This session` plus what the list holds — and record the decision and its reasoning in `NotesView.tsx`, since it is a deliberate reading of an assumption rather than a transcription
-- [ ] T010 [P] [US1] Write `apps/board/tests/e2e/notes.spec.ts` — newest first; text exactly as written; a relative time per note; the source line present where supplied and **absent** where not; the empty state; and only the selected session's notes (FR-018)
-- [ ] T011 [US1] **The arrival test**, in the same spec — scroll a long list, send a note, and assert the reading position is unchanged and the new note is at the top. Assert on `scrollTop` against a measured anchor row, not by eye. If Chromium's scroll anchoring does not hold it, fix it in the view and say in the CSS what is holding it up
+- [x] T005 [US1] Create `apps/board/src/renderer/src/views/notes/NoteRow.tsx` and its CSS — the export's row: a 44px gutter carrying the relative time and the dot, and a body carrying the text and the source line. Flat, no card: three lines at 13px with no container, because forty boxes is unreadable and forty rows is a column. A note with no `source` omits the line rather than placeholding it (FR-004)
+- [x] T006 [US1] Decide the dot in `NoteRow.tsx` per gap 2 above, and write the reason in the file — whatever is chosen, it must not be ember, and it must not claim a thing the row does not know
+- [x] T007 [US1] Create `apps/board/src/renderer/src/views/notes/NotesView.tsx` and its CSS — newest first by **reversing arrival order**, not by sorting on `receivedAt` (equal timestamps are ordinary at this resolution, and a sort makes their order arbitrary where arrival order is a fact). Keys from arrival index, which is stable because notes only ever append. Explicit empty state (FR-010)
+- [x] T008 [US1] Replace the `notes` placeholder in `apps/board/src/renderer/src/app/App.tsx`, threading `now` as the other three tabs do, and delete the placeholder branch entirely — with `notes` filled in there is no tab left for it to serve
+- [x] T009 [US1] Decide the header per gap 4 above — `This session` plus what the list holds — and record the decision and its reasoning in `NotesView.tsx`, since it is a deliberate reading of an assumption rather than a transcription
+- [x] T010 [P] [US1] Write `apps/board/tests/e2e/notes.spec.ts` — newest first; text exactly as written; a relative time per note; the source line present where supplied and **absent** where not; the empty state; and only the selected session's notes (FR-018)
+- [x] T011 [US1] **The arrival test**, in the same spec — scroll a long list, send a note, and assert the reading position is unchanged and the new note is at the top. Assert on `scrollTop` against a measured anchor row, not by eye. If Chromium's scroll anchoring does not hold it, fix it in the view and say in the CSS what is holding it up
 
 ---
 
@@ -136,8 +136,8 @@ disappear.
 **Independent test**: The view states impermanence, offers no affordance
 implying durability, and is empty after a restart.
 
-- [ ] T012 [US2] Create `apps/board/src/renderer/src/views/notes/ImpermanenceFooter.tsx` and its CSS — its own component, per the plan's structure decision, so it is a thing that must be *deliberately removed* rather than markup that can be lost in a refactor. Dashed top rule as the export draws it; both sentences (FR-006 and FR-007) in the agent-facing phrasing the export uses
-- [ ] T013 [P] [US2] Extend `notes.spec.ts` with the honesty test — the footer's two statements are present; **no** save, pin, star, archive, export, delete or compose control exists anywhere in the notes tree, asserted structurally over the source as well as over the rendered page; and notes are gone after a restart (SC-007). Teeth-check the absence half by adding a pin button and confirming it fails
+- [x] T012 [US2] Create `apps/board/src/renderer/src/views/notes/ImpermanenceFooter.tsx` and its CSS — its own component, per the plan's structure decision, so it is a thing that must be *deliberately removed* rather than markup that can be lost in a refactor. Dashed top rule as the export draws it; both sentences (FR-006 and FR-007) in the agent-facing phrasing the export uses
+- [x] T013 [P] [US2] Extend `notes.spec.ts` with the honesty test — the footer's two statements are present; **no** save, pin, star, archive, export, delete or compose control exists anywhere in the notes tree, asserted structurally over the source as well as over the rendered page; and notes are gone after a restart (SC-007). Teeth-check the absence half by adding a pin button and confirming it fails
 
 ---
 

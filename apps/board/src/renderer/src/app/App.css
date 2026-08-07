@@ -30,9 +30,3 @@
   z-index: 1;
   background: var(--bg);
 }
-
-.app__placeholder {
-  padding: var(--space-4);
-  font-size: var(--text-body);
-  color: var(--muted);
-}

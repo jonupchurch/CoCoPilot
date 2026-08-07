@@ -1,0 +1,68 @@
+/*
+ * A column: header, the list, and the footer pinned beneath it.
+ *
+ * No breakpoint here, unlike the other two detail views. There is nothing to
+ * rearrange — a note is a paragraph with a time beside it, and that is the same
+ * shape at 380px as at 900px. A layout that changed would be changing for its
+ * own sake.
+ */
+.notes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.notes__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 14px 10px;
+}
+
+.notes__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.notes__summary {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The list scrolls, not the view, so the footer stays put rather than being
+ * pushed off the bottom by the four hundredth note.
+ *
+ * `overflow-anchor` is left at its default `auto` deliberately, and this is
+ * load-bearing: Chromium's scroll anchoring is the only thing keeping a
+ * reader's position when a note is inserted above them. Setting it to `none`
+ * anywhere up this tree reintroduces the jump silently — measured, at this
+ * width, as 45px for one note and 447px for a burst of ten, which is half a
+ * screen. `notes.spec.ts` measures a row's position across an arrival and is
+ * what proves it is still working.
+ */
+.notes__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.notes__empty {
+  flex: 1;
+  margin: 0;
+  padding: var(--space-2) 14px var(--space-4);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--muted);
+}
