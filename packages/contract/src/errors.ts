@@ -16,7 +16,8 @@ export type RejectionCode =
   | 'invalid_json'
   | 'invalid_field'
   | 'session_limit'
-  | 'note_limit';
+  | 'note_limit'
+  | 'internal';
 
 export interface Rejection {
   ok: false;

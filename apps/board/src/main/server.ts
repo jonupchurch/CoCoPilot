@@ -33,8 +33,10 @@ const JSON_CONTENT_TYPE = 'application/json';
 export function createServer(deps: ServiceDeps): Server {
   return createHttpServer((req, res) => {
     void dispatch(req, res, deps).catch(() => {
+      // Nothing below is expected to throw, and a caller cannot act on this, so
+      // it says so rather than blaming a field.
       if (!res.headersSent) {
-        sendJson(res, 500, rejection('invalid_json', '(body)', 'the request could not be read'));
+        sendJson(res, 500, rejection('internal', '(none)', 'the request could not be handled'));
       }
     });
   });
