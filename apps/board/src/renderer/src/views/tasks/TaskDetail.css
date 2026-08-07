@@ -1,0 +1,150 @@
+.taskdetail {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 16px 18px;
+  overflow-y: auto;
+}
+
+.taskdetail--empty {
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.taskdetail--empty p {
+  margin: 0;
+}
+
+.taskdetail__head {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.taskdetail__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.taskdetail__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.taskdetail__age {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.taskdetail__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The agent's prose, in the card idiom the Focus section uses on Overview —
+ * same content, same treatment, so it is recognisable as the same thing said in
+ * a second place.
+ */
+.taskdetail__focus {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--teal);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.taskdetail__detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.taskdetail__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.taskdetail__block--ruled {
+  gap: 7px;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.taskdetail__heading {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.taskdetail__check {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+/* A dot, not a checkbox: nothing in the contract says whether a check passed. */
+.taskdetail__bullet {
+  flex: none;
+  width: 4px;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+}
+
+.taskdetail__check-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.taskdetail__file {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.taskdetail__from {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

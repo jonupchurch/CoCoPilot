@@ -4,15 +4,25 @@
 
 ## Prerequisites
 
-Features 001–004 implemented.
+Features 001–005 implemented. 005 matters as well as 004: this feature widens
+the same `SessionView` projection that the transcript reader added to.
 
 ## Run the checks
 
 ```bash
-npm test --workspace=apps/board
-npm run test:e2e
+# Playwright drives the built app in apps/board/out, not the source. Without
+# this the suite tests the previous build and reports missing elements for
+# components that are right there in the tree.
+npm run build --workspace @cocopilot/board
+
+npm test          # 410 unit + integration
+npm run test:e2e  # 154 Playwright
 npm run typecheck
 ```
+
+`npm test --workspace=apps/board` — what this file said before — does not run:
+`apps/board` has no `test` script, because the Vitest projects are defined at
+the root.
 
 ## Validation scenarios
 
@@ -29,20 +39,37 @@ npm run typecheck
 ### 2. Status rendering (US3)
 
 Same matrix as feature 004 — recognised values keep their treatments, `donee`
-stays neutral, `waiting on CI` shows in full. Verify **both tabs agree**, since
-the vocabulary is shared and a divergence here would show one status two ways.
+stays neutral, `waiting on CI` shows in full. Verify **every surface agrees**,
+since the vocabulary is shared and a divergence would show one status two ways.
+
+There are four surfaces, not two: Spec tasks and Plan steps on Overview, a
+story's tasks on Stories, and the task list on Tasks.
+`tests/e2e/status-vocabulary.spec.ts` reads the same matrix from each and
+compares them, so the check is a comparison rather than four copies of an
+expectation; `tests/source-hygiene.test.ts` separately forbids a second
+mapping from being written at all.
 
 ### 3. The breakpoint (US4)
 
 | Width | Stories | Tasks |
 |---|---|---|
-| ≥ 640px | List beside detail | List beside detail |
-| < 640px | List collapses to a picker, detail full width | List stacks above detail |
+| ≥ 640px | List beside detail | Scope picker above a list beside a detail |
+| < 640px | List collapses to a picker, detail full width | Scope picker above a list stacked over a detail |
+
+The Tasks tab's picker is present at **every** width. It is not the narrow
+substitute for a list, the way the Stories tab's is — it is the control that
+says which story's tasks are on screen, and one that vanished as the window
+grew would leave the view unable to change scope at all.
 
 - Every item selectable from the picker, with enough shown to tell them apart.
 - No horizontal scrolling at any width.
 - **Cross the breakpoint in both directions with a selection active**: the
   selection survives.
+
+Checking the boundary by hand is harder than it looks, and the spec that does
+it records why: at a 1.5 display scale an odd content width rounds up, so a
+window asked for 639 is 640 and is not narrow. Set the **content** size, then
+read back what was applied.
 
 ### 4. Selection reconciliation — **the one that will break**
 
@@ -77,9 +104,20 @@ Across a full exercise of both views, with every control activated:
 
 ## Expected outcome
 
-All pass. Scenario 4 is the one most likely to fail first — it is a consequence
-of snapshot semantics that is easy to miss until a report happens to drop the
-thing being looked at.
+All pass.
+
+Scenario 4 was called out as the one most likely to fail first. It did not, and
+the reason is worth keeping: `useSelection` holds the *intent* — an id someone
+clicked — and resolves it against the current report on every render. There is
+no effect watching for reports and no copy of a story to go stale, so "keep it
+if it still exists" and "move somewhere valid if it does not" are the same two
+lines rather than a lifecycle to get right. Scroll position survives for the
+same reason: the list is the same DOM element before and after.
+
+What actually failed first was the *tests*, twice, in the same way — passing
+while measuring something other than what they named. A resize to 380px that
+silently landed at 452, and a teeth-check whose sabotage never applied. Both
+are now asserted rather than assumed.
 
 ## Not validated here
 

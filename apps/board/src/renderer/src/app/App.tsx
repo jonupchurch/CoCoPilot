@@ -4,6 +4,8 @@ import type { BoardState } from '../../../main/view.js';
 import { useBoardState } from '../state/useBoardState.js';
 import { useNow } from '../state/useNow.js';
 import { OverviewView } from '../views/overview/OverviewView.js';
+import { StoriesView } from '../views/stories/StoriesView.js';
+import { TasksView } from '../views/tasks/TasksView.js';
 import { TabStrip, type Tab } from './TabStrip.js';
 import { TitleBar } from './TitleBar.js';
 import { WaitingState } from './WaitingState.js';
@@ -38,9 +40,13 @@ export function App(): React.JSX.Element {
           <WaitingState />
         ) : active === 'overview' ? (
           <OverviewView session={state.session} now={now} />
+        ) : active === 'stories' ? (
+          <StoriesView session={state.session} now={now} />
+        ) : active === 'tasks' ? (
+          <TasksView session={state.session} now={now} />
         ) : (
-          // Features 005 through 008 fill the rest in. Until then the frame is
-          // honest about being a frame rather than pretending to have content.
+          // Feature 007 fills Notes in. Until then the frame is honest about
+          // being a frame rather than pretending to have content.
           <div className="app__placeholder" data-testid="view-placeholder">
             Nothing to show in this view yet.
           </div>

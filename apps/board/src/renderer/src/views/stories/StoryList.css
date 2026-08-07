@@ -1,0 +1,131 @@
+/*
+ * The 268px column from the export, at or above the breakpoint. Below it this
+ * component is not rendered at all — `StoryPicker` takes over, for the reason
+ * written in `StoriesView.css`.
+ */
+.storylist {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 268px;
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+.storylist__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 14px 10px;
+}
+
+.storylist__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.storylist__count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A button drawn as a row: reachable from the keyboard, and the focus ring is
+   the same teal outline every other control on the board uses. */
+.storylist__row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  padding: 9px 14px;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.storylist__row:hover {
+  background: var(--surface);
+}
+
+.storylist__row:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+/*
+ * Selection is a fill *and* a rule, not a fill alone: at the smallest sizes the
+ * panel sits over whatever the editor behind it looks like, and a single subtle
+ * background is the first thing to become ambiguous there. FR-003 asks for
+ * visibly marked, which has to survive the habitat.
+ */
+.storylist__row[data-selected='true'] {
+  border-left-color: var(--teal);
+  background: var(--surface);
+}
+
+.storylist__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.storylist__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.storylist__priority {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Two lines at most, then ellipsised. A story title is a sentence and one line
+   loses too much of it; three would push the summary off a short row. */
+.storylist__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.storylist__foot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.storylist__tasks {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Teal, which is where the eye already goes for the current task on the
+   Overview tab. The same fact, in the same colour, on a second screen. */
+.storylist__owns {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  white-space: nowrap;
+}

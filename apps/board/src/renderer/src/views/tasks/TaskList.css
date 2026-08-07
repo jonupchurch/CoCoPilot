@@ -1,0 +1,137 @@
+/*
+ * A column at or above the breakpoint; a band above the detail below it. The
+ * arrangement is set by `TasksView.css`, which is also where the reason this
+ * view stacks and the Stories view swaps is written down.
+ */
+.tasklist {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 236px;
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+.tasks[data-narrow='true'] .tasklist {
+  width: auto;
+  max-height: 38%;
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.tasklist__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 14px 10px;
+}
+
+.tasklist__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tasklist__count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A button drawn as a row: reachable from the keyboard, and the focus ring is
+   the same teal outline every other control on the board uses. */
+.tasklist__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 14px;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tasklist__row:hover {
+  background: var(--surface);
+}
+
+.tasklist__row:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+/* A fill and a rule, for the reason `StoryList.css` gives: at the smallest
+   sizes a fill alone competes with whatever editor is behind the panel. */
+.tasklist__row[data-selected='true'] {
+  border-left-color: var(--teal);
+  background: var(--surface);
+}
+
+/* The disc sits on the first line rather than centred against two. */
+.tasklist__row .disc {
+  margin-top: 2px;
+}
+
+.tasklist__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tasklist__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tasklist__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.tasklist__row[data-current='true'] .tasklist__id {
+  color: var(--teal);
+}
+
+.tasklist__age {
+  flex: none;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tasklist__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.tasklist__empty {
+  margin: 0;
+  padding: 0 14px var(--space-3);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--muted);
+}

@@ -1,0 +1,43 @@
+/*
+ * The scope picker across the top at every width, and beneath it a list and a
+ * detail — side by side at or above 640px, stacked below it.
+ *
+ * **The Stories tab swaps its list out instead, and that difference is
+ * deliberate.** A story row is three lines — identifier and status, a wrapped
+ * title, a task count — so five of them stacked above the detail would push the
+ * thing the developer came for most of a narrow panel down, which is why that
+ * view replaces its column with a picker. A task row is two short lines and a
+ * capped-height list stacks for almost nothing, so this view keeps its list
+ * visible: it is the thing being moved through, and hiding it behind a control
+ * would cost a click per task.
+ *
+ * Same breakpoint, different answer, on purpose. Without this note it reads as
+ * an inconsistency someone will helpfully unify.
+ */
+.tasks {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.tasks__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.tasks[data-narrow='true'] .tasks__body {
+  flex-direction: column;
+}
+
+.tasks--empty {
+  padding: var(--space-4) 14px;
+  font-size: var(--text-body);
+  color: var(--muted);
+}
+
+.tasks--empty p {
+  margin: 0;
+}

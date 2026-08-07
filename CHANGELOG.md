@@ -8,6 +8,53 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 006 — Stories and Tasks tabs.** The two remaining detail views, and
+  the last placeholder tabs except Notes. A story in full — narrative, numbered
+  criteria, its tasks and the files it touches — and a task in full: detail,
+  checks, files, and which story it came from.
+  - **The developer is never moved.** Not by a report and not by a resize.
+    `useSelection` holds the *intent* — an id someone clicked — and resolves it
+    against the current report on every render, so "keep the selection if it
+    still exists" and "move somewhere valid if it does not" are the same two
+    lines rather than an effect and a stale copy. Reports replace wholesale
+    (decision 26), so a story vanishing between two reports is ordinary rather
+    than exceptional, and a view that rendered nothing there would read as a
+    crash. Scroll position survives for the same structural reason.
+  - **A scope for tasks belonging to no reported story.** Nothing validates that
+    an agent reports a consistent graph: `storyId` may be null or name a story
+    that was never sent. The design export has no such scope — it assumes the
+    graph resolves — so this is designed rather than transcribed, and it appears
+    only when it actually holds something.
+  - **One status vocabulary, enforced rather than intended.** Four surfaces now
+    draw a status. `source-hygiene.test.ts` fails on a synonym literal or a
+    `classify` call anywhere in the renderer outside the two files that own the
+    vocabulary, and `status-vocabulary.spec.ts` reads the same ten-case matrix
+    from every surface and *compares* them, so a divergence fails in CI rather
+    than being noticed by someone with two tabs open a month later.
+  - Same breakpoint, two different answers, each with the reason in its
+    stylesheet: Stories collapses its list into a picker below 640px because a
+    story row is three lines and five of them would push the detail off the
+    panel; Tasks stacks instead because a task row is two short lines and
+    hiding the list would cost a click per task. The Tasks scope picker is
+    present at every width — it is the scope control, not a narrow fallback.
+  - Two more export bindings the contract cannot supply, decided rather than
+    invented: `task.updated` is the *report's* age shown against the current
+    task only, with its `title` saying so outright, because no per-task
+    timestamp exists and decision 26 refuses the state that would create one;
+    and `story.spec` is the feature's path, labelled as the feature's.
+  - **SC-008 as three assertions, not one.** The bridge exposes two members and
+    both are reads; no file in either view tree names a way of sending; and
+    every control in both views is activated with zero outbound requests
+    recorded. The third alone would pass on a build with no controls yet, and
+    the first two alone would miss an `<img>` — which is what the teeth-check
+    used.
+  - Two tests were found passing while measuring something other than what they
+    named: a resize to 380px that silently landed at 452 (the renderer sees a
+    resize a beat late), and a boundary case at 639px that a 1.5 display scale
+    rounds back up to 640. Both now assert the width they actually got.
+  - 45 more Playwright tests and one more unit test; 410 unit and integration
+    tests and 154 end-to-end in total.
+
 - **Feature 005 — Transcript reader.** The board follows Claude Code's own
   session transcript for the repository being shown, and three more sections sit
   above the reported ones: *Last prompt*, *History* and *In context*. Read-only,

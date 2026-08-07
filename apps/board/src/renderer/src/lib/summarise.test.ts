@@ -8,6 +8,7 @@ import {
   formatTokens,
   planSummary,
   specSummary,
+  taskSummary,
 } from './summarise.js';
 
 const task = (id: string, status: string): Task => ({
@@ -86,6 +87,25 @@ describe('specSummary', () => {
   it('stays true to the list at 500 tasks', () => {
     const many = Array.from({ length: 500 }, (_, i) => task(`T${i}`, i < 137 ? 'done' : 'todo'));
     expect(specSummary(null, many)).toBe('137 of 500 done');
+  });
+});
+
+describe('taskSummary', () => {
+  it('counts the done ones against the total', () => {
+    expect(taskSummary([task('a', 'done'), task('b', 'todo'), task('c', 'wip')])).toBe('1/3');
+  });
+
+  it('recognises done the same way every other count does', () => {
+    // The whole reason this lives beside the other summaries: three components
+    // draw it, and a second definition would disagree the first time a synonym
+    // is added.
+    expect(taskSummary([task('a', 'Completed'), task('b', 'donee')])).toBe('1/2');
+  });
+
+  it('says there are none rather than reading 0/0', () => {
+    // `0/0` is a fraction of nothing, and reads for a moment as a story whose
+    // tasks are all outstanding.
+    expect(taskSummary([])).toBe('no tasks');
   });
 });
 

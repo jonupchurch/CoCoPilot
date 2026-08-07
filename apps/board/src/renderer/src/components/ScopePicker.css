@@ -1,0 +1,113 @@
+/*
+ * A full-width bar at the top of whichever view holds it. The views position it;
+ * this file only draws it, so the Tasks tab keeping it at every width and the
+ * Stories tab showing it only when narrow costs nothing here.
+ */
+.scopepicker {
+  position: relative;
+  flex: none;
+  padding: var(--space-3) 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.scopepicker__current {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: var(--space-2) 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.scopepicker__current:hover {
+  border-color: var(--line-strong);
+}
+
+.scopepicker__current:focus-visible,
+.scopepicker__option:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+/*
+ * Above everything, and above the detail it overlaps. `--shadow-menu` is the
+ * one shadow in the product — `tokens.css` says depth is a border rather than a
+ * shadow, and this is the exception the export itself draws, because a menu
+ * floating over content is the one thing that genuinely leaves the surface.
+ */
+.scopepicker__options {
+  position: absolute;
+  z-index: 5;
+  top: 52px;
+  right: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  padding: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-menu);
+  overflow-y: auto;
+}
+
+.scopepicker__option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: var(--space-2) 9px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.scopepicker__option:hover {
+  background: var(--raised);
+}
+
+.scopepicker__option[data-selected='true'] {
+  background: var(--raised);
+}
+
+.scopepicker__id {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.scopepicker__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.scopepicker__tasks {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scopepicker__caret {
+  flex: none;
+  font-size: 9px;
+  color: var(--muted);
+}
