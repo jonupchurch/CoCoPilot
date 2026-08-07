@@ -27,7 +27,7 @@ export function TitleBar({
   return (
     <header className="titlebar">
       <Mark size={11} />
-      <span className="titlebar__brand">CoCoPilot</span>
+      <span className="titlebar__brand">CoCoaPilot</span>
 
       {session === null ? (
         <span className="titlebar__quiet" data-testid="nothing-heard">

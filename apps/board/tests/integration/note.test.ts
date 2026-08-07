@@ -1,4 +1,4 @@
-import { MAX_NOTES_PER_SESSION } from '@cocopilot/contract';
+import { MAX_NOTES_PER_SESSION } from '@cocoapilot/contract';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { UNATTRIBUTED } from '../../src/main/store.js';

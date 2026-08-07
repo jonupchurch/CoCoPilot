@@ -1,4 +1,4 @@
-import { APP_VERSION } from '@cocopilot/contract';
+import { APP_VERSION } from '@cocoapilot/contract';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { registerTools, type ToolOptions } from './tools.js';
@@ -23,7 +23,7 @@ import { registerTools, type ToolOptions } from './tools.js';
  */
 export function createMcpServer(options: ToolOptions = {}): McpServer {
   const server = new McpServer(
-    { name: 'cocopilot', version: APP_VERSION },
+    { name: 'cocoapilot', version: APP_VERSION },
     { capabilities: { tools: {} } },
   );
 

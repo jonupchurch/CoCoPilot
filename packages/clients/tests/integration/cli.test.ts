@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { UNATTRIBUTED, type Service } from '@cocopilot/board';
-import { MAX_TEXT } from '@cocopilot/contract';
+import { UNATTRIBUTED, type Service } from '@cocoapilot/board';
+import { MAX_TEXT } from '@cocoapilot/contract';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { EXIT_OK, EXIT_REJECTED, EXIT_USAGE, run } from '../../src/cli/run.js';
@@ -14,7 +14,7 @@ let board: Service;
 let repo: string;
 
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-cli-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-cli-'));
   mkdirSync(join(repo, '.git'), { recursive: true });
   writeFileSync(join(repo, '.git', 'HEAD'), 'ref: refs/heads/main\n');
 });
@@ -105,7 +105,7 @@ describe('the CLI exit codes', () => {
   });
 
   it('exits 1 outside a repository', async () => {
-    const orphan = mkdtempSync(join(tmpdir(), 'cocopilot-orphan-'));
+    const orphan = mkdtempSync(join(tmpdir(), 'cocoapilot-orphan-'));
     try {
       const result = await cli(['report'], [board.port], orphan);
 
@@ -165,7 +165,7 @@ describe('the CLI argument handling', () => {
   it('prints usage on --help and exits 0', async () => {
     const result = await cli(['--help']);
     expect(result.code).toBe(EXIT_OK);
-    expect(result.out).toMatch(/cocopilot report/);
+    expect(result.out).toMatch(/cocoapilot report/);
     expect(result.out).toMatch(/Exit codes/);
   });
 });

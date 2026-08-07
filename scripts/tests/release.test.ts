@@ -46,7 +46,7 @@ const good = (): { pkg: string; manifest: Manifest }[] => [
       files: ['dist'],
       publishConfig: { access: 'public' },
       scripts: { prepublishOnly: 'npm run build' },
-      dependencies: { '@cocopilot/contract': '1.0.0', zod: '^3.0.0' },
+      dependencies: { '@cocoapilot/contract': '1.0.0', zod: '^3.0.0' },
     },
   },
 ];
@@ -77,10 +77,10 @@ describe('refusalsFor', () => {
     // and the client asks for a contract that will not exist. Inside the
     // workspace it resolves to a sibling directory and looks fine.
     const manifests = good();
-    manifests[1]!.manifest.dependencies!['@cocopilot/contract'] = '0.9.0';
+    manifests[1]!.manifest.dependencies!['@cocoapilot/contract'] = '0.9.0';
 
     expect(why(refusalsFor({ dirty: '', manifests }))).toMatch(
-      /pins @cocopilot\/contract at 0\.9\.0, but the release is 1\.0\.0/u,
+      /pins @cocoapilot\/contract at 0\.9\.0, but the release is 1\.0\.0/u,
     );
   });
 

@@ -56,15 +56,15 @@ default for anything common, and memorable enough to grep for.
 
 ```text
 packages/clients/
-├── package.json           # bin: cocopilot-mcp, cocopilot
+├── package.json           # bin: cocoapilot-mcp, cocoapilot
 ├── src/
-│   ├── discover.ts        # Probe 41847–41851; accept only app === "cocopilot"
+│   ├── discover.ts        # Probe 41847–41851; accept only app === "cocoapilot"
 │   ├── transport.ts       # POST; bounded timeout; soft failure
 │   ├── identity.ts        # repo via git toplevel, branch, sessionId
 │   ├── messages.ts        # The board-absent text, in one place
 │   ├── mcp/
 │   │   ├── server.ts      # Starts unconditionally; connects per call
-│   │   └── tools.ts       # cocopilot_report, cocopilot_note
+│   │   └── tools.ts       # cocoapilot_report, cocoapilot_note
 │   └── cli/
 │       └── index.ts       # report, note
 └── tests/

@@ -1,5 +1,5 @@
 /**
- * The one definition of CoCoPilot's push contract.
+ * The one definition of CoCoaPilot's push contract.
  *
  * The service and both clients import from here rather than restating the
  * payload, which is the only thing stopping three front doors from drifting.

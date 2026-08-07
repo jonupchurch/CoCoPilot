@@ -18,10 +18,10 @@ software for the board (FR-007).
 
 **200**
 ```json
-{ "app": "cocopilot", "version": "0.1.0", "contract": "v1" }
+{ "app": "cocoapilot", "version": "0.1.0", "contract": "v1" }
 ```
 
-Clients **must** match on `app === "cocopilot"`. A 200 alone means only that
+Clients **must** match on `app === "cocoapilot"`. A 200 alone means only that
 something answered. This is the whole point of the endpoint.
 
 ---

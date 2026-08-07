@@ -18,10 +18,10 @@ let window: BrowserWindow | undefined;
 let transcripts: TranscriptSource | undefined;
 
 async function start(): Promise<void> {
-  // Normally the documented range, walked in order. `COCOPILOT_PORT` pins it
+  // Normally the documented range, walked in order. `COCOAPILOT_PORT` pins it
   // instead, which is how the end-to-end suite reaches a board without either
   // guessing or colliding with one the developer already has open.
-  const pinned = Number(process.env['COCOPILOT_PORT']);
+  const pinned = Number(process.env['COCOAPILOT_PORT']);
   service = await createService(Number.isInteger(pinned) ? { port: pinned } : {});
   const held = service.store;
 
@@ -42,16 +42,16 @@ async function start(): Promise<void> {
   // The renderer's initial read. Without it, reopening the window on a session
   // that is not currently reporting would show nothing until the next report --
   // which for an idle session could be a long time.
-  ipcMain.handle('cocopilot:state', () => toBoardState(held, selected));
+  ipcMain.handle('cocoapilot:state', () => toBoardState(held, selected));
 
   const publish = (): void => {
     // Send the whole projection rather than a delta. The board holds one
     // agent's latest word, and rebuilding it is cheap next to the alternative of
     // two places that have to agree about what changed.
-    window?.webContents.send('cocopilot:state', toBoardState(held, selected));
+    window?.webContents.send('cocoapilot:state', toBoardState(held, selected));
   };
 
-  ipcMain.on('cocopilot:select', (_event, key: unknown) => {
+  ipcMain.on('cocoapilot:select', (_event, key: unknown) => {
     // Validated even here. This channel is reachable only from our own window,
     // but "only our own window" is a claim about the whole renderer, and the
     // renderer's job is drawing text an agent composed.
@@ -60,7 +60,7 @@ async function start(): Promise<void> {
     publish();
   });
 
-  ipcMain.on('cocopilot:dismiss', (_event, key: unknown) => {
+  ipcMain.on('cocoapilot:dismiss', (_event, key: unknown) => {
     if (typeof key !== 'string') return;
     // The store announces its own change, so a successful dismissal publishes
     // through the subscription below. Publishing here as well would send the

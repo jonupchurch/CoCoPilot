@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import type { Story, Task } from '@cocopilot/contract';
+import type { Story, Task } from '@cocoapilot/contract';
 
 /**
  * Which story and which task the developer is reading, across a report that may

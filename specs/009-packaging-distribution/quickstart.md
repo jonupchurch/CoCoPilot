@@ -26,12 +26,12 @@ only thing standing between a mistake and a permanent one.
 ### 1. One command runs the product (US1)
 
 ```bash
-npx cocopilot-board
+npx cocoapilot-board
 ```
 
 - The board opens and shows its waiting state.
 - Same command on all three platforms.
-- The reporting tools arrive with it — `cocopilot` and `cocopilot-mcp` are both
+- The reporting tools arrive with it — `cocoapilot` and `cocoapilot-mcp` are both
   on the path after installing the one package.
 - On Node older than 22, the failure **names the version** rather than throwing
   from inside a dependency.
@@ -43,7 +43,7 @@ are true tests only after publishing.
 
 ### 2. The reporting tools stay small (US2)
 
-- Installing `@cocopilot/mcp` alone brings **no** Electron, Chromium or
+- Installing `@cocoapilot/mcp` alone brings **no** Electron, Chromium or
   Playwright — asserted over the installed tree, not the manifest.
 - The CLI runs with no board and says so softly, exiting 0.
 - The configuration entry is unchanged from previous versions and names no path.
@@ -74,16 +74,16 @@ deliberate, not unfinished: see the runbook.
 version cannot be replaced, and unpublishing is limited to 72 hours.
 
 1. **Create an npm account** and enable 2FA. Public packages are free.
-2. **Settle the naming**, which is the one open decision. `cocopilot` unscoped
-   is an npm *security holding package* and cannot be had, so `npx cocopilot` is
+2. **Settle the naming**, which is the one open decision. `cocoapilot` unscoped
+   is an npm *security holding package* and cannot be had, so `npx cocoapilot` is
    unavailable whatever else is chosen.
-   - Check whether the **`@cocopilot` organisation** can be created. If it can,
+   - Check whether the **`@cocoapilot` organisation** can be created. If it can,
      nothing changes: publish as-is.
-   - If it cannot, rename the two scoped packages to `cocopilot-contract` and
-     `cocopilot-mcp` — both confirmed free. It is a find-and-replace across 52
+   - If it cannot, rename the two scoped packages to `cocoapilot-contract` and
+     `cocoapilot-mcp` — both confirmed free. It is a find-and-replace across 52
      files that the typechecker verifies completely, plus one assertion in
      `packaging.test.ts`, one line in the client README and the pin in
-     `packages/runner`. `cocopilot-board` is unscoped already and unaffected.
+     `packages/runner`. `cocoapilot-board` is unscoped already and unaffected.
 3. **`npm login`** on the release machine, or mint a granular token for CI.
 4. **`npm run release`** and read every line. It builds from scratch and
    rehearses the install.

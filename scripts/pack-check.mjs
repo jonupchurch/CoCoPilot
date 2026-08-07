@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
  * and the alternative to doing that here is doing it by publishing, which
  * cannot be undone. This is the rehearsal.
  *
- * It caught the real thing already: `@cocopilot/mcp` pins `@cocopilot/contract`
+ * It caught the real thing already: `@cocoapilot/mcp` pins `@cocoapilot/contract`
  * at an exact version, so installing the client alone fails with a 404 against
  * a registry that has never seen it. That is a publishing-order problem, and it
  * is invisible from inside the workspace, where npm resolves the dependency to
@@ -50,7 +50,7 @@ function run(args, cwd) {
   });
 }
 
-const scratch = join(tmpdir(), `cocopilot-pack-${process.pid}`);
+const scratch = join(tmpdir(), `cocoapilot-pack-${process.pid}`);
 rmSync(scratch, { recursive: true, force: true });
 mkdirSync(scratch, { recursive: true });
 
@@ -110,7 +110,7 @@ try {
 
   const bin = join(runnerDir, 'node_modules', '.bin');
   const bins = existsSync(bin) ? readdirSync(bin) : [];
-  for (const expected of ['cocopilot-board', 'cocopilot', 'cocopilot-mcp']) {
+  for (const expected of ['cocoapilot-board', 'cocoapilot', 'cocoapilot-mcp']) {
     if (bins.some((entry) => entry === expected || entry.startsWith(`${expected}.`))) {
       note(`${expected} is on the path`);
     } else {
@@ -118,7 +118,7 @@ try {
     }
   }
 
-  const staged = join(runnerDir, 'node_modules', 'cocopilot-board', 'out', 'main', 'app.cjs');
+  const staged = join(runnerDir, 'node_modules', 'cocoapilot-board', 'out', 'main', 'app.cjs');
   if (existsSync(staged)) note('the built application is inside the package');
   else failures.push('the runner package does not contain the built application');
 
@@ -135,7 +135,7 @@ try {
    * Which is the lesson: a package that installs is not a package that runs.
    */
   process.stdout.write('\nStarting the installed board:\n');
-  const launcher = join(runnerDir, 'node_modules', 'cocopilot-board', 'bin', 'cocopilot-board.mjs');
+  const launcher = join(runnerDir, 'node_modules', 'cocoapilot-board', 'bin', 'cocoapilot-board.mjs');
   const board = spawn(process.execPath, [launcher], {
     cwd: runnerDir,
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -187,7 +187,7 @@ try {
   }
 
   // And it still works with no board running: exit 0, said softly.
-  const cli = join(clientDir, 'node_modules', '@cocopilot', 'mcp', 'dist', 'cli', 'index.js');
+  const cli = join(clientDir, 'node_modules', '@cocoapilot', 'mcp', 'dist', 'cli', 'index.js');
   try {
     const said = execFileSync(process.execPath, [cli, 'report', '--chip', 'idle'], {
       cwd: root,

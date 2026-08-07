@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { Service } from '@cocopilot/board';
-import { UNATTRIBUTED } from '@cocopilot/board';
+import type { Service } from '@cocoapilot/board';
+import { UNATTRIBUTED } from '@cocoapilot/board';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { note, report } from '../../src/client.js';
@@ -14,7 +14,7 @@ let board: Service;
 let repo: string;
 
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-repo-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-repo-'));
   mkdirSync(join(repo, '.git'), { recursive: true });
   writeFileSync(join(repo, '.git', 'HEAD'), 'ref: refs/heads/feat/session-hook\n');
 });
@@ -112,7 +112,7 @@ describe('an agent reporting with content only', () => {
   });
 
   it('sends nothing at all when there is no repository to report against', async () => {
-    const orphan = mkdtempSync(join(tmpdir(), 'cocopilot-orphan-'));
+    const orphan = mkdtempSync(join(tmpdir(), 'cocoapilot-orphan-'));
     try {
       const result = await report({ task: 'T012' }, { ...options('agent-1'), cwd: orphan });
 

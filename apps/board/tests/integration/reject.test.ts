@@ -1,4 +1,4 @@
-import { MAX_BODY_BYTES, MAX_TEXT } from '@cocopilot/contract';
+import { MAX_BODY_BYTES, MAX_TEXT } from '@cocoapilot/contract';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { envelope, startTestService, type TestService } from '../helpers/service.js';

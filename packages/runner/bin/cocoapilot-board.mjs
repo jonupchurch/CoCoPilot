@@ -19,7 +19,7 @@ const REQUIRED_MAJOR = 22;
 const major = Number(process.versions.node.split('.')[0]);
 if (!Number.isInteger(major) || major < REQUIRED_MAJOR) {
   process.stderr.write(
-    `cocopilot-board needs Node ${REQUIRED_MAJOR} or newer; this is Node ${process.versions.node}.\n` +
+    `cocoapilot-board needs Node ${REQUIRED_MAJOR} or newer; this is Node ${process.versions.node}.\n` +
       `Upgrade Node and run it again — nothing was started.\n`,
   );
   process.exit(1);
@@ -38,7 +38,7 @@ try {
   electron = require('electron');
 } catch {
   process.stderr.write(
-    'cocopilot-board could not find its Electron runtime.\n' +
+    'cocoapilot-board could not find its Electron runtime.\n' +
       'This usually means the install did not finish — try installing again.\n',
   );
   process.exit(1);
@@ -46,7 +46,7 @@ try {
 
 if (typeof electron !== 'string') {
   process.stderr.write(
-    'cocopilot-board found an Electron package that did not report a binary path.\n',
+    'cocoapilot-board found an Electron package that did not report a binary path.\n',
   );
   process.exit(1);
 }
@@ -85,7 +85,7 @@ const child = spawn(electron, [app, ...process.argv.slice(2)], {
 });
 
 child.on('error', (error) => {
-  process.stderr.write(`cocopilot-board could not start Electron: ${error.message}\n`);
+  process.stderr.write(`cocoapilot-board could not start Electron: ${error.message}\n`);
   process.exit(1);
 });
 

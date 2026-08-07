@@ -1,4 +1,4 @@
-import { MAX_SESSIONS } from '@cocopilot/contract';
+import { MAX_SESSIONS } from '@cocoapilot/contract';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { startTestService, type TestService } from '../helpers/service.js';

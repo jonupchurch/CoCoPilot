@@ -23,7 +23,7 @@ function transcript(dir: string, name: string, at?: number): string {
 }
 
 beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-home-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-home-'));
 });
 
 afterEach(() => {

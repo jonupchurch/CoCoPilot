@@ -53,8 +53,8 @@ the workspace itself.
 - [x] T001 Create root `package.json`: npm workspaces (`packages/*`, `apps/*`), `"type": "module"`, `"private": true`, `engines.node >= 22`, and the scripts `test`, `test:unit`, `test:integration`, `typecheck` named in [quickstart.md](quickstart.md)
 - [x] T002 [P] Create `tsconfig.base.json`: `strict`, `ES2022`, `moduleResolution: NodeNext`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `declaration`
 - [x] T003 [P] Append `node_modules/`, `dist/`, `coverage/`, `*.tsbuildinfo` to `.gitignore`
-- [x] T004 [P] Create `packages/contract/package.json` (name `@cocopilot/contract`, dependency `zod`) and `packages/contract/tsconfig.json` extending the base
-- [x] T005 [P] Create `apps/board/package.json` (name `@cocopilot/board`, workspace dependency on `@cocopilot/contract`, no Electron yet) and `apps/board/tsconfig.json` extending the base
+- [x] T004 [P] Create `packages/contract/package.json` (name `@cocoapilot/contract`, dependency `zod`) and `packages/contract/tsconfig.json` extending the base
+- [x] T005 [P] Create `apps/board/package.json` (name `@cocoapilot/board`, workspace dependency on `@cocoapilot/contract`, no Electron yet) and `apps/board/tsconfig.json` extending the base
 - [x] T006 Create root `vitest.config.ts` defining a `unit` project and an `integration` project, matching the two script names from T001
 - [x] T007 Run `npm install` at the root and confirm `npm run typecheck` is clean across the empty workspaces
 
@@ -68,7 +68,7 @@ store and the HTTP server. Nothing story-specific lives here.
 **⚠️ CRITICAL**: No user story can begin until this phase completes.
 
 - [x] T008 [P] Create `packages/contract/src/caps.ts` — every length and item cap from [data-model.md](data-model.md) as named exported constants (4,000 text; 200 title/status; 500 path; 500 tasks; 200 stories; 100 plan steps; 200 changed files; 50 criteria/checks; 100 files; 1,000 notes; 100 sessions), defined once so service and clients cannot disagree
-- [x] T009 [P] Create `packages/contract/src/version.ts` — `APP_NAME = "cocopilot"`, `APP_VERSION`, `CONTRACT_VERSION = "v1"`, the `HealthPayload` schema, and `isCoCoPilotHealth()` which matches on `app === "cocopilot"` and **not** on a 200 alone
+- [x] T009 [P] Create `packages/contract/src/version.ts` — `APP_NAME = "cocoapilot"`, `APP_VERSION`, `CONTRACT_VERSION = "v1"`, the `HealthPayload` schema, and `isCoCoaPilotHealth()` which matches on `app === "cocoapilot"` and **not** on a 200 alone
 - [x] T010 [P] Create `packages/contract/src/ports.ts` — `PORT_BASE = 41847`, `PORT_COUNT = 5`, `PORT_RANGE` (41847–41851), fixed by feature 002's plan and shared so the server and the prober walk one list in one order
 - [x] T011 Create `packages/contract/src/schema.ts` — `Envelope`, `Feature`, `Story`, `Task`, `PlanStep`, `Focus`, `ChangedFile`, `PushRequest`, `NoteRequest`; caps applied from T008; objects strip unknown keys (FR-013); `status` typed `string` with no enum (decision 25, FR-018); `chip` the one closed enum, defaulting to `thinking` (depends on T008)
 - [x] T012 Create `packages/contract/src/errors.ts` — the rejection body `{ ok: false, error, field, message }` and a mapper turning a zod issue into a dotted/indexed field path such as `tasks[3].title` (FR-009, SC-007) (depends on T011)
@@ -177,9 +177,9 @@ application and version; confirm the shared guard rejects a bare `200 {}`.
 
 ### Tests for User Story 4
 
-- [x] T036 [P] [US4] Write `packages/contract/tests/version.test.ts` — `isCoCoPilotHealth()` accepts the real payload and rejects `{}` and `{ app: "other" }`, which is the server half of SC-008 that feature 002's prober tests against
+- [x] T036 [P] [US4] Write `packages/contract/tests/version.test.ts` — `isCoCoaPilotHealth()` accepts the real payload and rejects `{}` and `{ app: "other" }`, which is the server half of SC-008 that feature 002's prober tests against
 - [x] T037 [P] [US4] Write `apps/board/tests/unit/port.test.ts` — the base port is claimed when free; an occupied base walks up the range; all five occupied surfaces a named error rather than hanging
-- [x] T038 [P] [US4] Write `apps/board/tests/integration/health.test.ts` — `GET /v1/health` returns `200 { app: "cocopilot", version, contract: "v1" }`
+- [x] T038 [P] [US4] Write `apps/board/tests/integration/health.test.ts` — `GET /v1/health` returns `200 { app: "cocoapilot", version, contract: "v1" }`
 
 ### Implementation for User Story 4
 

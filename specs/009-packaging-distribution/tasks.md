@@ -27,7 +27,7 @@ is irreversible, and is the maintainer's to run — see the runbook in
 
 | Thing | Where | Why it matters here |
 |---|---|---|
-| The client is runtime-free | `packages/clients/tests/unit/packaging.test.ts` | Already asserts no `@cocopilot/board` and nothing that could pull in Electron. FR-004 and SC-003 extend it rather than replacing it |
+| The client is runtime-free | `packages/clients/tests/unit/packaging.test.ts` | Already asserts no `@cocoapilot/board` and nothing that could pull in Electron. FR-004 and SC-003 extend it rather than replacing it |
 | Both binaries have shebangs | `dist/cli/index.js`, `dist/mcp/main.js` | Verified 2026-08-07; `bin` entries do not work without them |
 | `files: ["dist"]` | Both published manifests | Already ships build output only. FR-005 makes it a test |
 | The board builds to `out/` | `apps/board` `electron-vite build` | The input to both routes. FR-025 says neither route may change it |
@@ -50,7 +50,7 @@ bytes. No new packages yet.
 
 ## Phase 2: User Story 1 — Run the whole product with one command (Priority: P1) 🎯 MVP
 
-**Goal**: `npx cocopilot-board` opens the board on a machine with nothing
+**Goal**: `npx cocoapilot-board` opens the board on a machine with nothing
 installed.
 
 **Covers**: FR-001, FR-002, FR-003, FR-006, FR-025
@@ -58,8 +58,8 @@ installed.
 **Independent test**: Pack every package, install the runner into a clean
 directory, run its binary, and confirm the board starts.
 
-- [x] T006 [US1] Create `packages/runner/` — `cocopilot-board`, depending on `electron` and on the client package, with `files: ["bin", "out"]`. **A separate package rather than un-privating `apps/board`**, because `electron-builder` requires `electron` to be a devDependency and this route requires it to be a dependency; one manifest cannot be both. Say that in the manifest's own comment or the package README, since it looks like duplication until you know
-- [x] T007 [US1] Write `packages/runner/bin/cocopilot-board.mjs` — resolves the `electron` binary and spawns it on the bundled `out/`, forwarding the exit code, with **no logic of its own**. It also checks the Node version and fails naming the requirement (FR-006), because failing inside a dependency's syntax is the worst version error there is
+- [x] T006 [US1] Create `packages/runner/` — `cocoapilot-board`, depending on `electron` and on the client package, with `files: ["bin", "out"]`. **A separate package rather than un-privating `apps/board`**, because `electron-builder` requires `electron` to be a devDependency and this route requires it to be a dependency; one manifest cannot be both. Say that in the manifest's own comment or the package README, since it looks like duplication until you know
+- [x] T007 [US1] Write `packages/runner/bin/cocoapilot-board.mjs` — resolves the `electron` binary and spawns it on the bundled `out/`, forwarding the exit code, with **no logic of its own**. It also checks the Node version and fails naming the requirement (FR-006), because failing inside a dependency's syntax is the worst version error there is
 - [x] T008 [US1] Wire the runner's build to copy `apps/board/out` rather than rebuilding it (FR-025) — one build feeds both routes, and a second build path is a second thing that can differ
 - [x] T009 [P] [US1] Write `packages/runner/tests/unit/packaging.test.ts` — the manifest declares `electron` as a real dependency and the client package with it; the bin is listed and exists; `engines.node` is declared; and the packed contents carry `out/` and the bin and nothing else
 - [x] T010 [US1] Write `scripts/pack-check.mjs` and an npm script that packs every publishable package into a scratch directory, installs the runner from those tarballs into a clean directory, and asserts both binaries resolve — the local stand-in for a publish, and the only way to find out that a package does not install without publishing it to find out
@@ -75,7 +75,7 @@ directory, run its binary, and confirm the board starts.
 **Independent test**: Install only the client package into a clean directory and
 confirm no Electron anywhere in the tree.
 
-- [x] T011 [US2] Extend `packages/clients/tests/unit/packaging.test.ts` for the new neighbour — the client must not depend on `cocopilot-board` either, directly or transitively. The runner depends on the client; the moment that arrow reverses, an agent starts downloading a browser to report a task
+- [x] T011 [US2] Extend `packages/clients/tests/unit/packaging.test.ts` for the new neighbour — the client must not depend on `cocoapilot-board` either, directly or transitively. The runner depends on the client; the moment that arrow reverses, an agent starts downloading a browser to report a task
 - [x] T012 [P] [US2] Extend `scripts/pack-check.mjs` to install the **client alone** into its own clean directory and assert `electron` appears nowhere in the installed tree (SC-003), then run its CLI and confirm the soft failure with no board running (FR-011)
 - [x] T013 [US2] Update `packages/clients/README.md` for the two-package world — the configuration entry unchanged (FR-008, FR-010), and a line saying which package to install when you want only the tools
 

@@ -43,8 +43,8 @@ function installUnder(fixture: string, transcriptId: string): string {
 }
 
 test.beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-e2e-home-'));
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-e2e-repo-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-e2e-home-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-e2e-repo-'));
   projects = join(home, '.claude', 'projects', slug(repo));
   mkdirSync(projects, { recursive: true });
 });

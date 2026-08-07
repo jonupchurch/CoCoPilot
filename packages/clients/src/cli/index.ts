@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { run } from './run.js';
 
-/** The `cocopilot` binary. */
+/** The `cocoapilot` binary. */
 process.exitCode = await run(process.argv.slice(2), {
   io: {
     out: (line) => {

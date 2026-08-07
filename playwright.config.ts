@@ -4,7 +4,7 @@ import { defineConfig } from '@playwright/test';
  * End-to-end against the built Electron app.
  *
  * No web server: the app is the thing under test, launched per spec file from
- * `apps/board/out`. Run `npm run build --workspace @cocopilot/board` first —
+ * `apps/board/out`. Run `npm run build --workspace @cocoapilot/board` first —
  * testing the dev server would test a different artefact from the one that
  * ships.
  */

@@ -1,4 +1,4 @@
-import type { ReportedFeature, Task } from '@cocopilot/contract';
+import type { ReportedFeature, Task } from '@cocoapilot/contract';
 
 import { StatusDisc, StatusLabel } from '../../components/StatusLabel.js';
 import { focusAge } from '../../lib/elapsed.js';

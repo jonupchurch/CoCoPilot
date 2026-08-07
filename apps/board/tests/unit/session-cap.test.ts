@@ -1,4 +1,4 @@
-import { MAX_NOTES_PER_SESSION, MAX_SESSIONS, NoteRequest, PushRequest } from '@cocopilot/contract';
+import { MAX_NOTES_PER_SESSION, MAX_SESSIONS, NoteRequest, PushRequest } from '@cocoapilot/contract';
 import { describe, expect, it } from 'vitest';
 
 import { Store } from '../../src/main/store.js';

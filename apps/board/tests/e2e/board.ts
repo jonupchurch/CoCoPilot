@@ -53,10 +53,10 @@ export async function launchBoard(options: LaunchOptions = {}): Promise<Board> {
     args: [APP],
     env: {
       ...env,
-      COCOPILOT_PORT: String(port),
+      COCOAPILOT_PORT: String(port),
       // Always set, even when a test does not care: an unset value would send
       // the reader to the real home directory.
-      COCOPILOT_HOME: options.home ?? join(APP, 'tests', 'fixtures', 'empty-home'),
+      COCOAPILOT_HOME: options.home ?? join(APP, 'tests', 'fixtures', 'empty-home'),
     } as Record<string, string>,
   });
 
@@ -104,11 +104,11 @@ export function envelope(overrides: Record<string, unknown> = {}): Record<string
  * placement lives here, in the harness, for that reason.
  *
  * Size is untouched -- only the origin moves -- and on a single-display machine
- * (CI, most laptops) this does nothing at all. Set `COCOPILOT_E2E_PRIMARY=1` to
+ * (CI, most laptops) this does nothing at all. Set `COCOAPILOT_E2E_PRIMARY=1` to
  * keep the window where it would otherwise land.
  */
 async function moveOffPrimary(app: ElectronApplication): Promise<void> {
-  if (process.env['COCOPILOT_E2E_PRIMARY'] === '1') return;
+  if (process.env['COCOAPILOT_E2E_PRIMARY'] === '1') return;
 
   await app.evaluate(({ BrowserWindow, screen }) => {
     const window = BrowserWindow.getAllWindows()[0];

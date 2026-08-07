@@ -34,7 +34,7 @@ interface Bridge {
 
 declare global {
   interface Window {
-    cocopilot?: Bridge;
+    cocoapilot?: Bridge;
   }
 }
 
@@ -47,18 +47,18 @@ declare global {
  * because a renderer running outside Electron is a test harness, not a fault.
  */
 export function selectSession(key: string): void {
-  window.cocopilot?.select(key);
+  window.cocoapilot?.select(key);
 }
 
 export function dismissSession(key: string): void {
-  window.cocopilot?.dismiss(key);
+  window.cocoapilot?.dismiss(key);
 }
 
 export function useBoardState(): BoardState {
   const [state, setState] = useState<BoardState>(EMPTY);
 
   useEffect(() => {
-    const bridge = window.cocopilot;
+    const bridge = window.cocoapilot;
     if (bridge === undefined) return;
 
     let live = true;

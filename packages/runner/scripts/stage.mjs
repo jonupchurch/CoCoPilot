@@ -19,8 +19,8 @@ const here = fileURLToPath(new URL('../out', import.meta.url));
 
 if (!existsSync(board)) {
   process.stderr.write(
-    'cocopilot-board: apps/board has not been built.\n' +
-      'Run `npm run build --workspace @cocopilot/board` first — refusing to stage nothing.\n',
+    'cocoapilot-board: apps/board has not been built.\n' +
+      'Run `npm run build --workspace @cocoapilot/board` first — refusing to stage nothing.\n',
   );
   process.exit(1);
 }
@@ -28,4 +28,4 @@ if (!existsSync(board)) {
 rmSync(here, { recursive: true, force: true });
 cpSync(board, here, { recursive: true });
 
-process.stdout.write(`cocopilot-board: staged ${board}\n`);
+process.stdout.write(`cocoapilot-board: staged ${board}\n`);

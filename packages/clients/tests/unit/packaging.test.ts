@@ -27,12 +27,12 @@ const readme = readFileSync(join(root, 'README.md'), 'utf8').replaceAll('\r\n', 
  */
 describe('the published package', () => {
   it('is the name the documented configuration entry fetches', () => {
-    expect(manifest.name).toBe('@cocopilot/mcp');
-    expect(readme).toContain('"@cocopilot/mcp"');
+    expect(manifest.name).toBe('@cocoapilot/mcp');
+    expect(readme).toContain('"@cocoapilot/mcp"');
   });
 
   it('declares both binaries', () => {
-    expect(Object.keys(manifest.bin).sort()).toEqual(['cocopilot', 'cocopilot-mcp']);
+    expect(Object.keys(manifest.bin).sort()).toEqual(['cocoapilot', 'cocoapilot-mcp']);
   });
 
   it('ships only build output', () => {
@@ -40,15 +40,15 @@ describe('the published package', () => {
   });
 
   it('does not drag the desktop application into its dependency tree', () => {
-    // `@cocopilot/board` exists here only so integration tests can run a real
+    // `@cocoapilot/board` exists here only so integration tests can run a real
     // service. A consumer installing from npm must never receive it.
-    expect(Object.keys(manifest.dependencies)).not.toContain('@cocopilot/board');
-    expect(Object.keys(manifest.devDependencies)).toContain('@cocopilot/board');
+    expect(Object.keys(manifest.dependencies)).not.toContain('@cocoapilot/board');
+    expect(Object.keys(manifest.devDependencies)).toContain('@cocoapilot/board');
   });
 
   it('depends on nothing that could pull in Electron', () => {
     expect(Object.keys(manifest.dependencies).sort()).toEqual([
-      '@cocopilot/contract',
+      '@cocoapilot/contract',
       '@modelcontextprotocol/sdk',
       'zod',
     ]);
@@ -140,18 +140,18 @@ describe('the runner carries the product, and the client stays out of it', () =>
     // bundles the runtime itself; this route requires the opposite so that
     // `npm install` fetches it. One manifest cannot be both.
     expect(Object.keys(runner?.dependencies ?? {}).sort()).toEqual([
-      '@cocopilot/mcp',
+      '@cocoapilot/mcp',
       'electron',
     ]);
-    expect(runner?.bin?.['cocopilot-board']).toBe('bin/cocopilot-board.mjs');
+    expect(runner?.bin?.['cocoapilot-board']).toBe('bin/cocoapilot-board.mjs');
     expect(runner?.engines?.['node']).toBeTruthy();
   });
 
   it('keeps the arrow pointing one way', () => {
     // The runner depends on the client. The moment that reverses, an agent
     // starts downloading a browser in order to report a task.
-    expect(Object.keys(manifest.dependencies)).not.toContain('cocopilot-board');
-    expect(Object.keys(manifest.devDependencies)).not.toContain('cocopilot-board');
+    expect(Object.keys(manifest.dependencies)).not.toContain('cocoapilot-board');
+    expect(Object.keys(manifest.devDependencies)).not.toContain('cocoapilot-board');
   });
 });
 

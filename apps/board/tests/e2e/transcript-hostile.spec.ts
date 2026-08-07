@@ -41,8 +41,8 @@ let repo: string;
 let projects: string;
 
 test.beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-hostile-home-'));
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-hostile-repo-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-hostile-home-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-hostile-repo-'));
   projects = join(home, '.claude', 'projects', slug(repo));
   mkdirSync(projects, { recursive: true });
 });

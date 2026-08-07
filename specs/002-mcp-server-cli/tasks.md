@@ -5,7 +5,7 @@
 **Prerequisites**: [plan.md](plan.md), [spec.md](spec.md),
 [contracts/client-surface.md](contracts/client-surface.md),
 [quickstart.md](quickstart.md). Feature 001 is merged — `packages/contract`
-exports the schemas, caps, `PORT_RANGE`, `HOST` and `isCoCoPilotHealth`, and
+exports the schemas, caps, `PORT_RANGE`, `HOST` and `isCoCoaPilotHealth`, and
 `apps/board` exports `createService()` for integration tests to run a real
 service against.
 
@@ -42,7 +42,7 @@ SC-003 bounds at two seconds, and does not require `git` on `PATH` — which the
 MCP server, launched by a host rather than a shell, cannot assume.
 `client-surface.md` gets corrected to match.
 
-**2. `@cocopilot/contract` has to be publishable.** It is currently
+**2. `@cocoapilot/contract` has to be publishable.** It is currently
 `"private": true`, which makes it unresolvable for anyone who installs the
 published client from npm. Bundling it into the client build was the
 alternative; publishing two packages released together is less machinery and
@@ -52,12 +52,12 @@ this feature only has to stop the package from being unpublishable.
 ## Path conventions
 
 ```text
-packages/clients/          # Published as @cocopilot/mcp (decision 27)
-├── package.json           # bin: cocopilot-mcp, cocopilot
+packages/clients/          # Published as @cocoapilot/mcp (decision 27)
+├── package.json           # bin: cocoapilot-mcp, cocoapilot
 ├── src/
 │   ├── messages.ts        # The board-absent text, in one place
 │   ├── identity.ts        # repo, branch, sessionId — all derived
-│   ├── discover.ts        # Probe the range; accept only app === "cocopilot"
+│   ├── discover.ts        # Probe the range; accept only app === "cocoapilot"
 │   ├── transport.ts       # One bounded call budget; soft failure
 │   ├── client.ts          # report() and note(), the shared surface
 │   ├── mcp/{server,tools}.ts
@@ -74,10 +74,10 @@ the desktop application behind it.
 
 ## Phase 1: Setup
 
-- [x] T001 Create `packages/clients/package.json` — name `@cocopilot/mcp` (decision 27's `npx -y @cocopilot/mcp`), `bin` entries `cocopilot-mcp` → `dist/mcp/server.js` and `cocopilot` → `dist/cli/index.js`, dependency on `@cocopilot/contract` and `@modelcontextprotocol/sdk`, devDependency on `@cocopilot/board`, `files: ["dist"]`
-- [x] T002 [P] Create `packages/clients/tsconfig.json` (src + tests, path mapping for `@cocopilot/contract` and `@cocopilot/board`) and `packages/clients/tsconfig.build.json` (emit `dist` from `src` only)
+- [x] T001 Create `packages/clients/package.json` — name `@cocoapilot/mcp` (decision 27's `npx -y @cocoapilot/mcp`), `bin` entries `cocoapilot-mcp` → `dist/mcp/server.js` and `cocoapilot` → `dist/cli/index.js`, dependency on `@cocoapilot/contract` and `@modelcontextprotocol/sdk`, devDependency on `@cocoapilot/board`, `files: ["dist"]`
+- [x] T002 [P] Create `packages/clients/tsconfig.json` (src + tests, path mapping for `@cocoapilot/contract` and `@cocoapilot/board`) and `packages/clients/tsconfig.build.json` (emit `dist` from `src` only)
 - [x] T003 [P] Drop `"private": true` from `packages/contract/package.json` — a published client cannot depend on an unpublishable package
-- [x] T004 Add a `@cocopilot/board` alias to the root `vitest.config.ts` pointing at `apps/board/src/main/index.ts`, and extend the `unit`/`integration` include globs to reach `packages/clients/tests`
+- [x] T004 Add a `@cocoapilot/board` alias to the root `vitest.config.ts` pointing at `apps/board/src/main/index.ts`, and extend the `unit`/`integration` include globs to reach `packages/clients/tests`
 - [x] T005 Run `npm install` at the root and confirm `npm run typecheck` and `npm test` are still clean
 
 ---
@@ -88,7 +88,7 @@ the desktop application behind it.
 
 - [x] T006 [P] Create `packages/clients/src/messages.ts` — `BOARD_ABSENT` exactly as `client-surface.md` words it, plus the not-a-repository and version-mismatch messages. Its wording is a behavioural requirement, not copy: an agent reading "continue working, no need to retry" behaves differently from one reading `ECONNREFUSED`
 - [x] T007 Create `packages/clients/src/identity.ts` — walk up from a starting directory for `.git` (resolving the `gitdir:` form used by worktrees), read `HEAD` for the branch, fall back to the raw SHA when detached; derive a `sessionId` stable for the process lifetime; return a discriminated result so "not inside a repository" is a value rather than a throw
-- [x] T008 Create `packages/clients/src/discover.ts` — probe an ordered port list, `GET /v1/health` on each, accept the first whose body satisfies `isCoCoPilotHealth`, transmit nothing to anything else, conclude absence when the list is exhausted. Takes the port list and a deadline as parameters so tests do not fight a real board
+- [x] T008 Create `packages/clients/src/discover.ts` — probe an ordered port list, `GET /v1/health` on each, accept the first whose body satisfies `isCoCoaPilotHealth`, transmit nothing to anything else, conclude absence when the list is exhausted. Takes the port list and a deadline as parameters so tests do not fight a real board
 - [x] T009 Create `packages/clients/src/transport.ts` — one overall call budget for discovery plus delivery, so SC-003's two-second bound holds even when every port black-holes rather than refusing; no caching between calls, no retry, no queue
 - [x] T010 Create `packages/clients/src/client.ts` — `report()` and `note()` returning a discriminated result (`delivered` | `no-board` | `rejected` | `not-a-repo` | `version-mismatch`), which is the one surface both binaries wrap
 - [x] T011 Create `packages/clients/tests/helpers/harness.ts` — start a real 001 service on a chosen port, start a stub server that answers `200 {}`, and expose the port list to hand to discovery
@@ -121,7 +121,7 @@ tools are listed, then start a service and call a tool **without restarting**.
 
 ### Implementation for User Story 2
 
-- [x] T015 [US2] Create `packages/clients/src/mcp/tools.ts` — `cocopilot_report` and `cocopilot_note` as static definitions with zod input schemas built from `packages/contract`; `repo`, `branch` and `sessionId` are deliberately **not** parameters
+- [x] T015 [US2] Create `packages/clients/src/mcp/tools.ts` — `cocoapilot_report` and `cocoapilot_note` as static definitions with zod input schemas built from `packages/contract`; `repo`, `branch` and `sessionId` are deliberately **not** parameters
 - [x] T016 [US2] Create `packages/clients/src/mcp/server.ts` — register tools from T015 and connect stdio, touching the network nowhere in this file; every tool call is an independent attempt
 - [x] T017 [US2] Add `#!/usr/bin/env node` to `packages/clients/src/mcp/server.ts` and a `build` script to `packages/clients/package.json`, and confirm `dist/mcp/server.js` runs
 
@@ -148,8 +148,8 @@ branch that the agent never supplied.
 
 ### Implementation for User Story 1
 
-- [x] T021 [US1] Wire the `cocopilot_report` handler in `packages/clients/src/mcp/tools.ts` to `client.report()`, merging derived identity with model-composed content
-- [x] T022 [US1] Wire the `cocopilot_note` handler in `packages/clients/src/mcp/tools.ts` to `client.note()`
+- [x] T021 [US1] Wire the `cocoapilot_report` handler in `packages/clients/src/mcp/tools.ts` to `client.report()`, merging derived identity with model-composed content
+- [x] T022 [US1] Wire the `cocoapilot_note` handler in `packages/clients/src/mcp/tools.ts` to `client.note()`
 - [x] T023 [US1] Return a confirmation the agent does not have to act on, and never content that invites a follow-up call
 
 **Checkpoint**: The path essentially every report takes works end to end.
@@ -221,12 +221,12 @@ application; confirm the tools appear and fail soft on a machine with no board.
 ### Tests for User Story 5
 
 - [x] T036 [P] [US5] Write `packages/clients/tests/unit/version.test.ts` — a board reporting a different contract version yields the version-mismatch message naming both versions, rather than an obscure failure; a matching version proceeds
-- [x] T037 [P] [US5] Write `packages/clients/tests/unit/packaging.test.ts` — `packages/clients/package.json` declares both bins, ships only `dist`, carries no dependency on `@cocopilot/board` outside `devDependencies`, and the documented configuration entry in the README contains no filesystem path
+- [x] T037 [P] [US5] Write `packages/clients/tests/unit/packaging.test.ts` — `packages/clients/package.json` declares both bins, ships only `dist`, carries no dependency on `@cocoapilot/board` outside `devDependencies`, and the documented configuration entry in the README contains no filesystem path
 
 ### Implementation for User Story 5
 
 - [x] T038 [US5] Surface a contract-version mismatch in `packages/clients/src/discover.ts` as a distinct result rather than treating the board as absent — decision 27 accepts that a published client can drift from the installed app, and drift is only worth accepting if it is detectable
-- [x] T039 [US5] Write `packages/clients/README.md` with the `.mcp.json` entry (`npx -y @cocopilot/mcp`), the CLI usage, the exit-code table, and an explicit note that no path to the desktop application is involved
+- [x] T039 [US5] Write `packages/clients/README.md` with the `.mcp.json` entry (`npx -y @cocoapilot/mcp`), the CLI usage, the exit-code table, and an explicit note that no path to the desktop application is involved
 
 ---
 

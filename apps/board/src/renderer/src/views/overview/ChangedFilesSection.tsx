@@ -1,4 +1,4 @@
-import type { ChangedFile } from '@cocopilot/contract';
+import type { ChangedFile } from '@cocoapilot/contract';
 
 import { Section } from '../../components/Section.js';
 import { changedFilesSummary, formatChangedFiles, MINUS } from '../../lib/summarise.js';

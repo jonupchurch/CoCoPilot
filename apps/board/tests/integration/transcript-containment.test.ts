@@ -46,7 +46,7 @@ const { homedir, tmpdir } = await import('node:os');
 const { join } = await import('node:path');
 const { fileURLToPath } = await import('node:url');
 
-const { PushRequest } = await import('@cocopilot/contract');
+const { PushRequest } = await import('@cocoapilot/contract');
 const { normalise, pathish, WRITE_APIS } = await import('../helpers/fs-calls.js');
 const { sessionKey, Store } = await import('../../src/main/store.js');
 const { TranscriptSource } = await import('../../src/main/transcript/index.js');
@@ -78,7 +78,7 @@ function capture(run: () => void): void {
 
 /** A repository stocked with the files a "helpful" future change would read. */
 function makeRepo(): string {
-  const repo = mkdtempSync(join(tmpdir(), 'cocopilot-containment-repo-'));
+  const repo = mkdtempSync(join(tmpdir(), 'cocoapilot-containment-repo-'));
   writeFileSync(join(repo, 'tasks.md'), '- [x] T001 A task\n- [ ] T002 Another\n');
   mkdirSync(join(repo, 'specs'));
   writeFileSync(join(repo, 'specs', 'spec.md'), '# A spec\n');
@@ -94,7 +94,7 @@ function projectsFor(repo: string): string {
 }
 
 beforeAll(() => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-containment-home-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-containment-home-'));
 
   // The session that names its transcript, in a directory that also holds a
   // sibling session and a subagents tree. Neither is ours to read.

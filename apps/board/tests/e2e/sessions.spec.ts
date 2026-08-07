@@ -584,6 +584,9 @@ test.describe('density never costs the ability to tell sessions apart', () => {
     // The repository name alone tells them apart, so the branch is the thing
     // that goes when space runs out.
     await expect(page.locator('.pill__branch')).toHaveCount(0);
+    // `CoCoPilot` is this checkout's directory name, not the product's — the
+    // repository was never renamed alongside the product, so do not "correct"
+    // it to CoCoaPilot. It comes from `process.cwd()` via REPO_A.
     await expect(page.locator('.pill__repo')).toHaveText([
       'CoCoPilot',
       'apps',
@@ -606,7 +609,7 @@ test.describe('density never costs the ability to tell sessions apart', () => {
     await declare(`${process.cwd()}/packages`, 's3');
 
     await expect(page.locator('.pill')).toHaveCount(4);
-    // Only the two sharing `CoCoPilot` keep theirs.
+    // Only the two sharing `CoCoPilot` — this checkout's directory — keep theirs.
     await expect(page.locator('.pill__branch')).toHaveText(['feat/s0', 'feat/s1']);
 
     // And they are genuinely separable, not merely different-looking.

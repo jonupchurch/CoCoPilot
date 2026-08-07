@@ -1,6 +1,6 @@
 import type { Server } from 'node:http';
 
-import { PORT_RANGE } from '@cocopilot/contract';
+import { PORT_RANGE } from '@cocoapilot/contract';
 
 import { listenOnFirstFree } from './port.js';
 import { createServer } from './server.js';

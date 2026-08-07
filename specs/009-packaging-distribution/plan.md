@@ -75,25 +75,25 @@ contents, and publish in dependency order so a half-finished release never
 leaves a package pointing at one that does not exist.
 
 **Naming is the one decision this feature does not make.** The unscoped name
-`cocopilot` is an npm security holding package and cannot be had, so `npx
-cocopilot` is unavailable whatever else is decided. Beyond that there are two
+`cocoapilot` is an npm security holding package and cannot be had, so `npx
+cocoapilot` is unavailable whatever else is decided. Beyond that there are two
 shapes, and the choice is irreversible in the way publishing is:
 
-| | Scoped — keep `@cocopilot/*` | Unscoped — `cocopilot-*` |
+| | Scoped — keep `@cocoapilot/*` | Unscoped — `cocoapilot-*` |
 |---|---|---|
-| Entry point | `npx @cocopilot/board` | `npx cocopilot-board` |
+| Entry point | `npx @cocoapilot/board` | `npx cocoapilot-board` |
 | Needs an npm organisation | **Yes**, and its availability could not be verified without a login | No |
-| Churn to adopt | None | 52 files import `@cocopilot/contract` |
+| Churn to adopt | None | 52 files import `@cocoapilot/contract` |
 
 **Nothing here is built against that choice.** The runner package, the release
 script, the manifest hygiene and the tests are all name-agnostic, and the new
-package takes the unscoped `cocopilot-board` because it is a new name with
+package takes the unscoped `cocoapilot-board` because it is a new name with
 nothing to rename and is confirmed free. The existing two keep their names until
 someone checks whether the organisation can be claimed — which is the first step
 of the release runbook, not a build task.
 
 If the organisation turns out to be taken, the fallback is a mechanical rename
-to `cocopilot-contract` / `cocopilot-mcp`: a find-and-replace across 52 files
+to `cocoapilot-contract` / `cocoapilot-mcp`: a find-and-replace across 52 files
 that the typechecker verifies completely, plus one assertion in
 `packaging.test.ts` and one line in the client README. Recorded so that
 discovering it at publish time is an inconvenience rather than a redesign.
@@ -121,13 +121,13 @@ path. It is specified and left.
 Recorded rather than researched afresh, because they were established by direct
 check on 2026-08-07:
 
-- `cocopilot` on npm is a **security holding package** (`0.0.1-security`, no
+- `cocoapilot` on npm is a **security holding package** (`0.0.1-security`, no
   maintainer). Unavailable.
-- `cocopilot-board`, `cocopilot-mcp`, `cocopilot-contract`, `cocopilot-app`,
-  `cocopilot-cli` and `co-copilot` are all free.
-- `@cocopilot/mcp` does not exist; whether the `@cocopilot` **organisation** is
+- `cocoapilot-board`, `cocoapilot-mcp`, `cocoapilot-contract`, `cocoapilot-app`,
+  `cocoapilot-cli` and `co-copilot` are all free.
+- `@cocoapilot/mcp` does not exist; whether the `@cocoapilot` **organisation** is
   free could not be determined without an authenticated session.
-- `@cocopilot/mcp` packs to 21.4 kB over 46 files and installs cleanly with both
-  binaries working — but only alongside `@cocopilot/contract`, which is pinned
+- `@cocoapilot/mcp` packs to 21.4 kB over 46 files and installs cleanly with both
+  binaries working — but only alongside `@cocoapilot/contract`, which is pinned
   exactly and unpublished, so installing the client alone fails with a 404.
 - No npm credentials are present on the development machine.
