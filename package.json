@@ -17,7 +17,7 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "tsc -p tsconfig.root.json --noEmit && npm run typecheck --workspaces --if-present",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
