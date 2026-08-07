@@ -5,8 +5,9 @@ import './TabStrip.css';
  *
  * A tab whose view would be empty is a dead end, so the strip is hidden entirely
  * in the waiting state and each individual tab appears only once its content
- * exists (FR-009). The contents themselves are features 004 through 008; this
- * feature owns the frame.
+ * exists (FR-009). That rule does more work than it looks: it is also how each
+ * view's "nothing here yet" state is answered, by there being no view to open.
+ * All four destinations are built as of feature 007.
  *
  * Tabs are view state, not routes. Giving them URLs would invent history, deep
  * links and back semantics that a single desktop panel does not have.

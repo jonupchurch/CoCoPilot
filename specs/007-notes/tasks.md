@@ -175,7 +175,7 @@ minimum width with no horizontal scrolling.
 - [x] T019 Walk the `stacks/vite-react.md` checklist for the notes tree — stable keys, no colour literals outside `tokens.css` (now enforced by `tests/source-hygiene.test.ts`), no `useEffect` computing what could be derived, and no timer refreshing data
 - [x] T020 Run `npm run build --workspace @cocopilot/board`, `npm run typecheck`, `npm test` and `npm run test:e2e`, then walk the five scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself — its prerequisites and its `npm test --workspace=apps/board` are both already stale
 - [x] T021 [P] Update `CHANGELOG.md` and `STATUS.md`, including the round-2 carried-forward item this feature closes: **Notes drawn at six entries rather than forty**
-- [ ] T022 Read back the full diff, then merge
+- [x] T022 Read back the full diff, then merge
 
 ---
 
