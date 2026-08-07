@@ -1,0 +1,8 @@
+{"type":"user","uuid":"u1","parentUuid":null,"sessionId":"s1","cwd":"/repo","gitBranch":"main","version":"2.0.0","isSidechain":false,"userType":"external","timestamp":"2026-08-07T10:00:00.000Z","message":{"role":"user","content":[{"type":"text","text":"Pull the repeated session fetch out of the three route components and give me a hook. Keep the existing error handling."}]}}
+{"type":"assistant","uuid":"a1","parentUuid":"u1","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:04.000Z","message":{"role":"assistant","usage":{"input_tokens":12400,"output_tokens":312,"cache_read_input_tokens":9000},"content":[{"type":"text","text":"Reading the call sites first."}]}}
+{"type":"user","uuid":"u2","parentUuid":"a1","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:09.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"src/routes/index.tsx\nsrc/routes/settings.tsx"}]}}
+{"type":"ai-title","uuid":"x1","sessionId":"s1","title":"Session hook refactor"}
+{"type":"last-prompt","leafUuid":"u1","sessionId":"s1","lastPrompt":"Pull the repeated session fetch out of the three route components and give me a hook. Keep the existing error handling."}
+{"type":"user","uuid":"u3","parentUuid":"u2","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:04:00.000Z","message":{"role":"user","content":[{"type":"text","text":"Why does the route rerender on every keystroke?"}]}}
+{"type":"queue-operation","uuid":"q1","sessionId":"s1","operation":"drain"}
+{"type":"file-history-delta","uuid":"f1","sessionId":"s1","messageId":"a1"}

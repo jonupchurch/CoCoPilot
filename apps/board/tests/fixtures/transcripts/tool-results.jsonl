@@ -1,0 +1,10 @@
+{"type":"user","uuid":"u1","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:00.000Z","message":{"role":"user","content":[{"type":"text","text":"Rename fetchUser to loadUser everywhere"}]}}
+{"type":"user","uuid":"u2","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:01.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"ok"}]}}
+{"type":"user","uuid":"u3","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:02.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t2","content":"src/api/client.ts"}]}}
+{"type":"user","uuid":"u4","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:03.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t3","content":"3 files changed"}]}}
+{"type":"user","uuid":"u5","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:04.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t4","content":"tests passed"}]}}
+{"type":"user","uuid":"u6","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:05.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t5","content":"no output"}]}}
+{"type":"user","uuid":"u7","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:05:00.000Z","message":{"role":"user","content":[{"type":"text","text":"Now run the session tests"}]}}
+{"type":"user","uuid":"u8","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:05:01.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t6","content":"12 passed"}]}}
+{"type":"user","uuid":"u9","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:05:02.000Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t7","content":"done"}]}}
+{"type":"user","uuid":"u10","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:06:00.000Z","message":{"role":"user","content":[{"type":"text","text":"Good. Commit that."}]}}
