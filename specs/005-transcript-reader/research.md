@@ -141,10 +141,58 @@ under the session's temp directory), **not** into the project transcript. So the
 plan's statement that "subagent turns land in the same file" is false for this
 version.
 
+They live here instead:
+
+```
+~/.claude/projects/<slug>/<sessionId>/subagents/agent-<id>.jsonl
+```
+
+— a **directory** sitting beside the main transcript and named identically to it
+minus the extension. Confirmed: the file found there carries the id of a
+subagent this session actually spawned.
+
 Keep the filter regardless: it costs one comparison, it is correct if the
 behaviour returns, and unfiltered it would show an agent's internal delegation
 as the developer's own instructions. But it is currently **inert**, and a test
 asserting it filters anything would be testing a fixture rather than reality.
+
+**Consequence for the locator**: the session directory is not a transcript, and
+FR-016 forbids reading anything outside the session's own file. Select regular
+files ending `.jsonl` at the top level only, and never descend.
+
+---
+
+## 3a. Locating the *right* file: the session ids do not match
+
+The board's `sessionId` is a `randomUUID()` minted by the MCP client process
+(feature 002, `identity.ts`). A transcript's filename is **Claude Code's** own
+session id. They are unrelated, so research's original claim — "the filename
+*is* the session identifier, so a session maps to exactly one file with no
+scanning" — does not hold for the id the board actually has.
+
+⚠️ **But the correct id is available.** Claude Code exports
+`CLAUDE_CODE_SESSION_ID` into the environment of the processes it launches, and
+it matches the transcript filename exactly:
+
+```
+CLAUDE_CODE_SESSION_ID = 8e8c2496-af0a-4ab6-8eec-706b3787430e
+transcript             = 8e8c2496-af0a-4ab6-8eec-706b3787430e.jsonl
+```
+
+**Decision**: the clients read that variable and report it as a separate,
+optional envelope field. It is derived, never model-composed, exactly like
+`repo` and `branch` — and being optional means an agent that is not Claude Code,
+or a future release that drops the variable, simply falls back.
+
+**Fallback when it is absent**: the most recently modified `.jsonl` in the
+directory. Right whenever one session is running in a repository, and capable of
+picking a sibling session's transcript when two are. Stated here as a known
+limitation rather than discovered later as a bug.
+
+This is a change to the contract from feature 001 and the clients from feature
+002. Named as such rather than folded in quietly: FR-016 says read only the
+transcript belonging to the session being shown, and without this field that
+requirement cannot be honestly met.
 
 **No `<system-reminder>` text is persisted inside a stored prompt.** Injected
 context appears at request time and not in the record, so a stored prompt is
@@ -219,6 +267,7 @@ and the board keeps working.
 | Unknown | Resolution |
 |---|---|
 | Location | `~/.claude/projects/<slug>/<sessionId>.jsonl`; slug = every non-alphanumeric character replaced by `-` |
+| Which file | `CLAUDE_CODE_SESSION_ID`, reported by the clients as an optional envelope field; newest `.jsonl` when absent |
 | Format | JSONL, `type`-discriminated, unknown types skipped (9 types seen, and counting) |
 | Prompt identification | Text-only `message.content` — accepting **string or array** — *and* none of the four wrapper shapes |
 | Subagent turns | Filter `isSidechain`, but it is inert: subagent transcripts are written elsewhere |
