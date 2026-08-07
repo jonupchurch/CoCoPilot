@@ -1,0 +1,139 @@
+/*
+ * Rows run to the panel edge so the hover band reads as a row rather than a
+ * floating strip, exactly as in Changed files. The section's own body padding is
+ * cancelled here and repaid per row.
+ */
+.section[data-testid='section-history'] .section__body {
+  gap: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.history__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 14px;
+}
+
+.history__row:hover {
+  background: var(--surface);
+}
+
+/*
+ * The prompt on one line. `nowrap` collapses the newlines in a multi-line
+ * prompt to spaces, which is the browser doing the flattening rather than this
+ * code editing what the developer wrote — the full text is one click and one
+ * hover away, and both show it exactly.
+ */
+.history__text {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+}
+
+.history__text:hover {
+  color: var(--ink);
+}
+
+.history__text:focus-visible,
+.history__action:focus-visible,
+.history__more:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+  border-radius: var(--radius-field);
+}
+
+.history__age {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 22px square in the export; the hit target is the full control height, so the
+   glyph can stay small without the button becoming hard to land on. */
+.history__action {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.history__action:hover {
+  background: var(--raised);
+  color: var(--ink);
+}
+
+.history__caret {
+  font-size: 9px;
+}
+
+/*
+ * Teal, which is the action colour. The tick is the only confirmation the copy
+ * gives and it clears itself after about a second — a control that stayed ticked
+ * would read as a state rather than as something that just happened.
+ */
+.history__copied {
+  font-size: 11px;
+  color: var(--teal);
+}
+
+/*
+ * The untruncated prompt, in place. `pre-wrap` because the blank lines a
+ * developer put between paragraphs are part of what they wrote, and
+ * `overflow-wrap` because a prompt often carries a long unbroken path and the
+ * panel must not scroll sideways for it.
+ */
+.history__full {
+  margin: 0 14px 8px;
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.history__more {
+  align-self: flex-start;
+  margin: 6px 14px 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-meta);
+  font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+}
+
+.history__none {
+  margin: 0;
+  padding: 0 14px;
+  font-size: var(--text-body);
+  color: var(--muted);
+}

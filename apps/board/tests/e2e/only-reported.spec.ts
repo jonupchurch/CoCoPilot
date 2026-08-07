@@ -64,13 +64,14 @@ const DERIVED: readonly RegExp[] = [
   // Uppercase because that is how `innerText` reports a `text-transform` label,
   // and matching the rendered form keeps the pattern from reaching into a
   // lowercase path like `specs/002-session-hook/spec.md`.
-  /CHANGED FILES|LAST PROMPT|FOCUS|SPEC|PLAN/g,
+  /CHANGED FILES|LAST PROMPT|HISTORY|FOCUS|SPEC|PLAN/g,
   /*
-   * Feature 005 put a section above these whose content comes from the
-   * transcript rather than from a report. The harness points the board at a home
-   * directory with no transcripts in it, so all that appears here is the
-   * section's own "cannot read this" chrome — which is board text, and therefore
-   * has to be declared like every other piece of it.
+   * Feature 005 put sections above these whose content comes from the transcript
+   * rather than from a report. The harness points the board at a home directory
+   * with no transcripts in it, so all that appears here is their own "cannot
+   * read this" chrome — which is board text, and therefore has to be declared
+   * like every other piece of it. Both sections use the same sentence, so one
+   * pattern covers them.
    *
    * If a *prompt* ever shows up in this test, that is a real finding: it would
    * mean the fixture home stopped being empty and the suite had started reading

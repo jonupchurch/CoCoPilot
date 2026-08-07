@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { SessionView } from '../../../../main/view.js';
 import { ChangedFilesSection } from './ChangedFilesSection.js';
 import { FocusSection } from './FocusSection.js';
+import { HistorySection } from './HistorySection.js';
 import { LastPromptSection } from './LastPromptSection.js';
 import { PlanSection } from './PlanSection.js';
 import { SpecSection } from './SpecSection.js';
@@ -23,7 +24,7 @@ import './OverviewView.css';
  * same tab, different source.
  */
 
-export type SectionKey = 'lastPrompt' | 'focus' | 'spec' | 'plan' | 'changed';
+export type SectionKey = 'lastPrompt' | 'history' | 'focus' | 'spec' | 'plan' | 'changed';
 
 /**
  * Component state, not persisted. It survives an arriving report because this
@@ -32,6 +33,7 @@ export type SectionKey = 'lastPrompt' | 'focus' | 'spec' | 'plan' | 'changed';
  */
 const ALL_OPEN: Record<SectionKey, boolean> = {
   lastPrompt: true,
+  history: true,
   focus: true,
   spec: true,
   plan: true,
@@ -64,6 +66,19 @@ export function OverviewView({
         open={open.lastPrompt}
         onToggle={() => {
           toggle('lastPrompt');
+        }}
+      />
+
+      {/*
+        Directly under the prompt it is the history of, and above everything the
+        agent reported: what was asked comes before what is being done about it.
+      */}
+      <HistorySection
+        prompts={session.transcript.prompts}
+        now={now}
+        open={open.history}
+        onToggle={() => {
+          toggle('history');
         }}
       />
 

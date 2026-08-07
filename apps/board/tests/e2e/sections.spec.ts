@@ -35,7 +35,16 @@ function full(taskCount = 4): Record<string, unknown> {
   };
 }
 
-const SECTIONS = ['focus', 'spec', 'plan', 'changed'] as const;
+/**
+ * Every section on the Overview tab, transcript-fed ones included.
+ *
+ * Listed in full rather than as the four reported ones, because SC-002's claim
+ * is about a developer with *everything* closed — a section added later that
+ * quietly stopped summarising itself would pass a list that had not grown with
+ * it. The harness points at a home with no transcripts, so the two transcript
+ * sections summarise as unavailable here, which is still a summary.
+ */
+const SECTIONS = ['last-prompt', 'history', 'focus', 'spec', 'plan', 'changed'] as const;
 
 test.describe('sections collapse independently', () => {
   test('hides its content and moves the sections below it up', async () => {
@@ -82,7 +91,7 @@ test.describe('sections collapse independently', () => {
 });
 
 test.describe('a collapsed header still answers its question', () => {
-  test('keeps every label and summary visible with all four closed', async () => {
+  test('keeps every label and summary visible with all of them closed', async () => {
     const { page } = board;
     await board.push(full());
 

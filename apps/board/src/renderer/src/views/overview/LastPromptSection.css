@@ -25,41 +25,10 @@
   overflow-wrap: anywhere;
 }
 
-/*
- * Unavailable and empty are deliberately different, and not only in wording:
- * empty is bare text, unavailable is a bordered block in a heavier ink. Drawing
- * them alike would present a failure as a confident answer (SC-006).
- *
- * Deliberately *not* the ember tint, which this section used until the collapsed
- * case forced the question. `--ember` is documented as attention and `needs-you`
- * and nothing else; `--ember-tint` already carries `blocked` in the status
- * vocabulary; and a transcript is unreadable for every agent that is not Claude
- * Code, and for every repository Claude Code has never run in. Tinting it would
- * light a standing alarm for a state that is simply normal in those sessions,
- * and spend the one colour that means the agent wants a human.
- */
-.prompt__unavailable {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-field);
-  background: var(--surface);
-  font-size: var(--text-body);
-  color: var(--ink-soft);
-}
-
+/* The unavailable treatment is shared by all three transcript sections and
+   lives in `components/Unavailable.css`. Empty is bare muted text. */
 .prompt__none {
   margin: 0;
   font-size: var(--text-body);
   color: var(--muted);
-}
-
-/*
- * The collapsed case, where the distinction was only a word: with the body
- * unmounted, the summary is all that is left of the section. The same dashed
- * line and the same heavier ink as the block it stands in for.
- */
-.prompt__summary--unavailable {
-  border-bottom: 1px dashed var(--line);
-  color: var(--ink-soft);
 }

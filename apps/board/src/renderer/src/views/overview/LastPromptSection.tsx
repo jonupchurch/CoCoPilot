@@ -1,6 +1,7 @@
 import type { Prompt } from '../../../../main/transcript/classify.js';
 import type { Availability } from '../../../../main/transcript/availability.js';
 import { Section } from '../../components/Section.js';
+import { UnavailableNote, UnavailableSummary } from '../../components/Unavailable.js';
 import { elapsed } from '../../lib/elapsed.js';
 
 import './LastPromptSection.css';
@@ -43,9 +44,7 @@ export function LastPromptSection({
       testId="last-prompt"
     >
       {prompts.state === 'unreadable' ? (
-        <p className="prompt__unavailable" data-testid="last-prompt-unavailable">
-          Unavailable — no transcript could be read for this session.
-        </p>
+        <UnavailableNote testId="last-prompt-unavailable" />
       ) : latest === null ? (
         <p className="prompt__none" data-testid="last-prompt-none">
           No prompt has been recorded for this session yet.
@@ -82,11 +81,7 @@ function summary(
   now: number,
 ): string | React.JSX.Element {
   if (prompts.state === 'unreadable') {
-    return (
-      <span className="prompt__summary--unavailable" data-testid="last-prompt-summary-unavailable">
-        unavailable
-      </span>
-    );
+    return <UnavailableSummary testId="last-prompt-summary-unavailable" />;
   }
   if (latest === null) return 'none yet';
   return latest.at === null ? 'recorded' : elapsed(latest.at, now);

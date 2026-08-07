@@ -155,10 +155,10 @@ it.
 **Independent test**: Several prompts list newest first with relative times; one
 expands in place; copying puts exactly that text on the clipboard.
 
-- [ ] T022 [US2] Create `apps/board/src/renderer/src/views/overview/HistorySection.tsx` and its CSS — newest first, relative times, a row expanding in place, and the total count stated when more exist than are listed
-- [ ] T023 [US2] Add copy-to-clipboard with a brief self-confirmation, copying the stored text exactly — no trimming, no normalising, no re-wrapping (SC-002)
-- [ ] T024 [P] [US2] Extend `apps/board/tests/e2e/transcript.spec.ts` — order and relative times; expansion shows untruncated text; a copied prompt matches character for character including newlines; the count appears only when the list is short of the total
-- [ ] T025 [US2] Decide and document the list length — a display choice research left open. State the number and why in the component, since "Show all 18" having no destination is a known open item from design round 2
+- [x] T022 [US2] Create `apps/board/src/renderer/src/views/overview/HistorySection.tsx` and its CSS — newest first, relative times, a row expanding in place, and the total count stated when more exist than are listed
+- [x] T023 [US2] Add copy-to-clipboard with a brief self-confirmation, copying the stored text exactly — no trimming, no normalising, no re-wrapping (SC-002)
+- [x] T024 [P] [US2] Extend `apps/board/tests/e2e/transcript.spec.ts` — order and relative times; expansion shows untruncated text; a copied prompt matches character for character including newlines; the count appears only when the list is short of the total
+- [x] T025 [US2] Decide and document the list length — a display choice research left open. State the number and why in the component, since "Show all 18" having no destination is a known open item from design round 2
 
 ---
 

@@ -1,15 +1,57 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { expect, test } from '@playwright/test';
 
 import { envelope, launchBoard, type Board } from './board.js';
 
 let board: Board;
+let home: string;
+let repo: string;
 
+/**
+ * Every test here runs with a real transcript in place.
+ *
+ * It did not, until feature 005 put two transcript-fed sections on the Overview
+ * — and with the harness pointing at an empty home, both of them rendered as
+ * "unavailable" and the History rows that tick were never on screen at all. The
+ * absence test would have kept passing while the values it exists to watch went
+ * unwatched.
+ */
 test.beforeEach(async () => {
-  board = await launchBoard();
+  home = mkdtempSync(join(tmpdir(), 'cocopilot-timer-home-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocopilot-timer-repo-'));
+  const projects = join(home, '.claude', 'projects', repo.replace(/[^A-Za-z0-9]/g, '-'));
+  mkdirSync(projects, { recursive: true });
+
+  const at = Date.now();
+  writeFileSync(
+    join(projects, 'session-1.jsonl'),
+    Array.from({ length: 3 }, (_, i) =>
+      JSON.stringify({
+        type: 'user',
+        uuid: `u${i}`,
+        isSidechain: false,
+        timestamp: new Date(at - (3 - i) * 1_000).toISOString(),
+        message: { role: 'user', content: [{ type: 'text', text: `Prompt number ${i}` }] },
+      }),
+    ).join('\n').concat('\n'),
+  );
+
+  board = await launchBoard({ home });
 });
 
 test.afterEach(async () => {
   await board.close();
+  rmSync(home, { recursive: true, force: true });
+  rmSync(repo, { recursive: true, force: true });
+});
+
+/** An envelope pointing at this file's repository and transcript. */
+const reporting = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
+  ...envelope({ repo, transcriptId: 'session-1' }),
+  ...overrides,
 });
 
 /**
@@ -24,12 +66,16 @@ test.describe('nothing changes on a timer', () => {
   test('only the elapsed counter moves while an agent is quiet', async () => {
     const { page } = board;
 
-    await board.push({
-      ...envelope(),
-      focus: { task: 'T025', note: 'gone quiet on purpose', chip: 'watching' },
-      tasks: [{ id: 'T025', title: 'A task', status: 'todo' }],
-    });
+    await board.push(
+      reporting({
+        focus: { task: 'T025', note: 'gone quiet on purpose', chip: 'watching' },
+        tasks: [{ id: 'T025', title: 'A task', status: 'todo' }],
+      }),
+    );
     await expect(page.getByTestId('identity')).toBeVisible();
+    // The rows whose ages tick are actually on screen, so the snapshot below is
+    // comparing something.
+    await expect(page.locator('.history__age')).toHaveCount(2);
 
     /**
      * Everything except the elapsed figures, which are supposed to advance.
@@ -37,7 +83,8 @@ test.describe('nothing changes on a timer', () => {
      * The exemption is a list of specific elements rather than a pattern applied
      * to the whole tree, which is what keeps the test honest: a new counter, a
      * staleness badge or an age-driven class lands outside the list and fails
-     * here. Feature 004 added three entries to it, deliberately and visibly.
+     * here. Feature 004 added three entries to it, deliberately and visibly;
+     * feature 005 added the History row ages, the same way.
      */
     const snapshot = async (): Promise<string> =>
       page.evaluate(() => {
@@ -47,6 +94,8 @@ test.describe('nothing changes on a timer', () => {
           '[data-testid="focus-elapsed"]', // the Focus card
           '[data-testid^="task-elapsed-"]', // the focused task row
           '[data-testid="section-summary-focus"]', // the Focus header summary
+          '[data-testid^="history-age-"]', // how long ago each earlier prompt
+          '[data-testid="section-summary-last-prompt"]', // how long ago the latest one
         ].join(',');
 
         for (const el of root.querySelectorAll(allowedToTick)) {
@@ -68,7 +117,7 @@ test.describe('nothing changes on a timer', () => {
   test('the chip never moves on its own, at any duration', async () => {
     const { page } = board;
 
-    await board.push({ ...envelope(), focus: { chip: 'watching' } });
+    await board.push({ ...reporting(), focus: { chip: 'watching' } });
     await expect(page.locator('.chip')).toHaveAttribute('data-chip', 'watching');
 
     await page.waitForTimeout(4_000);
@@ -81,7 +130,7 @@ test.describe('nothing changes on a timer', () => {
 
   test('the window issues no request of its own while idle', async () => {
     const { page } = board;
-    await board.push(envelope());
+    await board.push(reporting());
 
     const requests: string[] = [];
     page.on('request', (request) => {
@@ -97,7 +146,7 @@ test.describe('nothing changes on a timer', () => {
 
   test('never describes the agent as stalled, stuck or failed', async () => {
     const { page } = board;
-    await board.push({ ...envelope(), focus: { chip: 'thinking' } });
+    await board.push({ ...reporting(), focus: { chip: 'thinking' } });
 
     await page.waitForTimeout(3_000);
 

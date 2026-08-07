@@ -209,6 +209,238 @@ test.describe('unavailable is not empty', () => {
 });
 
 /**
+ * A transcript of `count` prompts, oldest first, one minute apart and ending
+ * `count` minutes ago — so every row has a distinct, predictable age.
+ */
+function prompts(count: number, at = Date.now()): string {
+  return Array.from({ length: count }, (_, i) => {
+    const minutes = count - i;
+    return `${JSON.stringify({
+      type: 'user',
+      uuid: `u${i}`,
+      isSidechain: false,
+      timestamp: new Date(at - minutes * 60_000).toISOString(),
+      message: { role: 'user', content: [{ type: 'text', text: `Prompt number ${i}` }] },
+    })}\n`;
+  }).join('');
+}
+
+test.describe('earlier prompts', () => {
+  test('lists them newest first, with how long ago each was given', async () => {
+    writeFileSync(join(projects, 'session-1.jsonl'), prompts(4));
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    // Four prompts: the newest is the card above, so three are "earlier", and
+    // they run backwards from there.
+    await expect(board.page.locator('.history__text')).toHaveText([
+      'Prompt number 2',
+      'Prompt number 1',
+      'Prompt number 0',
+    ]);
+    await expect(board.page.locator('.history__age')).toHaveText(['2m', '3m', '4m']);
+    await expect(board.page.getByTestId('section-summary-history')).toHaveText('3');
+  });
+
+  test('never repeats the prompt shown in the card above it', async () => {
+    install('typical.jsonl', 'session-1');
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.getByTestId('last-prompt-text')).toHaveText(
+      'Why does the route rerender on every keystroke?',
+    );
+    await expect(board.page.locator('.history__text')).toHaveText([
+      'Pull the repeated session fetch out of the three route components and give me a hook. Keep the existing error handling.',
+    ]);
+  });
+
+  test('expands a row in place to its full untruncated text', async () => {
+    const long = 'Rework the reducer.\n\nCover the refresh race, and the logout-during-refresh case.';
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      `${JSON.stringify({
+        type: 'user',
+        uuid: 'u0',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:00:00.000Z',
+        message: { role: 'user', content: [{ type: 'text', text: long }] },
+      })}\n${JSON.stringify({
+        type: 'user',
+        uuid: 'u1',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:05:00.000Z',
+        message: { role: 'user', content: [{ type: 'text', text: 'And now deploy it' }] },
+      })}\n`,
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    // Collapsed, the row is one line: the newlines are collapsed by the browser
+    // rather than edited out of the text, and the whole thing is on `title`.
+    const row = board.page.getByTestId('history-text-u0');
+    await expect(row).toHaveAttribute('title', long);
+    await expect(board.page.getByTestId('history-full-u0')).toHaveCount(0);
+
+    await board.page.getByTestId('history-toggle-u0').click();
+
+    // In place, under its own row -- not in a dialog and not somewhere else.
+    const full = board.page.getByTestId('history-full-u0');
+    await expect(full).toBeVisible();
+    await expect(full).toHaveText(long);
+    await expect(board.page.getByTestId('history-u0')).toContainText(long);
+  });
+
+  test('copies the prompt exactly, and says so briefly', async () => {
+    // Every awkward thing at once: newlines, trailing space, a tab, markup and
+    // a character outside the BMP. SC-002 is character for character.
+    const exact = 'Fix <the> bug\n\n\tin  useSession — 🙂 \nand keep the tests green ';
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      `${JSON.stringify({
+        type: 'user',
+        uuid: 'u0',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:00:00.000Z',
+        message: { role: 'user', content: [{ type: 'text', text: exact }] },
+      })}\n${JSON.stringify({
+        type: 'user',
+        uuid: 'u1',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:05:00.000Z',
+        message: { role: 'user', content: [{ type: 'text', text: 'later' }] },
+      })}\n`,
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+    await board.page.getByTestId('history-copy-u0').click();
+
+    // Read back through Electron's own clipboard in the main process, so the
+    // assertion is about what actually reached the system rather than about
+    // what the renderer believes it wrote.
+    //
+    // `\r` stripped, and *only* `\r`: Windows puts text on the clipboard as
+    // CF_UNICODETEXT, whose convention is CRLF, so Chromium expands every
+    // newline on the way out and no API can put a bare LF there. That is the
+    // platform's line ending, not an edit — and asserting it this way keeps the
+    // test strict about everything that *is* ours: the tab, the doubled space,
+    // the em dash, the astral-plane character, the markup, and the trailing
+    // space that a helpful `trim()` would eat.
+    await expect
+      .poll(async () =>
+        board.app.evaluate(({ clipboard }) => clipboard.readText().replaceAll('\r', '')),
+      )
+      .toBe(exact);
+
+    // Confirmed, and then not: a control that stayed ticked would read as a
+    // state rather than as something that just happened.
+    await expect(board.page.getByTestId('history-copied-u0')).toBeVisible();
+    await expect(board.page.getByTestId('history-copied-u0')).toHaveCount(0, { timeout: 5_000 });
+  });
+
+  test('states the total when more exist than are listed, and shows them in place', async () => {
+    writeFileSync(join(projects, 'session-1.jsonl'), prompts(12));
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    // Eleven earlier prompts, four listed.
+    await expect(board.page.locator('.history__text')).toHaveCount(4);
+    const more = board.page.getByTestId('history-show-all');
+    await expect(more).toHaveText('Show all 11');
+
+    // In place, in this section -- the open item from design round 2 was that
+    // "Show all 18" had nowhere to go.
+    await more.click();
+    await expect(board.page.locator('.history__text')).toHaveCount(11);
+    await expect(more).toHaveCount(0);
+  });
+
+  test('offers no total when everything is already listed', async () => {
+    writeFileSync(join(projects, 'session-1.jsonl'), prompts(5));
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.locator('.history__text')).toHaveCount(4);
+    await expect(board.page.getByTestId('history-show-all')).toHaveCount(0);
+  });
+
+  test('says so when there is nothing earlier, and that is not unavailable', async () => {
+    writeFileSync(join(projects, 'session-1.jsonl'), prompts(1));
+    board = await launchBoard({ home });
+
+    await board.push(session());
+
+    await expect(board.page.getByTestId('history-none')).toBeVisible();
+    await expect(board.page.getByTestId('history-unavailable')).toHaveCount(0);
+    await expect(board.page.getByTestId('section-summary-history')).toHaveText('none');
+  });
+
+  test('keeps an expanded row open as the transcript grows', async () => {
+    const path = join(projects, 'session-1.jsonl');
+    writeFileSync(path, prompts(4));
+    board = await launchBoard({ home });
+
+    await board.push(session());
+    await board.page.getByTestId('history-toggle-u0').click();
+    await expect(board.page.getByTestId('history-full-u0')).toBeVisible();
+
+    writeFileSync(
+      path,
+      `${JSON.stringify({
+        type: 'user',
+        uuid: 'u9',
+        isSidechain: false,
+        timestamp: new Date().toISOString(),
+        message: { role: 'user', content: [{ type: 'text', text: 'And now deploy it' }] },
+      })}\n`,
+      { flag: 'a' },
+    );
+
+    // The row keys count from the oldest entry precisely so this holds: keying
+    // from the end would remount every row on each arrival and shut them all.
+    await expect(board.page.locator('.history__text')).toHaveCount(4);
+    await expect(board.page.getByTestId('history-full-u0')).toBeVisible();
+  });
+
+  test('renders markup in an earlier prompt as visible characters', async () => {
+    writeFileSync(
+      join(projects, 'session-1.jsonl'),
+      `${JSON.stringify({
+        type: 'user',
+        uuid: 'u0',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:00:00.000Z',
+        message: {
+          role: 'user',
+          content: [{ type: 'text', text: '<script>window.__pwned = true</script> fix it' }],
+        },
+      })}\n${JSON.stringify({
+        type: 'user',
+        uuid: 'u1',
+        isSidechain: false,
+        timestamp: '2026-08-07T10:05:00.000Z',
+        message: { role: 'user', content: [{ type: 'text', text: 'later' }] },
+      })}\n`,
+    );
+    board = await launchBoard({ home });
+
+    await board.push(session());
+    await board.page.getByTestId('history-toggle-u0').click();
+
+    await expect(board.page.getByTestId('history-full-u0')).toContainText('<script>');
+    expect(
+      await board.page.evaluate(() => (window as { __pwned?: boolean }).__pwned),
+    ).toBeUndefined();
+  });
+});
+
+/**
  * The report every case below pushes, so that "nothing else broke" is checked
  * against the same full board each time.
  */

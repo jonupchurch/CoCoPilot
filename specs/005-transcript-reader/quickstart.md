@@ -33,8 +33,18 @@ the board is presenting tool output as things the developer typed.
 - The most recent prompt is shown as written.
 - Earlier prompts list newest first with relative times.
 - Expanding one shows its full untruncated text.
-- Copying puts **exactly** that text on the clipboard, character for character.
-- The total count is stated when more exist than are listed.
+- Copying puts **exactly** that text on the clipboard, character for character —
+  with one platform exception found while building this: **on Windows every
+  newline comes back as CRLF.** The clipboard's text format there is
+  `CF_UNICODETEXT`, whose convention is CRLF, and Chromium converts on the way
+  out; no API can put a bare LF on it. Strip `\r` and the result is the original
+  exactly, which is what the end-to-end test asserts. Nothing else changes — not
+  the tabs, the doubled spaces, or the trailing space a `trim()` would eat.
+- The total count is stated when more exist than are listed, and **"Show all N"
+  expands the list in place**. Design round 2 flagged that the export's
+  "Show all 18" had no destination; there is no separate history view to send
+  anyone to, and inventing one would be a second place to read the same thing.
+  The list shows 4 until asked, as the export draws it.
 - Close and reopen the board: history is still there — the only thing that
   survives a restart.
 
