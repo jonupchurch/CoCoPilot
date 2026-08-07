@@ -1,0 +1,16 @@
+# Line endings are normalised to LF in the repository and left to the platform
+# in the working tree — except where the bytes themselves are the subject.
+
+* text=auto
+
+# Transcript fixtures are a *format* under test, not source code. Real
+# transcripts are LF-delimited JSONL, and `truncated.jsonl` deliberately ends
+# mid-record with no trailing newline so the reader's partial-line handling has
+# something real to handle. A CRLF checkout would change the byte offsets these
+# tests reason about and make them pass or fail for reasons unrelated to the
+# code — which has already happened once in this repository, to a README
+# assertion.
+*.jsonl -text
+
+# Design exports are generated artefacts; leave them exactly as they arrived.
+resources/*.dc.html -text

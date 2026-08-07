@@ -1,6 +1,7 @@
 import { app, ipcMain, type BrowserWindow } from 'electron';
 
 import { createService, type Service } from './index.js';
+import { TranscriptSource } from './transcript/index.js';
 import { toBoardState } from './view.js';
 import { createWindow, preloadPath, rendererPath } from './window.js';
 
@@ -14,6 +15,7 @@ import { createWindow, preloadPath, rendererPath } from './window.js';
 
 let service: Service | undefined;
 let window: BrowserWindow | undefined;
+let transcripts: TranscriptSource | undefined;
 
 async function start(): Promise<void> {
   // Normally the documented range, walked in order. `COCOPILOT_PORT` pins it
@@ -36,6 +38,13 @@ async function start(): Promise<void> {
     load: devServer === undefined ? { file: rendererPath(appPath) } : { url: devServer },
   });
 
+  // The one thing the board reads from disk. It follows only sessions the board
+  // is already holding, so nothing is scanned and no other session's transcript
+  // is opened (FR-016). Every failure inside it degrades three display sections
+  // and touches nothing else.
+  transcripts = new TranscriptSource(held);
+  transcripts.start();
+
   held.subscribe(() => {
     // Send the whole projection rather than a delta. The board holds one
     // agent's latest word, and rebuilding it is cheap next to the alternative of
@@ -53,6 +62,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
+  // File watchers hold nothing open that would block a quit, but stopping is
+  // still the honest counterpart to starting.
+  transcripts?.stop();
   // Leaving the port held would make the next launch walk the range for no
   // reason, and a client would find a board that is not there.
   void service?.close();

@@ -1,5 +1,5 @@
 import { createServer } from 'node:net';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { _electron as electron, type ElectronApplication, type Page } from '@playwright/test';
@@ -29,7 +29,18 @@ export interface Board {
   close(): Promise<void>;
 }
 
-export async function launchBoard(): Promise<Board> {
+export interface LaunchOptions {
+  /**
+   * Where the board should look for `.claude/projects`.
+   *
+   * Without it the board would read the developer's own transcripts while the
+   * suite runs — their real prompts on screen, and a test whose result depends
+   * on what they happened to be doing.
+   */
+  home?: string | undefined;
+}
+
+export async function launchBoard(options: LaunchOptions = {}): Promise<Board> {
   const port = await freePort();
 
   // `ELECTRON_RUN_AS_NODE` makes electron.exe behave as plain Node, so the
@@ -40,7 +51,13 @@ export async function launchBoard(): Promise<Board> {
 
   const app = await electron.launch({
     args: [APP],
-    env: { ...env, COCOPILOT_PORT: String(port) } as Record<string, string>,
+    env: {
+      ...env,
+      COCOPILOT_PORT: String(port),
+      // Always set, even when a test does not care: an unset value would send
+      // the reader to the real home directory.
+      COCOPILOT_HOME: options.home ?? join(APP, 'tests', 'fixtures', 'empty-home'),
+    } as Record<string, string>,
   });
 
   const page = await app.firstWindow();

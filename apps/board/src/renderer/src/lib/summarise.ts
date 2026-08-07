@@ -90,3 +90,25 @@ function total(files: readonly ChangedFile[], field: 'added' | 'removed'): numbe
   }
   return sum;
 }
+
+/**
+ * A token count, the way the export writes it: `12.4k`, `297k`, `840`.
+ *
+ * One decimal below a hundred thousand and none above. The boundary is the
+ * export's rather than a guess — it writes `12.4k`, which settles that five
+ * figures still carry the decimal; my first attempt dropped it at ten thousand
+ * and the test caught the disagreement. Past six figures the digit stops
+ * earning its place in a narrow header: nobody reads the difference between
+ * 296.8k and 297k, and the point of the figure is the order of magnitude.
+ *
+ * A count is never rounded up to a value it has not reached: `999` stays `999`
+ * rather than becoming `1.0k`, so a figure below a round number always reads as
+ * below it.
+ */
+export function formatTokens(tokens: number): string {
+  if (tokens < 1_000) return String(Math.floor(tokens));
+
+  const thousands = tokens / 1_000;
+  if (thousands < 100) return `${(Math.floor(tokens / 100) / 10).toFixed(1)}k`;
+  return `${Math.floor(thousands)}k`;
+}

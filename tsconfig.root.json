@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  /*
+   * The files that belong to no workspace: the repo-wide test project and the
+   * two runner configs. `npm run typecheck` walks workspaces, so without this
+   * they were checked by nothing at all.
+   *
+   * Deliberately not named `tsconfig.json`. A root `tsconfig.json` becomes the
+   * editor's default project for every file that has no closer one, which would
+   * quietly re-cover the workspaces with the wrong settings.
+   */
+  "include": ["tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"]
+}

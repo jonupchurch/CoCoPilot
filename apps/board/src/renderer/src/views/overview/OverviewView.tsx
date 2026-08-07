@@ -2,7 +2,10 @@ import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
 import { ChangedFilesSection } from './ChangedFilesSection.js';
+import { ContextSection } from './ContextSection.js';
 import { FocusSection } from './FocusSection.js';
+import { HistorySection } from './HistorySection.js';
+import { LastPromptSection } from './LastPromptSection.js';
 import { PlanSection } from './PlanSection.js';
 import { SpecSection } from './SpecSection.js';
 
@@ -22,7 +25,14 @@ import './OverviewView.css';
  * same tab, different source.
  */
 
-export type SectionKey = 'focus' | 'spec' | 'plan' | 'changed';
+export type SectionKey =
+  | 'lastPrompt'
+  | 'history'
+  | 'context'
+  | 'focus'
+  | 'spec'
+  | 'plan'
+  | 'changed';
 
 /**
  * Component state, not persisted. It survives an arriving report because this
@@ -30,6 +40,9 @@ export type SectionKey = 'focus' | 'spec' | 'plan' | 'changed';
  * true of everything else in the product.
  */
 const ALL_OPEN: Record<SectionKey, boolean> = {
+  lastPrompt: true,
+  history: true,
+  context: true,
   focus: true,
   spec: true,
   plan: true,
@@ -51,6 +64,47 @@ export function OverviewView({
 
   return (
     <div className="overview" data-testid="overview">
+      {/*
+        Above the reported sections, as the export has it: what was *asked*
+        frames everything the agent then said it was doing. Read from the
+        transcript rather than pushed, and unable to affect anything below it.
+      */}
+      <LastPromptSection
+        prompts={session.transcript.prompts}
+        now={now}
+        open={open.lastPrompt}
+        onToggle={() => {
+          toggle('lastPrompt');
+        }}
+      />
+
+      {/*
+        Directly under the prompt it is the history of, and above everything the
+        agent reported: what was asked comes before what is being done about it.
+      */}
+      <HistorySection
+        prompts={session.transcript.prompts}
+        now={now}
+        open={open.history}
+        onToggle={() => {
+          toggle('history');
+        }}
+      />
+
+      {/*
+        Last of the three transcript-fed sections, and the last thing above what
+        the agent reported: what it was asked, what it was asked before, and what
+        it is holding while it answers.
+      */}
+      <ContextSection
+        context={session.transcript.context}
+        repo={session.repo}
+        open={open.context}
+        onToggle={() => {
+          toggle('context');
+        }}
+      />
+
       <FocusSection
         focus={session.focus}
         reportedAt={session.reportedAt}

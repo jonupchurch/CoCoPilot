@@ -1,0 +1,4 @@
+{"type":"user","uuid":"s1","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:00:00.000Z","message":{"role":"user","content":"ok, we're back with the new folder name"}}
+{"type":"user","uuid":"s2","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:01:00.000Z","message":{"role":"user","content":"yes"}}
+{"type":"user","uuid":"s3","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:02:00.000Z","message":{"role":"user","content":"<local-command-stdout>Compacted </local-command-stdout>"}}
+{"type":"user","uuid":"s4","sessionId":"s1","isSidechain":false,"timestamp":"2026-08-07T10:03:00.000Z","message":{"role":"user","content":""}}

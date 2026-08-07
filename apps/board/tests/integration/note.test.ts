@@ -87,7 +87,14 @@ describe('POST /v1/note', () => {
     // here is the status code the route maps that refusal to.
     for (let index = 0; index < MAX_NOTES_PER_SESSION; index += 1) {
       service.store.appendNote(
-        { repo: process.cwd(), branch: 'main', sessionId: 'a1b2c3', text: `note ${index}`, source: null },
+        {
+          repo: process.cwd(),
+          branch: 'main',
+          sessionId: 'a1b2c3',
+          transcriptId: null,
+          text: `note ${index}`,
+          source: null,
+        },
         index,
       );
     }

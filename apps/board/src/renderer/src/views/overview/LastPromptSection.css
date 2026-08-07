@@ -1,0 +1,34 @@
+/* The export's "Last prompt" block: a bordered card on the raised surface,
+   holding body copy rather than a row of fields. */
+.prompt__card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+/*
+ * `pre-wrap`, so a multi-line prompt keeps the shape it was typed in — the
+ * blank lines a developer put between paragraphs are part of what they wrote.
+ * `overflow-wrap` because a prompt often contains a long unbroken path and the
+ * panel must not scroll sideways for it.
+ */
+.prompt__text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The unavailable treatment is shared by all three transcript sections and
+   lives in `components/Unavailable.css`. Empty is bare muted text. */
+.prompt__none {
+  margin: 0;
+  font-size: var(--text-body);
+  color: var(--muted);
+}

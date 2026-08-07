@@ -1,6 +1,6 @@
 import type { Chip } from '@cocopilot/contract';
 
-import { findRepository } from './identity.js';
+import { findRepository, transcriptId } from './identity.js';
 import {
   BOARD_ABSENT,
   DELIVERED,
@@ -66,6 +66,7 @@ export async function report(
     repo: identity.value.repo,
     branch: identity.value.branch,
     sessionId: options.sessionId,
+    transcriptId: transcriptId(),
   };
 
   if (content.task !== undefined || content.note !== undefined || content.chip !== undefined) {
@@ -93,6 +94,7 @@ export async function note(content: NoteContent, options: CallOptions): Promise<
         repo: identity.value.repo,
         branch: identity.value.branch,
         sessionId: options.sessionId,
+        transcriptId: transcriptId(),
         text: content.text,
         ...(content.source === undefined ? {} : { source: content.source }),
       },

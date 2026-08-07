@@ -8,6 +8,50 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 005 — Transcript reader.** The board follows Claude Code's own
+  session transcript for the repository being shown, and three more sections sit
+  above the reported ones: *Last prompt*, *History* and *In context*. Read-only,
+  resolved from the reported repository path with no configuration, and the only
+  thing on the board that survives a restart.
+  - **A `user` record is not a prompt, and neither is a `user` record whose
+    content is text.** Measured on a real session: **1,134** `user` records,
+    **74** with text-only content, **57** actual prompts. The rest are tool
+    results, skill instruction payloads, local-command echoes and interrupt
+    markers. Both wrong readings are wrong quietly, and the first pass of the
+    research made the second one.
+  - One optional envelope field, `transcriptId`, reaching back into features 001
+    and 002. The board's `sessionId` is a `randomUUID()` and a transcript's
+    filename is Claude Code's own id; without the field, "the transcript for the
+    session being shown" cannot be answered honestly. Derived from
+    `CLAUDE_CODE_SESSION_ID`, never model-composed, and an agent that cannot
+    supply one still reports successfully.
+  - **Three states, never two.** `available`, `empty` and `unreadable` are a
+    discriminated union from the reader to the section, and empty and unreadable
+    are drawn differently — including when the section is collapsed, where the
+    summary is all that is left of it.
+  - **Blast radius, asserted.** A transcript that is missing, denied, replaced
+    mid-session or full of rubbish costs three sections and nothing else. Every
+    `node:fs` call across a full read cycle is recorded and the paths touched are
+    required to be exactly one file: not the sibling session's transcript beside
+    it, not the `subagents/` tree beneath it, nothing inside the repository, and
+    zero writes anywhere.
+  - Copying a prompt writes the stored text with no trim, no normalising and no
+    re-wrapping. One platform exception, found while building: **Windows expands
+    every newline to CRLF on the way to the clipboard**, because
+    `CF_UNICODETEXT`'s convention is CRLF and no API puts a bare LF there.
+  - The In context section departs from the design export twice, both because
+    the transcript does not carry what it draws: there is no per-file token size
+    anywhere in the format, and the export's teal-versus-muted distinction among
+    held files has no source. Estimating either would be inventing content.
+  - Two facts the research had wrong and the real data corrected before any code
+    was written: `input_tokens` is *not* the context size (with prompt caching it
+    is routinely `2` against 290,000 cache reads), and `system` /
+    `compact_boundary` really appears — which is where the agent's context was
+    thrown away and the file list has to be emptied.
+  - 25 more Playwright tests and 66 more unit tests, most of them about failure
+    rather than success. The fixture set exists so that "the format changed" is a
+    case with expected behaviour rather than an incident.
+
 - **Feature 004 — Overview tab.** The default view: Focus, Spec, Plan and
   Changed files, each a collapsible section whose header carries its own
   summary, so a developer with everything closed can still read the feature's

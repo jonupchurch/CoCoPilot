@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    /*
+     * Both worlds, and this is the one place in the repo where that is correct.
+     * An E2E spec is Node code — it reads fixtures, spawns Electron, talks HTTP
+     * — that also ships callbacks into `page.evaluate()`, where `document` and
+     * `getComputedStyle` are the browser's and genuinely exist.
+     *
+     * The renderer keeps `types: []` so a `node:` import there stays a compile
+     * error. That rule is about the renderer, not about the tests that drive it.
+     */
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["tests/e2e"]
+}

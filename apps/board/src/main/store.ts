@@ -5,6 +5,7 @@ import {
   MAX_SESSIONS,
   rejection,
   type ChangedFile,
+  type Envelope,
   type Focus,
   type NoteRequest,
   type PlanStep,
@@ -14,6 +15,10 @@ import {
   type Story,
   type Task,
 } from '@cocopilot/contract';
+
+import type { Availability } from './transcript/availability.js';
+import type { Prompt } from './transcript/classify.js';
+import type { ContextView } from './transcript/context.js';
 
 /**
  * Everything CoCoPilot holds.
@@ -49,6 +54,12 @@ export interface Session {
   /** False for a script or hook, so the UI can label it honestly (decision 23). */
   attributed: boolean;
   branch: string;
+  /**
+   * The AI tool's own session id, naming its transcript file. Null when the
+   * client could not determine one, which feature 005 treats as a supported
+   * case rather than an error.
+   */
+  transcriptId: string | null;
   /** First contact. Set once — the switcher must not reorder as reports arrive. */
   declaredAt: number;
   /** Most recent contact of any kind. Reports *and* notes move it. */
@@ -56,11 +67,35 @@ export interface Session {
   /** Null when only notes have arrived. Distinct from an empty report. */
   report: Report | null;
   notes: Note[];
+  /**
+   * Read from disk, never reported. Null until the reader has looked at all,
+   * which is distinct from having looked and found nothing.
+   */
+  transcript: TranscriptState | null;
+}
+
+/**
+ * What the transcript reader contributes, held in its own branch of the session.
+ *
+ * Deliberately not folded into `Report`, and there is no code path anywhere that
+ * merges the two (FR-015). A task's status, a chip, a count — none of them may
+ * ever be influenced by a transcript, however tempting the extra signal. The
+ * whole justification for depending on an undocumented, externally-owned format
+ * is that when it changes, three display sections degrade and nothing else in
+ * the product notices; a merge would spend that guarantee immediately.
+ */
+export interface TranscriptState {
+  prompts: Availability<readonly Prompt[]>;
+  /** Files the agent is holding, and how much of its window they take. */
+  context: Availability<ContextView>;
+  /** When the reader last managed to look. Null before the first attempt. */
+  readAt: number | null;
 }
 
 export type StoreChange =
   | { type: 'report'; key: string }
   | { type: 'note'; key: string }
+  | { type: 'transcript'; key: string }
   | { type: 'dismiss'; key: string };
 
 export type StoreResult<T> = { ok: true; value: T } | { ok: false; rejection: Rejection };
@@ -93,11 +128,12 @@ export class Store {
    * nothing in the system can correct a board that has drifted.
    */
   putReport(request: PushRequest, receivedAt: number): StoreResult<Session> {
-    const opened = this.#openSession(request.repo, request.sessionId, request.branch, receivedAt);
+    const opened = this.#openSession(request, receivedAt);
     if (!opened.ok) return opened;
 
     const session = opened.value;
     session.branch = request.branch;
+    session.transcriptId = request.transcriptId;
     session.lastHeardAt = receivedAt;
 
     // Assigned whole. Never spread over `session.report`.
@@ -121,7 +157,7 @@ export class Store {
    * would force an agent to resend every note it had ever written to add one.
    */
   appendNote(request: NoteRequest, receivedAt: number): StoreResult<Session> {
-    const opened = this.#openSession(request.repo, request.sessionId, request.branch, receivedAt);
+    const opened = this.#openSession(request, receivedAt);
     if (!opened.ok) return opened;
 
     const session = opened.value;
@@ -137,6 +173,7 @@ export class Store {
     }
 
     session.branch = request.branch;
+    session.transcriptId = request.transcriptId;
     session.lastHeardAt = receivedAt;
 
     // Text is stored exactly as it arrived. Escaping belongs at the point of
@@ -146,6 +183,25 @@ export class Store {
 
     this.#announce({ type: 'note', key: sessionKey(session.repoPath, session.sessionId) });
     return { ok: true, value: session };
+  }
+
+  /**
+   * Record what the transcript reader found for one session.
+   *
+   * Assigned to its own field and nothing else. This method exists rather than
+   * letting the reader touch `Session` directly so that the one place
+   * transcript data enters held state is a single, greppable line.
+   */
+  putTranscript(key: string, state: TranscriptState): boolean {
+    const session = this.#sessions.get(key);
+    if (session === undefined) return false;
+
+    session.transcript = state;
+    // Deliberately does *not* move `lastHeardAt`. That is how long since the
+    // agent said something; another program writing to a file it owns is not
+    // the agent saying anything.
+    this.#announce({ type: 'transcript', key });
+    return true;
   }
 
   getSession(repoPath: string, sessionId: string): Session | undefined {
@@ -187,12 +243,9 @@ export class Store {
    * would be the only place in the product where something disappears without
    * either a restart or a deliberate dismissal.
    */
-  #openSession(
-    repoPath: string,
-    suppliedSessionId: string | null,
-    branch: string,
-    receivedAt: number,
-  ): StoreResult<Session> {
+  #openSession(envelope: Envelope, receivedAt: number): StoreResult<Session> {
+    const repoPath = envelope.repo;
+    const suppliedSessionId = envelope.sessionId;
     const sessionId = suppliedSessionId ?? UNATTRIBUTED;
     const key = sessionKey(repoPath, sessionId);
 
@@ -217,11 +270,13 @@ export class Store {
       // client that spells it out is a hook, and showing a hook as an agent
       // narrating would misrepresent where the information came from.
       attributed: suppliedSessionId !== null && suppliedSessionId !== UNATTRIBUTED,
-      branch,
+      branch: envelope.branch,
+      transcriptId: envelope.transcriptId,
       declaredAt: receivedAt,
       lastHeardAt: receivedAt,
       report: null,
       notes: [],
+      transcript: null,
     };
     this.#sessions.set(key, created);
     return { ok: true, value: created };

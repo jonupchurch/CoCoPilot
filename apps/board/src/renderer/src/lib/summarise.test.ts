@@ -5,6 +5,7 @@ import {
   changedFilesSummary,
   focusSummary,
   formatChangedFiles,
+  formatTokens,
   planSummary,
   specSummary,
 } from './summarise.js';
@@ -146,5 +147,34 @@ describe('changedFilesSummary', () => {
   it('shows the half it was given when only one side was reported', () => {
     expect(formatChangedFiles(changedFilesSummary([file({ added: 9 })]))).toBe('+9');
     expect(formatChangedFiles(changedFilesSummary([file({ removed: 4 })]))).toBe('−4');
+  });
+});
+
+describe('formatTokens', () => {
+  it('writes a small count as itself', () => {
+    expect(formatTokens(0)).toBe('0');
+    expect(formatTokens(840)).toBe('840');
+    expect(formatTokens(999)).toBe('999');
+  });
+
+  it('writes thousands with one decimal, as the export does', () => {
+    expect(formatTokens(1_000)).toBe('1.0k');
+    expect(formatTokens(12_400)).toBe('12.4k');
+    expect(formatTokens(9_990)).toBe('9.9k');
+  });
+
+  it('drops the decimal past six figures', () => {
+    expect(formatTokens(10_000)).toBe('10.0k');
+    expect(formatTokens(99_999)).toBe('99.9k');
+    expect(formatTokens(100_000)).toBe('100k');
+    expect(formatTokens(292_835)).toBe('292k');
+  });
+
+  it('never rounds up to a figure the count has not reached', () => {
+    // 999 must not read as 1.0k, and 99,999 must not read as 100k: a number
+    // below a round one should always look below it.
+    expect(formatTokens(999)).toBe('999');
+    expect(formatTokens(99_999)).toBe('99.9k');
+    expect(formatTokens(999_999)).toBe('999k');
   });
 });
