@@ -1,0 +1,91 @@
+/*
+ * The design system, transcribed from resources/CoCoPilot Design System.dc.html.
+ *
+ * The exports are canon for look and feel (decision 8), so this file is a
+ * transcription rather than an invention. A colour literal anywhere else in the
+ * renderer is a bug.
+ *
+ * The panel holds its own contrast rather than inheriting a host theme: it sits
+ * over whatever the editor behind it looks like, and has to stay legible there.
+ * There is no light mode, deliberately.
+ */
+
+:root {
+  /* Signal — three colours, and only these three. */
+  --teal: #37bda9; /* Action. Also the `watching` chip. */
+  --blue: #7fb2e8; /* Working. The `thinking` chip. */
+  --ember: #f6a06b; /* Attention. `needs-you`. Never decorative. */
+
+  /* Ground and ink — four greys and one ivory. */
+  --bg: #0e0d0c;
+  --surface: #1a1817;
+  --raised: #221f1d;
+  --line: #2b2724;
+  --muted: #948a7f;
+  --ink: #eff3f4;
+  /*
+   * Between --ink and --muted. Not in the Design System's named set; taken from
+   * the Overview Panel export, which uses it for the waiting state's body copy —
+   * softer than a heading, but not as recessive as a label.
+   */
+  --ink-soft: #c9c3bb;
+
+  /* Tints — 14% of the signal over --surface, for fills behind small text. */
+  --teal-tint: #1c2a28;
+  --blue-tint: #1e2630;
+  --ember-tint: #2a2119;
+
+  /* Type. Figtree for prose; JetBrains Mono for anything the machine wrote. */
+  --font-prose: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
+
+  --text-display: 18px;
+  --text-title: 15px;
+  --text-body: 13px;
+  --text-meta: 12px;
+  --text-code: 12px;
+  /* The floor, and only for uppercase mono labels. */
+  --text-label: 11px;
+
+  /* Space — a 4px step. Panel padding 16, row gap 8, section gap 16. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radius — panels are round; things inside them less so as they get smaller. */
+  --radius-panel: 16px;
+  --radius-card: 12px;
+  --radius-field: 8px;
+  --radius-pill: 999px;
+
+  /* Controls. Hit targets stay 28px even where the label looks smaller. */
+  --control-height: 28px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-prose);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  /* The window scrolls in one direction only, at every supported size. */
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Inside the panel, depth is a border rather than a shadow. Only the window
+   itself floats, and on the desktop that is the OS's job, not ours. */

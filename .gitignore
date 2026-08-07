@@ -19,8 +19,14 @@ Thumbs.db
 # Node / TypeScript
 node_modules/
 dist/
+out/
 coverage/
 *.tsbuildinfo
 
 # Vitest
 .vitest/
+
+# Playwright
+test-results/
+playwright-report/
+.playwright/

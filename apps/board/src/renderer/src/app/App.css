@@ -1,0 +1,38 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg);
+}
+
+/*
+ * The one scroll container. Title bar and tab strip stay put above it, so a
+ * short window still answers "which repository, how long ago, does it want me"
+ * no matter how far down the content someone has read.
+ */
+.app__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* Never sideways, at any supported size. */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+/*
+ * Section headers stick, so a section's label and summary stay legible while its
+ * contents pass behind. Features 004 onward use this; it lives here because the
+ * scroll container that makes it work is this feature's.
+ */
+.app__body .section__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg);
+}
+
+.app__placeholder {
+  padding: var(--space-4);
+  font-size: var(--text-body);
+  color: var(--muted);
+}

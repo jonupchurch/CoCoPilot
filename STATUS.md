@@ -6,10 +6,10 @@ An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
 
 **Phase:** Implementation. Design is settled (31 decisions below), all nine
-features are specced and planned, and features 001 and 002 are built and
-verified. Rule 7 is satisfied, so the remaining seven are ordinary feature work.
+features are specced and planned, and features 001 through 003 are built and
+verified. Rule 7 is satisfied, so the remaining six are ordinary feature work.
 
-**Last updated:** 2026-08-06 (features 001 and 002 implemented; decisions 29–31 added)
+**Last updated:** 2026-08-06 (features 001–003 implemented)
 
 ## Where things stand
 
@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining seven are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001 and 002 complete and merged; 003–009 not started |
+| Implementation | 🟡 **Started** — features 001–003 complete and merged; 004–009 not started |
 
 ## What this is
 

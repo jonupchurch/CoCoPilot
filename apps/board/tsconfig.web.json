@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // No `types: ["node"]`, deliberately. The renderer has no business
+    // resolving a Node global, and leaving them out is what makes an accidental
+    // `node:` import a compile error rather than a review catch.
+    "types": [],
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src/renderer"]
+}
