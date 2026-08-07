@@ -43,6 +43,28 @@ export function processSessionId(): string {
   return processSession;
 }
 
+/**
+ * The AI tool's own session id, which names its transcript file.
+ *
+ * Not `processSessionId()` — that one is ours and identifies a *board* session.
+ * This is Claude Code's, exported into the environment of processes it launches,
+ * and it is the only thing that tells the board which transcript belongs to the
+ * session it is showing (feature 005, FR-016).
+ *
+ * Read from the environment rather than asked for, like `repo` and `branch`, and
+ * null whenever the variable is absent — under a different agent, a bare shell,
+ * or a release that stops exporting it. Absence is a supported case: the board
+ * falls back to the most recently modified transcript in the directory.
+ *
+ * Not memoised. `processSessionId()` must be stable for the life of the process
+ * because it *is* the identity; this one merely reports what the environment
+ * currently says, and caching a value the host could change buys nothing.
+ */
+export function transcriptId(): string | null {
+  const value = process.env['CLAUDE_CODE_SESSION_ID'];
+  return value === undefined || value.trim() === '' ? null : value;
+}
+
 /** Walk up from `startDir` looking for `.git`. */
 export function findRepository(startDir: string): RepoResult {
   let current = resolve(startDir);

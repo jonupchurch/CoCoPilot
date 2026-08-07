@@ -38,6 +38,20 @@ export const Envelope = z.object({
   repo: z.string().min(1).max(MAX_PATH),
   branch: Label,
   sessionId: Label.nullish().default(null),
+  /**
+   * The AI tool's *own* session identifier, which is not `sessionId`.
+   *
+   * `sessionId` is minted by the client process and identifies a board session.
+   * This one is read from `CLAUDE_CODE_SESSION_ID` and identifies a transcript
+   * file, which is named after it. The two are unrelated, and without this field
+   * the board cannot tell which transcript belongs to the session it is showing
+   * — feature 005's FR-016.
+   *
+   * Derived from the environment, never composed by a model, and optional: an
+   * agent that is not Claude Code reports nothing here and the board falls back
+   * to the most recently modified transcript in the repository's directory.
+   */
+  transcriptId: Label.nullish().default(null),
 });
 
 export const ReportedFeature = z.object({

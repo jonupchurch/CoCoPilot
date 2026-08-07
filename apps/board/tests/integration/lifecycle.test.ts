@@ -88,6 +88,7 @@ describe('scale', () => {
               repo,
               branch: `feat/branch-${index}`,
               sessionId: `session-${index}`,
+              transcriptId: null,
               text: `note ${n} for session ${index}`,
               source: null,
             },

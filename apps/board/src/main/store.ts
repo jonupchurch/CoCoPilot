@@ -5,6 +5,7 @@ import {
   MAX_SESSIONS,
   rejection,
   type ChangedFile,
+  type Envelope,
   type Focus,
   type NoteRequest,
   type PlanStep,
@@ -49,6 +50,12 @@ export interface Session {
   /** False for a script or hook, so the UI can label it honestly (decision 23). */
   attributed: boolean;
   branch: string;
+  /**
+   * The AI tool's own session id, naming its transcript file. Null when the
+   * client could not determine one, which feature 005 treats as a supported
+   * case rather than an error.
+   */
+  transcriptId: string | null;
   /** First contact. Set once — the switcher must not reorder as reports arrive. */
   declaredAt: number;
   /** Most recent contact of any kind. Reports *and* notes move it. */
@@ -93,11 +100,12 @@ export class Store {
    * nothing in the system can correct a board that has drifted.
    */
   putReport(request: PushRequest, receivedAt: number): StoreResult<Session> {
-    const opened = this.#openSession(request.repo, request.sessionId, request.branch, receivedAt);
+    const opened = this.#openSession(request, receivedAt);
     if (!opened.ok) return opened;
 
     const session = opened.value;
     session.branch = request.branch;
+    session.transcriptId = request.transcriptId;
     session.lastHeardAt = receivedAt;
 
     // Assigned whole. Never spread over `session.report`.
@@ -121,7 +129,7 @@ export class Store {
    * would force an agent to resend every note it had ever written to add one.
    */
   appendNote(request: NoteRequest, receivedAt: number): StoreResult<Session> {
-    const opened = this.#openSession(request.repo, request.sessionId, request.branch, receivedAt);
+    const opened = this.#openSession(request, receivedAt);
     if (!opened.ok) return opened;
 
     const session = opened.value;
@@ -137,6 +145,7 @@ export class Store {
     }
 
     session.branch = request.branch;
+    session.transcriptId = request.transcriptId;
     session.lastHeardAt = receivedAt;
 
     // Text is stored exactly as it arrived. Escaping belongs at the point of
@@ -187,12 +196,9 @@ export class Store {
    * would be the only place in the product where something disappears without
    * either a restart or a deliberate dismissal.
    */
-  #openSession(
-    repoPath: string,
-    suppliedSessionId: string | null,
-    branch: string,
-    receivedAt: number,
-  ): StoreResult<Session> {
+  #openSession(envelope: Envelope, receivedAt: number): StoreResult<Session> {
+    const repoPath = envelope.repo;
+    const suppliedSessionId = envelope.sessionId;
     const sessionId = suppliedSessionId ?? UNATTRIBUTED;
     const key = sessionKey(repoPath, sessionId);
 
@@ -217,7 +223,8 @@ export class Store {
       // client that spells it out is a hook, and showing a hook as an agent
       // narrating would misrepresent where the information came from.
       attributed: suppliedSessionId !== null && suppliedSessionId !== UNATTRIBUTED,
-      branch,
+      branch: envelope.branch,
+      transcriptId: envelope.transcriptId,
       declaredAt: receivedAt,
       lastHeardAt: receivedAt,
       report: null,
