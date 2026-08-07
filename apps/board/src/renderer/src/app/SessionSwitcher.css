@@ -1,0 +1,17 @@
+/*
+ * A wrapping row between the title bar and the tabs.
+ *
+ * Wraps rather than scrolls sideways: the window never scrolls horizontally at
+ * any supported size, and a row of pills that ran off the edge would hide
+ * exactly the session asking for attention. Six pills at 380px become three
+ * short rows, which is legible; a horizontal scroller would be one row of which
+ * two are visible.
+ */
+.switcher {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--line);
+}

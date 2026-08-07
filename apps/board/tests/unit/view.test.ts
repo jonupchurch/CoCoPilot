@@ -17,6 +17,11 @@ function report(overrides: Record<string, unknown> = {}): PushRequest {
   return PushRequest.parse({ repo: REPO, branch: 'main', sessionId: 'a1', ...overrides });
 }
 
+/** A task, when the test only cares which session it came from. */
+function t(id: string): Record<string, unknown> {
+  return { id, title: `Task ${id}`, status: 'todo' };
+}
+
 function note(overrides: Record<string, unknown> = {}): NoteRequest {
   return NoteRequest.parse({
     repo: REPO,
@@ -124,6 +129,88 @@ describe('toBoardState — the reported body crosses the bridge', () => {
     // A session created by a note alone has no report at all; the renderer
     // still gets one absence to handle per field instead of two.
     expect(toBoardState(store).session?.stories).toEqual([]);
+  });
+
+  it('summarises every held session in declaration order', () => {
+    // FR-004. Declaration order, and `declaredAt` is never updated, so a
+    // session reporting again cannot move its own pill.
+    store.putReport(report({ repo: REPO, sessionId: 'a1' }), 1_000);
+    store.putReport(report({ repo: REPO, sessionId: 'b2', branch: 'other' }), 2_000);
+    // The first one speaks again, most recently of all.
+    store.putReport(report({ repo: REPO, sessionId: 'a1' }), 3_000);
+
+    const { sessions } = toBoardState(store);
+
+    expect(sessions.map((s) => s.branch)).toEqual(['main', 'other']);
+    expect(sessions[0]?.lastHeardAt).toBe(3_000);
+  });
+
+  it('gives a summary identity and state, and none of the reported body', () => {
+    // The whole reason summaries exist: 100 sessions of 500 tasks each cannot
+    // cross the bridge on every change to display one of them.
+    store.putReport(
+      report({ tasks: [{ id: 'T-011', title: 'A task', status: 'todo' }] }),
+      1_000,
+    );
+
+    const summary = toBoardState(store).sessions[0];
+
+    expect(Object.keys(summary ?? {}).sort()).toEqual([
+      'attributed',
+      'branch',
+      'chip',
+      'key',
+      'lastHeardAt',
+      'repo',
+      'repoName',
+    ]);
+  });
+
+  it('projects the selected session in full, and only that one', () => {
+    store.putReport(report({ sessionId: 'a1', tasks: [t('T-1')] }), 1_000);
+    store.putReport(report({ sessionId: 'b2', tasks: [t('T-2')] }), 2_000);
+
+    const both = toBoardState(store).sessions;
+    const second = both[1]?.key ?? '';
+
+    expect(toBoardState(store, second).session?.tasks.map((task) => task.id)).toEqual(['T-2']);
+    // And without a selection, the first declared — not the most recent.
+    expect(toBoardState(store).session?.tasks.map((task) => task.id)).toEqual(['T-1']);
+  });
+
+  it('falls back to the first when the selected session is gone', () => {
+    // FR-016, and it lives here rather than in a view so that no view can
+    // forget it. A dismissed session's key simply stops matching.
+    store.putReport(report({ sessionId: 'a1', tasks: [t('T-1')] }), 1_000);
+    store.putReport(report({ sessionId: 'b2', tasks: [t('T-2')] }), 2_000);
+
+    const second = toBoardState(store).sessions[1]?.key ?? '';
+    expect(toBoardState(store, second).session?.tasks[0]?.id).toBe('T-2');
+
+    store.dismissByKey(second);
+
+    const after = toBoardState(store, second);
+    expect(after.session?.tasks[0]?.id).toBe('T-1');
+    expect(after.sessions).toHaveLength(1);
+  });
+
+  it('gives nothing at all when nothing is held', () => {
+    expect(toBoardState(store, 'anything')).toEqual({
+      sessions: [],
+      session: null,
+      selectedKey: null,
+      sessionCount: 0,
+    });
+  });
+
+  it('keeps two sessions on the same branch of the same repository apart', () => {
+    // The edge case a key by repository alone would silently merge.
+    store.putReport(report({ sessionId: 'a1' }), 1_000);
+    store.putReport(report({ sessionId: 'b2' }), 2_000);
+
+    const { sessions } = toBoardState(store);
+    expect(sessions).toHaveLength(2);
+    expect(new Set(sessions.map((s) => s.key)).size).toBe(2);
   });
 
   it('carries notes in arrival order, with their text, source and time', () => {

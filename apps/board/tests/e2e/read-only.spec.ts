@@ -75,15 +75,53 @@ const REPORT = {
   focus: { task: 'T-013', note: 'Writing the hook.', chip: 'watching' },
 };
 
-test('the bridge is two reads and nothing else', async () => {
+test('the bridge is two reads, two local writes, and nothing else', async () => {
   const surface = await board.page.evaluate(() => {
     const api = (window as unknown as { cocopilot: Record<string, unknown> }).cocopilot;
     return Object.keys(api).sort();
   });
 
-  // Named individually rather than counted: a third member added later should
-  // fail here and be argued for, whatever it is called.
-  expect(surface).toEqual(['getState', 'subscribe']);
+  /*
+   * This list was `['getState', 'subscribe']` until feature 008, with a note
+   * saying a third member should fail here and be argued for. It did, and here
+   * is the argument.
+   *
+   * FR-012 requires a control that clears the board's copy of a session, and
+   * the store lives in the main process — there is no version of that feature
+   * without a write. So the property this test protects was restated rather
+   * than the test being loosened, and it is the one that was always the real
+   * one: **the window may change what it is showing and what this board holds,
+   * and still send nothing to any agent.**
+   *
+   * `select` and `dismiss` do not leave the process. No agent can observe that
+   * either happened; a dismissed session is not told and keeps working. The
+   * outbound-request assertion below is what holds that line, and it covers
+   * both of these as well as everything else.
+   *
+   * Still named individually. A fifth member should fail here too.
+   */
+  expect(surface).toEqual(['dismiss', 'getState', 'select', 'subscribe']);
+});
+
+test('selecting and dismissing a session sends nothing outbound', async () => {
+  // SC-005, and the reason the widened bridge is not a widened blast radius.
+  const { page } = board;
+  const repoB = `${process.cwd()}/apps`;
+
+  await board.push({ ...envelope({ sessionId: 'a1' }), ...REPORT });
+  await board.push({ ...envelope({ repo: repoB, sessionId: 'b2' }), ...REPORT });
+  await expect(page.getByTestId('session-switcher')).toBeVisible();
+
+  // Switch to it, switch back, then clear it — the whole of the feature's
+  // write surface, exercised.
+  const pills = page.locator('.pill');
+  await expect(pills).toHaveCount(2);
+  await pills.nth(1).locator('.pill__select').click();
+  await pills.nth(0).locator('.pill__select').click();
+  await pills.nth(1).locator('.pill__dismiss').click();
+  await expect(page.getByTestId('session-switcher')).toHaveCount(0);
+
+  expect(outbound).toEqual([]);
 });
 
 test('neither view tree contains a way to send anything', async () => {

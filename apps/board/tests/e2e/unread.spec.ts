@@ -99,30 +99,26 @@ test('does not steal focus, raise the window, or move it', async () => {
   // to break it.
   await session();
 
-  const before = await board.app.evaluate(({ BrowserWindow }) => {
-    const window = BrowserWindow.getAllWindows()[0];
-    return {
-      bounds: window?.getBounds(),
-      alwaysOnTop: window?.isAlwaysOnTop(),
-      focused: window?.isFocused(),
-      minimized: window?.isMinimized(),
-    };
-  });
+  // `isFocused()` is deliberately not among these: focus belongs to the window
+  // manager, so comparing it asserts the environment rather than the app. The
+  // app-raises-itself half is covered structurally in `sessions.spec.ts`, which
+  // asserts the main process calls nothing that focuses, flashes or floats.
+  const state = async (): Promise<unknown> =>
+    board.app.evaluate(({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      return {
+        bounds: window?.getBounds(),
+        alwaysOnTop: window?.isAlwaysOnTop(),
+        minimized: window?.isMinimized(),
+      };
+    });
+
+  const before = await state();
 
   await record('A note that must not demand anything.');
   await expect(board.page.getByTestId('tab-notes-unread')).toBeVisible();
 
-  const after = await board.app.evaluate(({ BrowserWindow }) => {
-    const window = BrowserWindow.getAllWindows()[0];
-    return {
-      bounds: window?.getBounds(),
-      alwaysOnTop: window?.isAlwaysOnTop(),
-      focused: window?.isFocused(),
-      minimized: window?.isMinimized(),
-    };
-  });
-
-  expect(after).toEqual(before);
+  expect(await state()).toEqual(before);
   // And the developer was not moved off the view they were reading.
   await expect(board.page.getByTestId('body')).toHaveAttribute('data-tab', 'overview');
 });

@@ -8,6 +8,55 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 008 — Multiple sessions.** Every view showed `sessions[0]` until
+  now, so a developer's second agent was invisible. A switcher row appears when
+  a second session declares itself, holds a pill per session in declaration
+  order, and offers a control that clears the board's copy of one.
+  - **The P1 story is an absence.** Below two sessions there is no row at all —
+    most sessions are single, and permanent chrome for a choice that usually
+    does not exist taxes every ordinary use to serve an occasional one. The
+    threshold lives in one component so no caller can draw a switcher for one
+    session by forgetting to check.
+  - **Pills carry their own attention state, and that is the point.** The chip
+    is the only channel an agent has for asking for a human (decision 15) and
+    the board shows one session at a time, so without state on unselected pills
+    a `needs-you` on the session you are not watching is an ask that never
+    arrives. It shows as an ember border; nothing reorders, moves or flashes,
+    and the board never switches itself.
+  - **The renderer gained its first write.** The preload bridge had been exactly
+    `getState` and `subscribe` since feature 001, with a test asserting that
+    list by name and a note saying a third member should be argued for. FR-012
+    needs a dismiss control and the store lives in main, so the argument is now
+    in the test and the property it protects was restated rather than loosened:
+    the window may change what it shows and what the board holds, and still send
+    nothing to any agent. Asserted by exercising select, switch-back and dismiss
+    with zero outbound requests.
+  - Main resolves the selection, which reverses feature 006's pattern for a
+    stated reason: in 006 the renderer held every story and task and could
+    resolve locally, but here it holds one session and cannot see the others.
+    Pushing all of them so it could pick is fine at three sessions and
+    untenable at `MAX_SESSIONS` of 100 with 500 tasks each. So the window gets a
+    summary per session plus one full projection, and FR-016's fallback lives in
+    the projection where no view can forget it.
+  - **The density rule needed correcting against FR-005.** The plan said the
+    branch drops from unselected pills past two sessions; that draws two
+    identical pills for the case the spec names in its own edge cases — two
+    sessions in the same repository on different branches. The branch now
+    survives wherever a repository name is not unique, however crowded the row
+    is. Density is a preference; telling which agent you are about to switch to
+    is the requirement.
+  - Three tests were written wrong first: SC-001 compared a single-session
+    window to itself (it now measures against the two-session case, so reserving
+    permanent space would fail); the no-expiry test faked twelve hours with
+    `page.clock`, which cannot patch timers a page created before it ran, so the
+    ages sat at `0s` and it passed for the wrong reason; and comparing
+    `isFocused()` across an arrival flaked in the full suite, because focus
+    belongs to the window manager. The last is now structural — the main process
+    calls nothing that focuses, flashes or floats, and its one `show()` is
+    named.
+  - 29 more Playwright tests and 8 more unit tests; 429 unit and integration
+    tests and 209 end-to-end in total.
+
 - **Feature 007 — Notes.** The last of the four tabs, and the only view whose
   content accumulates: what the agent recorded this session, newest first, with
   how long ago and why. Flat rows rather than cards, because forty cards is

@@ -1,0 +1,130 @@
+/*
+ * Two buttons sharing one outline: select, and clear-from-this-board.
+ *
+ * `min-width: 0` at every level so the repository name is what gives way when a
+ * pill runs out of room, rather than the row running past the panel edge.
+ */
+.pill {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  background: var(--surface);
+}
+
+.pill:hover {
+  border-color: var(--line-strong);
+}
+
+/*
+ * Selected is a fill *and* a border, for the reason the story list gives: the
+ * panel sits over whatever editor is behind it, and a single subtle background
+ * is the first thing to become ambiguous there.
+ */
+.pill[data-selected='true'] {
+  border-color: var(--teal);
+  background: var(--raised);
+}
+
+/*
+ * Attention outranks selection in the border, and only in the border.
+ *
+ * An unselected session asking for a human is the one thing on this row that
+ * must be visible without being looked for -- it is the only channel an agent
+ * has (decision 15), and the board shows one session at a time. Nothing moves,
+ * nothing reorders, nothing flashes: the ember edge is the whole treatment.
+ */
+.pill[data-attention='true'] {
+  border-color: var(--ember);
+}
+
+.pill__select {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 5px 4px 5px 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pill__select:focus-visible,
+.pill__dismiss:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+  border-radius: var(--radius-field);
+}
+
+.pill__identity {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+
+.pill__repo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.pill[data-selected='true'] .pill__repo {
+  color: var(--ink);
+}
+
+.pill__branch {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+/* Not a warning -- a fact about what is on the other end. */
+.pill__script {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+.pill__elapsed {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Always present rather than revealed on hover: a control that appears under
+ * the cursor is a control that gets clicked by accident, and this one removes
+ * something. Muted until hovered, so it does not compete with the state.
+ */
+.pill__dismiss {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0 7px;
+  border: 0;
+  background: none;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.pill__dismiss:hover {
+  color: var(--ink);
+}

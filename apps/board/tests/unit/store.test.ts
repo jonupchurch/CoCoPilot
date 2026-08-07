@@ -1,7 +1,7 @@
 import { NoteRequest, PushRequest } from '@cocopilot/contract';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Store, UNATTRIBUTED } from '../../src/main/store.js';
+import { sessionKey, Store, UNATTRIBUTED } from '../../src/main/store.js';
 
 function report(overrides: Record<string, unknown> = {}): PushRequest {
   return PushRequest.parse({ repo: 'D:\\Codelib\\example', branch: 'main', ...overrides });
@@ -153,5 +153,26 @@ describe('Store — a report is held', () => {
 
     store.putReport(report({ sessionId: 'a1' }), 2);
     expect(store.getSession('D:\\Codelib\\example', 'a1')?.declaredAt).toBe(2);
+  });
+
+  it('dismisses by the key the window was given, without parsing it apart', () => {
+    // The window holds keys rather than the repo/id pair, so this is the path a
+    // dismiss control actually takes. The NUL join is a security property, and
+    // keeping it unparsed outside this file is how it stays one.
+    store.putReport(report({ sessionId: 'a1' }), 1);
+
+    expect(store.dismissByKey(sessionKey('D:\\Codelib\\example', 'a1'))).toBe(true);
+    expect(store.size).toBe(0);
+  });
+
+  it('treats an unknown key as a no-op rather than an error', () => {
+    // Dismissing a session that a report already replaced, or that another
+    // click already removed, must not throw at a window that cannot catch it.
+    const seen = vi.fn();
+    store.subscribe(seen);
+
+    expect(store.dismissByKey('nothing like a key')).toBe(false);
+    expect(store.dismissByKey(sessionKey('D:\\Codelib\\example', 'gone'))).toBe(false);
+    expect(seen).not.toHaveBeenCalled();
   });
 });
