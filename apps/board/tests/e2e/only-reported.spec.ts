@@ -149,34 +149,44 @@ test.describe('limits and hostile content', () => {
       BrowserWindow.getAllWindows()[0]?.setSize(380, 320);
     });
 
+    // Every field below is capped at 200 or 500 by the contract, and every one
+    // of them is unbroken -- no whitespace to wrap on, which is the case that
+    // actually pushes a row past the panel edge.
+    const id = 'T-'.padEnd(200, 'I');
+    const title = 'T'.repeat(180);
     const status = 'S'.repeat(200);
     const path = `src/${'deeply/'.repeat(60)}client.ts`;
+    const note = 'N'.repeat(200);
 
     await board.push({
       ...envelope(),
-      tasks: [{ id: 'T-001', title: 'T'.repeat(180), status }],
-      changedFiles: [{ path, change: 'modified' }],
+      tasks: [{ id, title, status }],
+      focus: { task: id },
+      changedFiles: [{ path, change: 'modified', note }],
     });
 
     // Full text on `title`, which is FR-009 satisfied rather than asserted.
-    await expect(page.getByTestId('task-T-001').locator('.taskrow__title')).toHaveAttribute(
-      'title',
-      'T'.repeat(180),
-    );
-    await expect(page.getByTestId('task-T-001').locator('.status')).toHaveAttribute(
-      'title',
-      status,
-    );
+    const row = page.getByTestId(`task-${id}`);
+    await expect(row.locator('.taskrow__id')).toHaveAttribute('title', id);
+    await expect(row.locator('.taskrow__title')).toHaveAttribute('title', title);
+    await expect(row.locator('.status')).toHaveAttribute('title', status);
+    await expect(page.getByTestId('focus-task')).toHaveAttribute('title', id);
     await expect(page.getByTestId('changed-0').locator('.changed__path')).toHaveAttribute(
       'title',
       path,
     );
+    await expect(page.getByTestId('changed-note-0')).toHaveAttribute('title', note);
 
-    const overflow = await page.evaluate(() => {
-      const el = document.querySelector('.app__body');
-      return el === null ? 0 : el.scrollWidth - el.clientWidth;
-    });
-    expect(overflow).toBeLessThanOrEqual(0);
+    // Nothing on the page may make the window scroll sideways, at any width.
+    const overflow = await page.evaluate(() => ({
+      body: document.body.scrollWidth - document.body.clientWidth,
+      panel: (() => {
+        const el = document.querySelector('.app__body');
+        return el === null ? 0 : el.scrollWidth - el.clientWidth;
+      })(),
+    }));
+    expect(overflow.body).toBeLessThanOrEqual(0);
+    expect(overflow.panel).toBeLessThanOrEqual(0);
   });
 
   test('renders markup in every reported field as visible characters', async () => {

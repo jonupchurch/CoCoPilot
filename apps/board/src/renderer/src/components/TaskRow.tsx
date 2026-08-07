@@ -27,7 +27,9 @@ export function TaskRow({
   return (
     <div className="taskrow" data-focused={focused} data-testid={`task-${task.id}`}>
       <StatusDisc status={task.status} />
-      <span className="taskrow__id">{task.id}</span>
+      <span className="taskrow__id" title={task.id}>
+        {task.id}
+      </span>
       <span className="taskrow__title" title={task.title}>
         {task.title}
       </span>

@@ -215,9 +215,9 @@ position.
 
 - [x] T023 [P] Write `apps/board/tests/e2e/only-reported.spec.ts` — the comparison test (SC-005): push a known payload, walk the rendered view field by field, and assert every value on screen traces to a field in the report. Then 500 tasks stay navigable with an accurate header summary (SC-009), a 200-character status and a 500-character path truncate legibly with the full text retrievable, and prose containing `<script>` renders as visible characters (SC-008)
 - [x] T024 [P] Document the status vocabulary and the `note`-flags-a-file rule in `docs/design/push-schema.md`, `specs/001-push-contract-service/data-model.md` and `specs/002-mcp-server-cli/contracts/client-surface.md` — an agent cannot flag a file it has not been told how to flag
-- [ ] T025 Walk the `stacks/vite-react.md` checklist — no colour literal outside `tokens.css`, no `node:` import in the renderer, no timer that fetches, stable keys, nothing derived that was stored
-- [ ] T026 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged build, then walk the seven scenarios in [quickstart.md](quickstart.md)
-- [ ] T027 [P] Update `CHANGELOG.md` and `STATUS.md`
+- [x] T025 Walk the `stacks/vite-react.md` checklist — no colour literal outside `tokens.css`, no `node:` import in the renderer, no timer that fetches, stable keys, nothing derived that was stored
+- [x] T026 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged build, then walk the seven scenarios in [quickstart.md](quickstart.md)
+- [x] T027 [P] Update `CHANGELOG.md` and `STATUS.md`
 - [ ] T028 Read back the full diff, then merge
 
 ---

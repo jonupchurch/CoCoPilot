@@ -55,7 +55,7 @@ export function FocusSection({
         <div className="focus__card">
           {task === null ? null : (
             <div className="focus__head">
-              <span className="focus__task" data-testid="focus-task">
+              <span className="focus__task" title={task} data-testid="focus-task">
                 {task}
               </span>
               {reportedAt === null ? null : (

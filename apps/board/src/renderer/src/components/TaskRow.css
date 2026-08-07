@@ -20,8 +20,19 @@
   padding-left: 6px;
 }
 
+/*
+ * `flex: none` would be right for the short identifiers everyone actually
+ * sends, and wrong for the 200 characters the cap permits: with nothing able to
+ * shrink, one long id pushes the row past the panel and the window scrolls
+ * sideways, which FR-019 forbids at any width. It shrinks last, after the
+ * title, and keeps a legible floor.
+ */
 .taskrow__id {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 3ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-mono);
   font-size: var(--text-label);
   color: var(--muted);

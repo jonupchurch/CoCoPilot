@@ -57,7 +57,10 @@ export function ChangedFilesSection({
       testId="changed"
     >
       {files.map((file, index) => {
-        const flagged = file.note !== null && file.note.trim() !== '';
+        // Narrowed to a value rather than a boolean, so the `title` below can
+        // see it is a string.
+        const note = file.note !== null && file.note.trim() !== '' ? file.note : null;
+        const flagged = note !== null;
 
         return (
           // Paths repeat legitimately -- an agent may report the same file twice
@@ -80,9 +83,9 @@ export function ChangedFilesSection({
             <span className="changed__path" title={file.path}>
               {file.path}
             </span>
-            {flagged ? (
-              <span className="changed__note" data-testid={`changed-note-${index}`}>
-                {file.note}
+            {note !== null ? (
+              <span className="changed__note" title={note} data-testid={`changed-note-${index}`}>
+                {note}
               </span>
             ) : (
               <span className="changed__counts">
