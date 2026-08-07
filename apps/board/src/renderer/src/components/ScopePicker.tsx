@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { Scope } from '../../state/useSelection.js';
-import { taskSummary } from './StoryList.js';
+import { taskSummary } from '../lib/summarise.js';
+import { scopeKey, type Scope } from '../state/useSelection.js';
 
-import './StoryPicker.css';
+import './ScopePicker.css';
 
 /**
- * The story list, collapsed to one row, for a panel too narrow to hold both.
+ * The story list collapsed to one row, with the rest behind a caret.
+ *
+ * Shared by both detail views, and for **different reasons** — which is why it
+ * lives here rather than in either of them. The Stories tab shows it only below
+ * the breakpoint, as the narrow substitute for its column. The Tasks tab shows
+ * it at every width, because there it is not a fallback: it is the control that
+ * says which story's tasks are on screen, and a scope control that disappeared
+ * when the window grew would leave the view with no way to change scope at all.
+ *
+ * One component rather than two near-identical ones. The dismissal below is the
+ * fiddly part, and a second copy of it would be a second thing to get wrong.
  *
  * Each option shows identifier, title and task count — enough to tell them
  * apart, which US4 scenario 4 asks for explicitly and which a bare title would
@@ -20,14 +30,17 @@ import './StoryPicker.css';
 const NO_STORY_ID = '—';
 const NO_STORY_TITLE = 'Tasks belonging to no reported story';
 
-export function StoryPicker({
+export function ScopePicker({
   scopes,
   selected,
   onSelect,
+  testId,
 }: {
   scopes: readonly Scope[];
   selected: string;
   onSelect: (id: string) => void;
+  /** Names this instance, so two of them on two tabs are separately addressable. */
+  testId: string;
 }): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -58,34 +71,34 @@ export function StoryPicker({
   if (current === undefined) {
     // Unreachable while the view checks for an empty selection first, and
     // cheaper than making every field below optional to prove it.
-    return <div className="storypicker" />;
+    return <div className="scopepicker" />;
   }
 
   return (
-    <div className="storypicker" ref={root}>
+    <div className="scopepicker" ref={root}>
       <button
         type="button"
-        className="storypicker__current"
+        className="scopepicker__current"
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => {
           setOpen((was) => !was);
         }}
-        data-testid="story-picker"
+        data-testid={testId}
       >
         <Fields scope={current} />
-        <span className="storypicker__caret" aria-hidden="true">
+        <span className="scopepicker__caret" aria-hidden="true">
           {open ? '▲' : '▼'}
         </span>
       </button>
 
       {open ? (
-        <div className="storypicker__options" role="listbox" data-testid="story-picker-options">
+        <div className="scopepicker__options" role="listbox" data-testid={`${testId}-options`}>
           {scopes.map((scope) => (
             <button
               type="button"
               key={scope.id}
-              className="storypicker__option"
+              className="scopepicker__option"
               role="option"
               aria-selected={scope.id === selected}
               data-selected={scope.id === selected}
@@ -93,7 +106,7 @@ export function StoryPicker({
                 onSelect(scope.id);
                 setOpen(false);
               }}
-              data-testid={`story-option-${scope.id}`}
+              data-testid={`${testId}-option-${scopeKey(scope)}`}
             >
               <Fields scope={scope} />
             </button>
@@ -110,13 +123,13 @@ function Fields({ scope }: { scope: Scope }): React.JSX.Element {
 
   return (
     <>
-      <span className="storypicker__id" title={id}>
+      <span className="scopepicker__id" title={id}>
         {id}
       </span>
-      <span className="storypicker__title" title={title}>
+      <span className="scopepicker__title" title={title}>
         {title}
       </span>
-      <span className="storypicker__tasks">{taskSummary(scope.tasks)}</span>
+      <span className="scopepicker__tasks">{taskSummary(scope.tasks)}</span>
     </>
   );
 }

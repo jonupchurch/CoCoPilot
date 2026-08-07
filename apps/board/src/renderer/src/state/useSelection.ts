@@ -33,6 +33,17 @@ import type { Story, Task } from '@cocopilot/contract';
  */
 export const UNASSIGNED = '\0unassigned';
 
+/**
+ * A scope's name for a `data-testid` or a React key.
+ *
+ * `UNASSIGNED` carries a NUL so it cannot collide with a reported `Label`, and
+ * a NUL in a DOM attribute is legal but not addressable from a test. This is the
+ * one place that translation happens, so every view spells it the same way.
+ */
+export function scopeKey(scope: Scope): string {
+  return scope.story === null ? 'unassigned' : scope.id;
+}
+
 export interface Scope {
   /** A story's id, or `UNASSIGNED`. Stable across reports, which is the point. */
   id: string;

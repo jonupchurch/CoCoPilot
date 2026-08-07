@@ -1,8 +1,6 @@
-import type { Task } from '@cocopilot/contract';
-
 import { StatusLabel } from '../../components/StatusLabel.js';
-import { isDone } from '../../lib/vocabulary.js';
-import type { Scope } from '../../state/useSelection.js';
+import { taskSummary } from '../../lib/summarise.js';
+import { scopeKey, type Scope } from '../../state/useSelection.js';
 
 import './StoryList.css';
 
@@ -12,7 +10,8 @@ import './StoryList.css';
  * Every value on a row is reported except the task summary, which counts what
  * was sent — deriving a summary *of the report* is not inventing content, and
  * `only-reported.spec.ts` is where that distinction is held rather than
- * asserted here.
+ * asserted here. It comes from `lib/summarise.ts` because three components now
+ * draw it, and three of them counting separately is three chances to disagree.
  *
  * Rows are buttons, so the list is operable from the keyboard without this file
  * knowing anything about keys.
@@ -92,7 +91,7 @@ function StoryRow({
       onClick={() => {
         onSelect(scope.id);
       }}
-      data-testid={`story-row-${scope.id}`}
+      data-testid={`story-row-${scopeKey(scope)}`}
     >
       <span className="storylist__top">
         <span className="storylist__id" title={id}>
@@ -113,24 +112,11 @@ function StoryRow({
       <span className="storylist__foot">
         <span className="storylist__tasks">{taskSummary(scope.tasks)}</span>
         {owns ? (
-          <span className="storylist__owns" data-testid={`story-current-${scope.id}`}>
+          <span className="storylist__owns" data-testid={`story-current-${scopeKey(scope)}`}>
             · current
           </span>
         ) : null}
       </span>
     </button>
   );
-}
-
-/**
- * `2/4`, the export's summary, derived from the reported statuses.
- *
- * `isDone` comes from feature 004's vocabulary rather than a comparison here:
- * three tabs now count `done` and they must count it the same way.
- */
-export function taskSummary(tasks: readonly Task[]): string {
-  if (tasks.length === 0) return 'no tasks';
-
-  const done = tasks.filter((task) => isDone(task.status)).length;
-  return `${done}/${tasks.length}`;
 }

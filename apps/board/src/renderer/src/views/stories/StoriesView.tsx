@@ -1,9 +1,9 @@
 import type { SessionView } from '../../../../main/view.js';
+import { ScopePicker } from '../../components/ScopePicker.js';
 import { useIsNarrow } from '../../lib/breakpoint.js';
 import { useSelection } from '../../state/useSelection.js';
 import { StoryDetail } from './StoryDetail.js';
 import { StoryList } from './StoryList.js';
-import { StoryPicker } from './StoryPicker.js';
 
 import './StoriesView.css';
 
@@ -37,10 +37,11 @@ export function StoriesView({
   return (
     <div className="stories" data-narrow={narrow} data-testid="stories">
       {narrow ? (
-        <StoryPicker
+        <ScopePicker
           scopes={selection.scopes}
           selected={selection.scope.id}
           onSelect={selection.selectScope}
+          testId="story-picker"
         />
       ) : (
         <StoryList

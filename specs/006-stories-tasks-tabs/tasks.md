@@ -144,11 +144,11 @@ what it touches.
 **Independent test**: Select a story, then a task within it; its detail, checks
 and files are shown, and changing the scoped story follows.
 
-- [ ] T016 [US2] Create `apps/board/src/renderer/src/views/tasks/StoryScopePicker.tsx` and its CSS — the picker from the export, **present at every width** in this view because it is the scope control rather than a narrow-layout fallback, and carrying the unassigned scope from T007 when any orphan task exists
-- [ ] T017 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskList.tsx` and its CSS — the scoped story's tasks, each with disc, id, status and title, and the current one marked with the report's age
-- [ ] T018 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskDetail.tsx` and its CSS — header, title, the current-task line, detail, Checks, Files, and From the story. A task with no checks or no files omits those blocks rather than drawing empty headings
-- [ ] T019 [US2] Create `apps/board/src/renderer/src/views/tasks/TasksView.tsx` and replace the `tasks` placeholder in `App.tsx` — including the explicit "this story has no tasks" state (US2 scenario 5)
-- [ ] T020 [P] [US2] Write `apps/board/tests/e2e/tasks.spec.ts` — the scoped story's tasks list and one shows in full; changing scope follows in both list and detail; a story with no tasks says so; the current task is marked with its elapsed time; an orphan task is reachable through the unassigned scope and is *not* listed under a story it does not belong to. Also add the Tasks tab to `SURFACES` in `status-vocabulary.spec.ts`, which is the deferred half of T015
+- [x] T016 [US2] ~~Create `views/tasks/StoryScopePicker.tsx`~~ — **deviation, deliberate.** The Stories tab's narrow-layout picker (T021) is the same control: same three fields, same dismissal-on-outside-click. Writing a second one would be the duplication T014 exists to forbid, one feature later and in a component instead of a table. Extracted to `components/ScopePicker.tsx` + `.css` instead, taking a `testId` so two instances stay separately addressable, and **present at every width here** because in this view it is the scope control rather than a fallback. `taskSummary` moved with it to `lib/summarise.ts`, where the other derived summaries live
+- [x] T017 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskList.tsx` and its CSS — the scoped story's tasks, each with disc, id, status and title, and the current one marked with the report's age
+- [x] T018 [US2] Create `apps/board/src/renderer/src/views/tasks/TaskDetail.tsx` and its CSS — header, title, the current-task line, detail, Checks, Files, and From the story. A task with no checks or no files omits those blocks rather than drawing empty headings. The age is the **report's**, and its `title` says so outright rather than letting a bare `4m` beside a task be read as the task's own; `focus.note` appears against the named task only, since it is reported against the session
+- [x] T019 [US2] Create `apps/board/src/renderer/src/views/tasks/TasksView.tsx` and replace the `tasks` placeholder in `App.tsx` — including the explicit "this story has no tasks" state (US2 scenario 5)
+- [x] T020 [P] [US2] Write `apps/board/tests/e2e/tasks.spec.ts` — the scoped story's tasks list and one shows in full; changing scope follows in both list and detail; a story with no tasks says so; the current task is marked with its elapsed time; an orphan task is reachable through the unassigned scope and is *not* listed under a story it does not belong to. Also add the Tasks tab to `SURFACES` in `status-vocabulary.spec.ts`, which is the deferred half of T015
 
 ---
 
@@ -163,8 +163,8 @@ an editor.
 arrangement, all content reachable, nothing scrolling sideways, selection
 intact across the boundary.
 
-- [ ] T021 [US4] Create `apps/board/src/renderer/src/views/stories/StoryPicker.tsx` and its CSS — the collapsed list for the narrow story view, showing id, title and task summary so items are distinguishable (US4 scenario 4)
-- [ ] T022 [US4] Wire both views to `useIsNarrow` — Stories swaps its list for the picker, Tasks stacks its list above the detail. **Both CSS files carry the comment explaining why they differ**, because without it this reads as an inconsistency someone will helpfully unify
+- [x] T021 [US4] Create the collapsed list for the narrow story view, showing id, title and task summary so items are distinguishable (US4 scenario 4) — now `components/ScopePicker.tsx`, shared with the Tasks tab per T016
+- [x] T022 [US4] Wire both views to `useIsNarrow` — Stories swaps its list for the picker, Tasks stacks its list above the detail. **Both CSS files carry the comment explaining why they differ**, because without it this reads as an inconsistency someone will helpfully unify
 - [ ] T023 [P] [US4] Write `apps/board/tests/e2e/breakpoint.spec.ts` — each arrangement at each side of 640; a selection made wide survives narrow and back (SC-004); every item selectable from each picker; and **no horizontal scroll at the window minimum on either tab**, asserted the way feature 004 does it, on `scrollWidth` rather than by eye
 
 ---

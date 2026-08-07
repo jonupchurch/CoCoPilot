@@ -15,8 +15,7 @@ import { envelope, launchBoard, type Board } from './board.js';
  * `tests/source-hygiene.test.ts` forbids the second mapping from being written;
  * this proves the one mapping reaches the screen intact.
  *
- * Adding a surface means adding one entry to `SURFACES`. The Tasks tab lands
- * with feature 006's US2 and is added there.
+ * Adding a surface means adding one entry to `SURFACES`.
  */
 
 let board: Board;
@@ -113,6 +112,14 @@ const SURFACES: readonly Surface[] = [
       await expect(board.page.getByTestId('stories')).toBeVisible();
     },
     row: (index) => board.page.getByTestId(`story-task-${taskId(index)}`),
+  },
+  {
+    name: 'the task list, on Tasks',
+    open: async () => {
+      await board.page.getByTestId('tab-tasks').click();
+      await expect(board.page.getByTestId('tasks')).toBeVisible();
+    },
+    row: (index) => board.page.getByTestId(`task-row-${taskId(index)}`),
   },
 ];
 

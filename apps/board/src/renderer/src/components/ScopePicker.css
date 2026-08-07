@@ -1,11 +1,16 @@
-.storypicker {
+/*
+ * A full-width bar at the top of whichever view holds it. The views position it;
+ * this file only draws it, so the Tasks tab keeping it at every width and the
+ * Stories tab showing it only when narrow costs nothing here.
+ */
+.scopepicker {
   position: relative;
   flex: none;
   padding: var(--space-3) 14px;
   border-bottom: 1px solid var(--line);
 }
 
-.storypicker__current {
+.scopepicker__current {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -19,12 +24,12 @@
   cursor: pointer;
 }
 
-.storypicker__current:hover {
+.scopepicker__current:hover {
   border-color: #3d3833;
 }
 
-.storypicker__current:focus-visible,
-.storypicker__option:focus-visible {
+.scopepicker__current:focus-visible,
+.scopepicker__option:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: -2px;
 }
@@ -36,7 +41,7 @@
  * because a menu floating over content is the one thing that genuinely leaves
  * the surface.
  */
-.storypicker__options {
+.scopepicker__options {
   position: absolute;
   z-index: 5;
   top: 52px;
@@ -53,7 +58,7 @@
   overflow-y: auto;
 }
 
-.storypicker__option {
+.scopepicker__option {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -66,15 +71,15 @@
   cursor: pointer;
 }
 
-.storypicker__option:hover {
+.scopepicker__option:hover {
   background: var(--raised);
 }
 
-.storypicker__option[data-selected='true'] {
+.scopepicker__option[data-selected='true'] {
   background: var(--raised);
 }
 
-.storypicker__id {
+.scopepicker__id {
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--text-label);
@@ -83,7 +88,7 @@
   white-space: nowrap;
 }
 
-.storypicker__title {
+.scopepicker__title {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -93,7 +98,7 @@
   color: var(--ink);
 }
 
-.storypicker__tasks {
+.scopepicker__tasks {
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--text-label);
@@ -102,7 +107,7 @@
   white-space: nowrap;
 }
 
-.storypicker__caret {
+.scopepicker__caret {
   flex: none;
   font-size: 9px;
   color: var(--muted);

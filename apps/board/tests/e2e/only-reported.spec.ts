@@ -243,6 +243,94 @@ test.describe('the stories tab shows only what was reported', () => {
   });
 });
 
+/**
+ * And again on the Tasks tab, for the reason the second copy exists: this view
+ * derives things neither of the others does — the scope picker's summary of a
+ * story it is not currently showing, and a "From the story" line assembled from
+ * two reported values — and a shared allowlist would let either pass unexamined.
+ */
+const TASK_PAYLOAD = {
+  stories: [
+    { id: 'US-002', title: 'Share one session fetch across routes' },
+    { id: 'US-004', title: 'Read the prompt history' },
+  ],
+  tasks: [
+    {
+      id: 'T-011',
+      title: 'Audit the three call sites',
+      status: 'done',
+      storyId: 'US-002',
+      detail: 'Each route mounts the fetch itself.',
+      checks: ['Every call site is listed.'],
+      files: ['src/routes/index.tsx'],
+    },
+    { id: 'T-013', title: 'Implement useSession', status: 'active', storyId: 'US-002' },
+  ],
+  focus: { task: 'T-013', note: 'Writing the hook.', chip: 'watching' },
+};
+
+const TASK_REPORTED: string[] = [
+  ...TASK_PAYLOAD.stories.flatMap((s) => [s.id, s.title]),
+  ...TASK_PAYLOAD.tasks.flatMap((t) => [
+    t.id,
+    t.title,
+    t.status,
+    ...(t.detail === undefined ? [] : [t.detail]),
+    ...(t.checks ?? []),
+    ...(t.files ?? []),
+  ]),
+  TASK_PAYLOAD.focus.note,
+];
+
+/** Everything the Tasks tab is allowed to draw that nobody reported. */
+const TASK_DERIVED: readonly RegExp[] = [
+  /TASKS|CHECKS|FILES|FROM THE STORY/g, // section labels
+  /[▼▲]/g, // the scope picker's caret
+  /[✓!]/g, // status discs, as on both other tabs
+  /\b\d+\/\d+\b|no tasks/g, // the scope picker's task summary
+  /\b\d+[smhd]\b|\bnow\b/g, // the report's age against the current task
+  /(?<=^|\s)\d+(?=\s|$)/g, // the task count, and only a standalone number
+];
+
+test.describe('the tasks tab shows only what was reported', () => {
+  test.beforeEach(async () => {
+    await board.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setSize(900, 700);
+    });
+  });
+
+  test('renders nothing that was not reported or declared as derived', async () => {
+    const { page } = board;
+    await board.push({ ...envelope(), ...TASK_PAYLOAD });
+    await page.getByTestId('tab-tasks').click();
+    await expect(page.getByTestId('tasks')).toBeVisible();
+
+    let remaining = (await page.getByTestId('tasks').innerText()).replace(/\s+/gu, ' ');
+
+    for (const pattern of TASK_DERIVED) remaining = remaining.replace(pattern, ' ');
+    for (const value of [...TASK_REPORTED].sort((a, b) => b.length - a.length)) {
+      remaining = remaining.split(value).join(' ');
+    }
+
+    expect(remaining.replace(/[\s·]/gu, '')).toBe('');
+  });
+
+  test('does not sort or renumber the tasks it was given', async () => {
+    const { page } = board;
+    await board.push({
+      ...envelope(),
+      stories: [{ id: 'US-002', title: 'One story' }],
+      tasks: [
+        { id: 'T-9', title: 'Ninth', status: 'todo', storyId: 'US-002' },
+        { id: 'T-1', title: 'First', status: 'done', storyId: 'US-002' },
+      ],
+    });
+    await page.getByTestId('tab-tasks').click();
+
+    await expect(page.locator('.tasklist__id')).toHaveText(['T-9', 'T-1']);
+  });
+});
+
 test.describe('limits and hostile content', () => {
   test('stays navigable at 500 tasks with an accurate header summary', async () => {
     const { page } = board;

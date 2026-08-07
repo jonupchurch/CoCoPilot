@@ -37,6 +37,20 @@ export function specSummary(feature: ReportedFeature | null, tasks: readonly Tas
   return parts.join(' · ');
 }
 
+/**
+ * `2/4`, the export's per-story summary, in three places now — the story list,
+ * the scope picker and the picker's options.
+ *
+ * Here rather than beside any one of them for the reason every other summary is
+ * here: it counts what was reported, and three components counting it three
+ * times is three chances to count it differently.
+ */
+export function taskSummary(tasks: readonly Task[]): string {
+  if (tasks.length === 0) return 'no tasks';
+
+  return `${tasks.filter((task) => isDone(task.status)).length}/${tasks.length}`;
+}
+
 export interface PlanSummary {
   text: string;
   /** True when a step is active, which is what earns the blue pill treatment. */
