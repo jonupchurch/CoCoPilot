@@ -222,7 +222,7 @@ session's reported state was undisturbed.
 - [x] T047 [P] Write `apps/board/tests/integration/lifecycle.test.ts` — populate several sessions, stop, restart, and assert zero sessions held with no file created anywhere to make that true (SC-009); hold 20 sessions × 200 tasks × 100 notes without loss (SC-006)
 - [x] T048 Run `npm run typecheck` and the full suite, then walk all seven validation scenarios in [quickstart.md](quickstart.md) by hand — principle V distinguishes "I believe this works" from "I checked this works"
 - [x] T049 [P] Update `CHANGELOG.md` under `[Unreleased]` and flip the Implementation row in `STATUS.md` from unblocked to feature 001 complete
-- [ ] T050 Read back the full diff before merging to `main` (rule 5; the `diff-reviewer` subagent is the delegable form), then merge the feature branch
+- [x] T050 Read back the full diff before merging to `main` (rule 5; the `diff-reviewer` subagent is the delegable form), then merge the feature branch
 
 ---
 
