@@ -6,6 +6,39 @@ this project is pre-release and not yet versioned.
 
 ## [Unreleased]
 
+### Added
+
+- **Feature 001 — push contract and local service.** The first product code in
+  the repository. An npm-workspaces monorepo (`packages/contract`, `apps/board`)
+  on TypeScript strict + Vitest, and an HTTP service bound to `127.0.0.1`
+  serving `POST /v1/push`, `POST /v1/note` and `GET /v1/health` over in-memory,
+  volatile per-session state.
+  - `packages/contract` holds the payload schemas, every cap, the port range and
+    the health guard, so the service and both clients share one definition
+    rather than three that drift. Nothing in it touches the filesystem or the
+    network — the published client stays free of Node-only surface.
+  - `createService()` in `apps/board/src/main` is the seam feature 003 mounts in
+    the Electron main process. Nothing here depends on Electron, so the suite
+    runs without one.
+  - 122 tests. Two of them assert *absences*: across a full exercise of the
+    contract the service makes exactly one filesystem call — `statSync` on the
+    reported repository path — and reads nothing beneath it. Both were checked
+    for teeth by temporarily introducing the violation they exist to catch.
+
+### Changed
+
+- **The wire contract gained 413 and 415**, both found during implementation and
+  written back into
+  [`contracts/http-api.md`](specs/001-push-contract-service/contracts/http-api.md).
+  A body ceiling of 1 MiB, because the per-field and per-collection caps do not
+  bound a request on their own — 500 tasks each carrying 50 checks of 4,000
+  characters is legal by every individual cap and still around 127 MB. And a
+  required JSON content type, which is what forces a browser to preflight before
+  it can reach the service cross-origin; decision 18 accepts that any local
+  *process* may report, not that any page the user has open may.
+- **`plan` is an array**, not `{ steps: [...] }`. The contract doc's example and
+  the data model disagreed; the data model was right and the example is fixed.
+
 ### Design
 
 - **Design restarted 2026-08-06.** `resources/` was emptied — the round 1–3
