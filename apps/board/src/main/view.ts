@@ -10,7 +10,7 @@ import type {
   Task,
 } from '@cocopilot/contract';
 
-import type { Session, Store } from './store.js';
+import type { Note, Session, Store } from './store.js';
 import type { Availability } from './transcript/availability.js';
 import type { Prompt } from './transcript/classify.js';
 import type { ContextView } from './transcript/context.js';
@@ -65,6 +65,20 @@ export interface SessionView {
   plan: PlanStep[];
   focus: Focus | null;
   changedFiles: ChangedFile[];
+
+  /**
+   * The one field here whose contents **accumulate**.
+   *
+   * Everything above it is replaced wholesale by the next report (decision 26),
+   * so a value's identity across two pushes means nothing and no view may rely
+   * on it. Notes append, and only append — which makes this the only place on
+   * the board where arrival order is a durable fact rather than an artefact of
+   * whichever snapshot happened to be current.
+   *
+   * Projected in arrival order, exactly as held. The notes view reverses it to
+   * draw newest first; that is a display decision and it is made in the view.
+   */
+  notes: Note[];
 
   /**
    * Read from the AI tool's transcript, and kept in its own branch here for the
@@ -137,6 +151,10 @@ function toSessionView(session: Session): SessionView {
     plan: report?.plan ?? [],
     focus: report?.focus ?? null,
     changedFiles: report?.changedFiles ?? [],
+
+    // Not from `report`: notes arrive on their own endpoint and survive a
+    // report replacing everything above them, which is the whole of decision 20.
+    notes: session.notes,
 
     transcript:
       session.transcript === null

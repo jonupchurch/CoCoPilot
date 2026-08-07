@@ -67,9 +67,10 @@ describe('toBoardState — the reported body crosses the bridge', () => {
     // something nobody decided to give it.
     //
     // `stories` was the standing example of a withheld field until feature 006
-    // built the tab that reads them. Its arrival is exactly what this test is
-    // for: it had to be added here, deliberately, before it could reach a
-    // window rendering agent-composed text.
+    // built the tab that reads them, and `notes` was the next one until 007 did
+    // the same. Their arrival is exactly what this test is for: each had to be
+    // added here, deliberately, before it could reach a window rendering
+    // agent-composed text.
     store.putReport(report({ stories: [{ id: 'S1', title: 'A story' }] }), 1_000);
 
     const { session } = toBoardState(store);
@@ -85,6 +86,7 @@ describe('toBoardState — the reported body crosses the bridge', () => {
       'hasReport',
       'lastHeardAt',
       'noteCount',
+      'notes',
       'plan',
       'repo',
       'repoName',
@@ -122,6 +124,38 @@ describe('toBoardState — the reported body crosses the bridge', () => {
     // A session created by a note alone has no report at all; the renderer
     // still gets one absence to handle per field instead of two.
     expect(toBoardState(store).session?.stories).toEqual([]);
+  });
+
+  it('carries notes in arrival order, with their text, source and time', () => {
+    store.appendNote(note({ text: 'First thing' }), 1_000);
+    store.appendNote(note({ text: 'Second thing', source: 'you asked' }), 2_000);
+
+    const { session } = toBoardState(store);
+
+    // Arrival order, not newest-first. Drawing them newest-first is a display
+    // decision and it is made in the view; a projection that pre-sorted would
+    // put the same decision in two places and let them disagree.
+    expect(session?.notes.map((n) => n.text)).toEqual(['First thing', 'Second thing']);
+    expect(session?.notes[0]?.source).toBeNull();
+    expect(session?.notes[1]?.source).toBe('you asked');
+    expect(session?.notes[1]?.receivedAt).toBe(2_000);
+  });
+
+  it('carries an empty note list rather than an absent one', () => {
+    store.putReport(report(), 1_000);
+
+    expect(toBoardState(store).session?.notes).toEqual([]);
+  });
+
+  it('keeps notes when a report replaces everything else', () => {
+    // Decision 20's whole point, and the one way this field differs from every
+    // other one beside it: a snapshot replaces the body and leaves notes alone.
+    store.appendNote(note({ text: 'Still here' }), 1_000);
+    store.putReport(report({ tasks: [{ id: 'T-011', title: 'A task', status: 'todo' }] }), 2_000);
+
+    const { session } = toBoardState(store);
+    expect(session?.notes.map((n) => n.text)).toEqual(['Still here']);
+    expect(session?.tasks).toHaveLength(1);
   });
 
   it('replaces the body wholesale rather than merging into it', () => {

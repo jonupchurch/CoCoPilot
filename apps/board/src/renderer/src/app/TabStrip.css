@@ -23,6 +23,16 @@
   font-family: inherit;
 }
 
+/* Label and mark on one line, so the dot sits beside the word rather than
+   under it and the active rule stays the full width of the tab. */
+.tabstrip__top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .tabstrip__label {
   max-width: 100%;
   overflow: hidden;
@@ -35,6 +45,23 @@
 
 .tabstrip__tab[data-active='true'] .tabstrip__label {
   color: var(--ink);
+}
+
+/*
+ * Muted, and the same grey as an inactive label.
+ *
+ * Not teal, not ember, and not a badge. Teal is the action colour and ember is
+ * how an agent asks for a human (decision 15) — either would make an arriving
+ * note a summons, when the whole of US3 is that it should be noticeable and
+ * nothing more. 5px, the size of the dot in the notes list, so the same idea
+ * looks the same in both places.
+ */
+.tabstrip__dot {
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
 }
 
 .tabstrip__rule {

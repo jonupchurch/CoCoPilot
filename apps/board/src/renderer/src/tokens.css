@@ -101,5 +101,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * For a fact that is drawn but not written — the unread mark is a dot, and a
+ * dot has no accessible name. Clipped rather than `display: none`, which would
+ * take it out of the accessibility tree along with everything else.
+ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Inside the panel, depth is a border rather than a shadow. Only the window
    itself floats, and on the desktop that is the OS's job, not ours. */

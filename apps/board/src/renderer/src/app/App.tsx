@@ -3,6 +3,8 @@ import { useMemo, useState } from 'react';
 import type { BoardState } from '../../../main/view.js';
 import { useBoardState } from '../state/useBoardState.js';
 import { useNow } from '../state/useNow.js';
+import { useUnread } from '../state/useUnread.js';
+import { NotesView } from '../views/notes/NotesView.js';
 import { OverviewView } from '../views/overview/OverviewView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
@@ -30,10 +32,15 @@ export function App(): React.JSX.Element {
   // report.
   const active = chosen !== null && available.includes(chosen) ? chosen : (available[0] ?? 'overview');
 
+  // Asked here rather than inside the strip, which knows about destinations and
+  // not about notes. `active` is what makes it a rule about the developer's
+  // attention rather than about the count alone.
+  const unread = useUnread(state.session?.noteCount ?? 0, active === 'notes');
+
   return (
     <div className="app">
       <TitleBar session={state.session} now={now} />
-      <TabStrip available={available} active={active} onSelect={setChosen} />
+      <TabStrip available={available} active={active} unread={unread} onSelect={setChosen} />
 
       <main className="app__body" data-testid="body" data-tab={active}>
         {state.session === null ? (
@@ -45,11 +52,9 @@ export function App(): React.JSX.Element {
         ) : active === 'tasks' ? (
           <TasksView session={state.session} now={now} />
         ) : (
-          // Feature 007 fills Notes in. Until then the frame is honest about
-          // being a frame rather than pretending to have content.
-          <div className="app__placeholder" data-testid="view-placeholder">
-            Nothing to show in this view yet.
-          </div>
+          // The last of the four. There is no placeholder branch any more,
+          // because every tab the strip can offer now has a view behind it.
+          <NotesView session={state.session} now={now} />
         )}
       </main>
     </div>

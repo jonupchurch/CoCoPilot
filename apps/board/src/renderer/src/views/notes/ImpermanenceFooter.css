@@ -1,0 +1,25 @@
+/*
+ * Dashed, as the export draws it, and the only dashed rule in the product. A
+ * solid rule reads as structure — a section boundary, another row coming; a
+ * dashed one reads as a limit, which is what this is: the edge past which
+ * nothing is kept.
+ *
+ * `margin-top: auto` pins it to the bottom of a short list and lets it be
+ * pushed down by a long one. It is not sticky: a bar that followed the reader
+ * down four hundred notes would be nagging, and the statement does not need
+ * repeating so much as it needs to be unmissable and permanent.
+ */
+.impermanence {
+  flex: none;
+  margin-top: auto;
+  padding: 11px 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.impermanence__text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: 1.5;
+  color: var(--muted);
+}
