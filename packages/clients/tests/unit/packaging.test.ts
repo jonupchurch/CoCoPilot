@@ -15,7 +15,10 @@ const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as
   devDependencies: Record<string, string>;
 };
 
-const readme = readFileSync(join(root, 'README.md'), 'utf8');
+// Normalised, because git may check this file out with CRLF. A test that reads
+// a tracked file and then matches on `\n` passes on the machine that wrote it
+// and fails on the next checkout.
+const readme = readFileSync(join(root, 'README.md'), 'utf8').replaceAll('\r\n', '\n');
 
 /**
  * Decision 27: the spawnable piece ships as JavaScript fetched by npx, which is
