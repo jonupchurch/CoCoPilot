@@ -221,7 +221,19 @@ export class Store {
    * pushes would take that back (decision 17).
    */
   dismiss(repoPath: string, sessionId: string): boolean {
-    const key = sessionKey(repoPath, sessionId);
+    return this.dismissByKey(sessionKey(repoPath, sessionId));
+  }
+
+  /**
+   * The same thing, named by the key the window was given.
+   *
+   * The window holds session keys rather than the pair, so this exists to keep
+   * the key's format — a NUL join, which is a security property (see
+   * `sessionKey`) — from being parsed apart anywhere outside this file. An
+   * unknown key removes nothing and announces nothing, which is what makes
+   * dismissing an already-dismissed session a no-op rather than an error.
+   */
+  dismissByKey(key: string): boolean {
     const removed = this.#sessions.delete(key);
     if (removed) this.#announce({ type: 'dismiss', key });
     return removed;

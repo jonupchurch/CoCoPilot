@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 
 import type { BoardState } from '../../../main/view.js';
-import { useBoardState } from '../state/useBoardState.js';
+import { dismissSession, selectSession, useBoardState } from '../state/useBoardState.js';
 import { useNow } from '../state/useNow.js';
 import { useUnread } from '../state/useUnread.js';
 import { NotesView } from '../views/notes/NotesView.js';
 import { OverviewView } from '../views/overview/OverviewView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
+import { SessionSwitcher } from './SessionSwitcher.js';
 import { TabStrip, type Tab } from './TabStrip.js';
 import { TitleBar } from './TitleBar.js';
 import { WaitingState } from './WaitingState.js';
@@ -40,6 +41,17 @@ export function App(): React.JSX.Element {
   return (
     <div className="app">
       <TitleBar session={state.session} now={now} />
+      {/*
+        Between identity and navigation, because it *is* identity: which agent
+        the rest of the window is about. Absent entirely below two sessions.
+      */}
+      <SessionSwitcher
+        sessions={state.sessions}
+        selected={state.selectedKey}
+        now={now}
+        onSelect={selectSession}
+        onDismiss={dismissSession}
+      />
       <TabStrip available={available} active={active} unread={unread} onSelect={setChosen} />
 
       <main className="app__body" data-testid="body" data-tab={active}>

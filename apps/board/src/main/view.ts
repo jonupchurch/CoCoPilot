@@ -10,7 +10,7 @@ import type {
   Task,
 } from '@cocopilot/contract';
 
-import type { Note, Session, Store } from './store.js';
+import { sessionKey, type Note, type Session, type Store } from './store.js';
 import type { Availability } from './transcript/availability.js';
 import type { Prompt } from './transcript/classify.js';
 import type { ContextView } from './transcript/context.js';
@@ -21,8 +21,8 @@ import type { ContextView } from './transcript/context.js';
  * A deliberate projection rather than the `Session` objects themselves: the
  * renderer gets a flat, serialisable, read-only shape, and adding a field to the
  * store does not silently widen what a window rendering agent-composed text can
- * see. It is also the one place that decides *which* session is shown, which
- * feature 008 will replace with a selection rather than a default.
+ * see. It is also the one place that decides *which* session is shown — a
+ * selection since feature 008, and a fallback when that selection is gone.
  */
 
 export interface SessionView {
@@ -106,22 +106,93 @@ const NOT_YET_READ: TranscriptView = {
   context: { state: 'unreadable', reason: 'not-read' },
 };
 
+/**
+ * One held session, as much of it as a switcher pill draws — and no more.
+ *
+ * **Deliberately without the reported body.** The tempting shape is a list of
+ * full `SessionView`s so the window can pick one itself, the way feature 006's
+ * selection resolves locally. It does not survive the cap: `MAX_SESSIONS` is
+ * 100 and each session may hold 200 stories, 500 tasks and 1,000 notes, so
+ * serialising all of it on every change — to display one of them — is untenable
+ * at the cap even though it would be comfortable at three. So the window is
+ * given every session's *identity* and one session's *content*.
+ */
+export interface SessionSummary {
+  /** Opaque to the renderer, and what `select` and `dismiss` name. */
+  key: string;
+  repo: string;
+  repoName: string;
+  branch: string;
+  /** Reported, never derived — the same value the title bar shows. */
+  chip: Chip;
+  lastHeardAt: number;
+  /** False for a push with no process behind it: a script, not an agent. */
+  attributed: boolean;
+}
+
 export interface BoardState {
+  /** Every held session, in declaration order. Never sorted by anything else. */
+  sessions: SessionSummary[];
+  /** The selected one in full, or null when nothing is held. */
   session: SessionView | null;
+  /**
+   * The key of the session actually being shown — the **resolved** selection,
+   * not the requested one.
+   *
+   * They differ exactly when the requested session has gone, and sending the
+   * resolved value is what stops the switcher marking a pill that is no longer
+   * there. There is one answer to "which session is this", and it is this one.
+   */
+  selectedKey: string | null;
   sessionCount: number;
 }
 
-export const EMPTY_BOARD: BoardState = { session: null, sessionCount: 0 };
+export const EMPTY_BOARD: BoardState = {
+  sessions: [],
+  session: null,
+  selectedKey: null,
+  sessionCount: 0,
+};
 
-export function toBoardState(store: Store): BoardState {
+/**
+ * The projection, resolved against a selection.
+ *
+ * **FR-016 lives here rather than in a view.** A selected session can cease to
+ * exist between one render and the next — it is dismissed, or the window is
+ * reopened — and every view would otherwise need its own answer for that. The
+ * fallback is the first in declaration order, which is a visible move rather
+ * than a quiet substitution.
+ *
+ * `selected` is window state held by the main process: no more durable than the
+ * window's size, and gone on restart (FR-020). It is not stored, and nothing
+ * about it reaches disk.
+ */
+export function toBoardState(store: Store, selected?: string | null): BoardState {
   const sessions = store.listSessions();
-  // First declared wins until feature 008 adds a selection. Declaration order,
-  // not recency, so the shown session does not change under the reader.
-  const session = sessions[0];
+  // Declaration order, never recency: a pill is glanced at rather than read, so
+  // its position is something a developer learns. Sorting by recency would move
+  // the pill they are reaching for, because the one that moved is the one they
+  // want.
+  const chosen = sessions.find((held) => sessionKey(held.repoPath, held.sessionId) === selected);
+  const session = chosen ?? sessions[0];
 
   return {
+    sessions: sessions.map(toSessionSummary),
     sessionCount: sessions.length,
     session: session === undefined ? null : toSessionView(session),
+    selectedKey: session === undefined ? null : sessionKey(session.repoPath, session.sessionId),
+  };
+}
+
+function toSessionSummary(session: Session): SessionSummary {
+  return {
+    key: sessionKey(session.repoPath, session.sessionId),
+    repo: session.repoPath,
+    repoName: basename(session.repoPath) || session.repoPath,
+    branch: session.branch,
+    chip: session.report?.focus?.chip ?? 'thinking',
+    lastHeardAt: session.lastHeardAt,
+    attributed: session.attributed,
   };
 }
 

@@ -25,10 +25,48 @@ async function start(): Promise<void> {
   service = await createService(Number.isInteger(pinned) ? { port: pinned } : {});
   const held = service.store;
 
+  /*
+   * Which session the window is showing.
+   *
+   * Window state, not stored state: no more durable than the window's size,
+   * gone when the process exits (FR-020), and never written anywhere. It lives
+   * here rather than in the renderer because only this process can see the
+   * other sessions to project one of them -- see `toBoardState`.
+   *
+   * A key that is no longer held is not an error and is not cleared: the
+   * projection falls back on read, so a dismissed session's key simply stops
+   * matching. Storing the correction would be a second place to get it right.
+   */
+  let selected: string | null = null;
+
   // The renderer's initial read. Without it, reopening the window on a session
   // that is not currently reporting would show nothing until the next report --
   // which for an idle session could be a long time.
-  ipcMain.handle('cocopilot:state', () => toBoardState(held));
+  ipcMain.handle('cocopilot:state', () => toBoardState(held, selected));
+
+  const publish = (): void => {
+    // Send the whole projection rather than a delta. The board holds one
+    // agent's latest word, and rebuilding it is cheap next to the alternative of
+    // two places that have to agree about what changed.
+    window?.webContents.send('cocopilot:state', toBoardState(held, selected));
+  };
+
+  ipcMain.on('cocopilot:select', (_event, key: unknown) => {
+    // Validated even here. This channel is reachable only from our own window,
+    // but "only our own window" is a claim about the whole renderer, and the
+    // renderer's job is drawing text an agent composed.
+    if (typeof key !== 'string') return;
+    selected = key;
+    publish();
+  });
+
+  ipcMain.on('cocopilot:dismiss', (_event, key: unknown) => {
+    if (typeof key !== 'string') return;
+    // The store announces its own change, so a successful dismissal publishes
+    // through the subscription below. Publishing here as well would send the
+    // same state twice.
+    held.dismissByKey(key);
+  });
 
   const appPath = app.getAppPath();
   const devServer = process.env['ELECTRON_RENDERER_URL'];
@@ -45,12 +83,7 @@ async function start(): Promise<void> {
   transcripts = new TranscriptSource(held);
   transcripts.start();
 
-  held.subscribe(() => {
-    // Send the whole projection rather than a delta. The board holds one
-    // agent's latest word, and rebuilding it is cheap next to the alternative of
-    // two places that have to agree about what changed.
-    window?.webContents.send('cocopilot:state', toBoardState(held));
-  });
+  held.subscribe(publish);
 }
 
 void app.whenReady().then(start);
