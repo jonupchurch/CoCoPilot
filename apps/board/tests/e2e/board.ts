@@ -45,6 +45,7 @@ export async function launchBoard(): Promise<Board> {
 
   const page = await app.firstWindow();
   await page.waitForLoadState('domcontentloaded');
+  await moveOffPrimary(app);
 
   const send = async (path: string, body: Record<string, unknown>): Promise<number> => {
     const response = await fetch(`http://127.0.0.1:${port}${path}`, {
@@ -73,6 +74,40 @@ export function envelope(overrides: Record<string, unknown> = {}): Record<string
     sessionId: 'e2e',
     ...overrides,
   };
+}
+
+/**
+ * Put the test window on a secondary display when one exists.
+ *
+ * The suite launches and closes a window per test, so a full run flashes fifty
+ * windows over whatever the developer is reading. This moves them out of the
+ * way rather than changing what the product does: feature 003 holds that the
+ * window belongs to the developer, and the app deciding its own display would
+ * be exactly the behaviour `inert-and-layout.spec.ts` exists to forbid. The
+ * placement lives here, in the harness, for that reason.
+ *
+ * Size is untouched -- only the origin moves -- and on a single-display machine
+ * (CI, most laptops) this does nothing at all. Set `COCOPILOT_E2E_PRIMARY=1` to
+ * keep the window where it would otherwise land.
+ */
+async function moveOffPrimary(app: ElectronApplication): Promise<void> {
+  if (process.env['COCOPILOT_E2E_PRIMARY'] === '1') return;
+
+  await app.evaluate(({ BrowserWindow, screen }) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    if (window === undefined) return;
+
+    const primary = screen.getPrimaryDisplay();
+    const other = screen.getAllDisplays().find((display) => display.id !== primary.id);
+    if (other === undefined) return;
+
+    const bounds = window.getBounds();
+    window.setBounds({
+      ...bounds,
+      x: other.workArea.x + 40,
+      y: other.workArea.y + 40,
+    });
+  });
 }
 
 async function freePort(): Promise<number> {

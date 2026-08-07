@@ -74,15 +74,20 @@ beneath), *and* the row marker, unchanged, wherever the named task appears.
 
 **The focus tag counts from the report, not from when the task became current.**
 FR-002 asks for how long ago it was *reported*, so the tag is elapsed since
-`report.receivedAt`. Not `lastHeardAt` — a note arriving must not reset it to
-`now`. And deliberately not "when this task first became the focus", which would
-mean carrying state across snapshots and is the merge path decision 26 refuses.
+`report.receivedAt`. Not `lastHeardAt` — a note arriving must not reset it. And
+deliberately not "when this task first became the focus", which would mean
+carrying state across snapshots and is the merge path decision 26 refuses.
+
+Its first band is `now`, not `0s`: the export shows only `now` and `12m`, and
+quickstart scenario 1 states it outright. The title bar keeps counting seconds
+because liveness is watched second by second; which task is being worked on is
+not, and an agent reporting every few seconds would make this tag flicker.
 
 **A changed file carrying a `note` is the flagged one.** `note` has a cap in the
 data model and no stated meaning; this feature gives it one — *why this file
 wants your eye* — and renders it in ember in place of the counts. That is
 reading a field the agent chose to fill, not inferring attention from the data.
-T022 writes the meaning back into the contract docs.
+T024 writes the meaning back into the contract docs.
 
 **An unrecognised status gets no glyph at all.** Not the todo disc: an outline
 circle says "not started", which is a claim about a string the board does not
@@ -105,13 +110,13 @@ apps/board/src/renderer/src/
 **Purpose**: The bridge has to carry the report before anything can render it,
 and the three pure modules every section depends on.
 
-- [ ] T001 Widen the projection in `apps/board/src/main/view.ts` — add `feature`, `tasks`, `plan`, `focus`, `changedFiles` and `reportedAt` to `SessionView`, each named explicitly rather than spreading `session.report`, so the projection stays the deliberate boundary its comment claims it is
-- [ ] T002 [P] Write `apps/board/tests/unit/view.test.ts` — the projection carries exactly what was reported and nothing else; `reportedAt` is the report's receipt time and a subsequent note does **not** move it; a session that has only received notes projects an absent report rather than an empty one
-- [ ] T003 Create `apps/board/src/renderer/src/lib/vocabulary.ts` — trim and lowercase, then match the documented synonym table exactly; anything else is `unrecognised`. No prefix, fuzzy or stem matching, at any point, for any reason
-- [ ] T004 [P] Write `apps/board/src/renderer/src/lib/vocabulary.test.ts` — every synonym in the table; `DONE` and ` in progress ` recognised; `waiting on CI`, `donee`, `''` and `'  '` unrecognised. The near miss is the test that matters: if `donee` resolves to done, matching is too loose and the board is confidently wrong
-- [ ] T005 Create `apps/board/src/renderer/src/lib/summarise.ts` — the four header summaries, each a pure function of held state (depends on T003 for the done count)
-- [ ] T006 [P] Write `apps/board/src/renderer/src/lib/summarise.test.ts` — no tasks, one task, all done, a plan with no active step, changed files with null `added`/`removed`, and 500 tasks. Each summary must stay true to the list beside it in every case
-- [ ] T007 Create `apps/board/src/renderer/src/components/Section.tsx` and `Section.css` — the disclosure header (`.section__header`, already sticky via `App.css`), a `summary` prop that is **required** rather than optional, keyboard-operable, `aria-expanded` on the control and the body genuinely unmounted when collapsed
+- [x] T001 Widen the projection in `apps/board/src/main/view.ts` — add `feature`, `tasks`, `plan`, `focus`, `changedFiles` and `reportedAt` to `SessionView`, each named explicitly rather than spreading `session.report`, so the projection stays the deliberate boundary its comment claims it is
+- [x] T002 [P] Write `apps/board/tests/unit/view.test.ts` — the projection carries exactly what was reported and nothing else; `reportedAt` is the report's receipt time and a subsequent note does **not** move it; a session that has only received notes projects an absent report rather than an empty one
+- [x] T003 Create `apps/board/src/renderer/src/lib/vocabulary.ts` — trim and lowercase, then match the documented synonym table exactly; anything else is `unrecognised`. No prefix, fuzzy or stem matching, at any point, for any reason
+- [x] T004 [P] Write `apps/board/src/renderer/src/lib/vocabulary.test.ts` — every synonym in the table; `DONE` and ` in progress ` recognised; `waiting on CI`, `donee`, `''` and `'  '` unrecognised. The near miss is the test that matters: if `donee` resolves to done, matching is too loose and the board is confidently wrong
+- [x] T005 Create `apps/board/src/renderer/src/lib/summarise.ts` — the four header summaries, each a pure function of held state (depends on T003 for the done count)
+- [x] T006 [P] Write `apps/board/src/renderer/src/lib/summarise.test.ts` — no tasks, one task, all done, a plan with no active step, changed files with null `added`/`removed`, and 500 tasks. Each summary must stay true to the list beside it in every case
+- [x] T007 Create `apps/board/src/renderer/src/components/Section.tsx` and `Section.css` — the disclosure header (`.section__header`, already sticky via `App.css`), a `summary` prop that is **required** rather than optional, keyboard-operable, `aria-expanded` on the control and the body genuinely unmounted when collapsed
 
 **Checkpoint**: The report reaches the renderer; a section can be built.
 
@@ -128,10 +133,10 @@ ago it said so.
 appear, marked as current. Report a different task; the marker moves. Report no
 focus; the section says so and marks nothing.
 
-- [ ] T008 [US1] Create `apps/board/src/renderer/src/views/overview/OverviewView.tsx` and `OverviewView.css` — the section stack, and mount it from `App.tsx` in place of `app__placeholder`
-- [ ] T009 [US1] Create `apps/board/src/renderer/src/views/overview/FocusSection.tsx` and `FocusSection.css` — the named task, the prose card, and the elapsed tag from `reportedAt` with tabular figures so it does not reflow. The tag never changes colour or weight at any duration, and is never removed because time has passed
-- [ ] T010 [US1] Say so when there is no focus, in `FocusSection.tsx` — a report naming no current task must produce a stated absence, never an arbitrarily chosen task
-- [ ] T011 [P] [US1] Write `apps/board/tests/e2e/overview.spec.ts` — focus with prose renders both; a second report moves the marker; a report with no focus states the absence; the tag reads `0s` then advances without changing treatment
+- [x] T008 [US1] Create `apps/board/src/renderer/src/views/overview/OverviewView.tsx` and `OverviewView.css` — the section stack, and mount it from `App.tsx` in place of `app__placeholder`
+- [x] T009 [US1] Create `apps/board/src/renderer/src/views/overview/FocusSection.tsx` and `FocusSection.css` — the named task, the prose card, and the elapsed tag from `reportedAt` with tabular figures so it does not reflow. The tag never changes colour or weight at any duration, and is never removed because time has passed
+- [x] T010 [US1] Say so when there is no focus, in `FocusSection.tsx` — a report naming no current task must produce a stated absence, never an arbitrarily chosen task
+- [x] T011 [P] [US1] Write `apps/board/tests/e2e/overview.spec.ts` — focus with prose renders both; a second report moves the marker; a report with no focus states the absence; the tag reads `0s` then advances without changing treatment
 
 **Checkpoint**: The most valuable thing on the board works on its own.
 
@@ -149,11 +154,11 @@ summarises completion, the body lists every task with identifier, title and
 status, and the vocabulary table in [quickstart.md](quickstart.md) scenario 3
 holds row for row.
 
-- [ ] T012 [P] [US2] Create `apps/board/src/renderer/src/components/StatusLabel.tsx` and `StatusLabel.css` — the vocabulary's four treatments plus neutral; the reported text is always what is displayed, never a canonical form substituted for it
-- [ ] T013 [US2] Create `apps/board/src/renderer/src/components/TaskRow.tsx` and `TaskRow.css` — disc, identifier, title, status, and the focus marker (teal left rule, elapsed tag) when `focus.task` names this row. Keyed by task id, never by index
-- [ ] T014 [US2] Create `apps/board/src/renderer/src/views/overview/SpecSection.tsx` and `SpecSection.css` — the feature card and the task list, in the agent's order, with the completion summary in the header
-- [ ] T015 [US2] Truncate long titles, statuses and paths with the full text on `title`, in `TaskRow.css` and `SpecSection.css` — retrievable, per FR-009
-- [ ] T016 [P] [US2] Extend `apps/board/tests/e2e/overview.spec.ts` — the quickstart scenario 3 table asserted row by row, `waiting on CI` and `donee` both neutral with their text intact; a `focus.task` naming a task absent from the list still appears in the Focus section
+- [x] T012 [P] [US2] Create `apps/board/src/renderer/src/components/StatusLabel.tsx` and `StatusLabel.css` — the vocabulary's four treatments plus neutral; the reported text is always what is displayed, never a canonical form substituted for it
+- [x] T013 [US2] Create `apps/board/src/renderer/src/components/TaskRow.tsx` and `TaskRow.css` — disc, identifier, title, status, and the focus marker (teal left rule, elapsed tag) when `focus.task` names this row. Keyed by task id, never by index
+- [x] T014 [US2] Create `apps/board/src/renderer/src/views/overview/SpecSection.tsx` and `SpecSection.css` — the feature card and the task list, in the agent's order, with the completion summary in the header
+- [x] T015 [US2] Truncate long titles, statuses and paths with the full text on `title`, in `TaskRow.css` and `SpecSection.css` — retrievable, per FR-009
+- [x] T016 [P] [US2] Extend `apps/board/tests/e2e/overview.spec.ts` — the quickstart scenario 3 table asserted row by row, `waiting on CI` and `donee` both neutral with their text intact; a `focus.task` naming a task absent from the list still appears in the Focus section
 
 **Checkpoint**: "The agent is five tasks into a nine-task feature" is readable.
 
@@ -169,8 +174,8 @@ holds row for row.
 the reported order, the active one is distinguishable, and the header states
 position.
 
-- [ ] T017 [US3] Create `apps/board/src/renderer/src/views/overview/PlanSection.tsx` and `PlanSection.css` — the rail, the steps in reported order with the same three discs, step detail beneath an active step, and `Step N of M` in the header when a step is active, `N of M done` when none is
-- [ ] T018 [P] [US3] Extend `apps/board/tests/e2e/overview.spec.ts` — reported order preserved exactly; the active step distinguishable from done and upcoming; an unreported plan produces no section rather than an empty frame
+- [x] T017 [US3] Create `apps/board/src/renderer/src/views/overview/PlanSection.tsx` and `PlanSection.css` — the rail, the steps in reported order with the same three discs, step detail beneath an active step, and `Step N of M` in the header when a step is active, `N of M done` when none is
+- [x] T018 [P] [US3] Extend `apps/board/tests/e2e/overview.spec.ts` — reported order preserved exactly; the active step distinguishable from done and upcoming; an unreported plan produces no section rather than an empty frame
 
 ---
 
@@ -184,8 +189,8 @@ position.
 and the collapsed header carries the aggregate. One with a `note` is visibly
 distinct.
 
-- [ ] T019 [US4] Create `apps/board/src/renderer/src/views/overview/ChangedFilesSection.tsx` and `ChangedFilesSection.css` — path, change, `+N`/`−N`, the flagged treatment for a file carrying a `note`, and the aggregate in the header summing only the counts that were sent
-- [ ] T020 [P] [US4] Extend `apps/board/tests/e2e/overview.spec.ts` — files listed with kind; a flagged file distinct from ordinary ones; the aggregate matches the rows; editing a file in the repository by hand changes nothing on screen
+- [x] T019 [US4] Create `apps/board/src/renderer/src/views/overview/ChangedFilesSection.tsx` and `ChangedFilesSection.css` — path, change, `+N`/`−N`, the flagged treatment for a file carrying a `note`, and the aggregate in the header summing only the counts that were sent
+- [x] T020 [P] [US4] Extend `apps/board/tests/e2e/overview.spec.ts` — files listed with kind; a flagged file distinct from ordinary ones; the aggregate matches the rows; editing a file in the repository by hand changes nothing on screen
 
 ---
 
@@ -201,15 +206,15 @@ reveals, the sections below move up, every collapsed header keeps its label and
 summary, and a report arriving changes neither the arrangement nor the scroll
 position.
 
-- [ ] T021 [US5] Hold each section's open state in `OverviewView.tsx` as component state — not persisted, because nothing here is; it survives reports because the components do not remount
-- [ ] T022 [P] [US5] Write `apps/board/tests/e2e/sections.spec.ts` — each section collapses and expands independently and the ones below reflow; all four collapsed, every question is still answered by headers alone; a report arriving mid-read leaves both the arrangement and the scroll offset untouched
+- [x] T021 [US5] Hold each section's open state in `OverviewView.tsx` as component state — not persisted, because nothing here is; it survives reports because the components do not remount
+- [x] T022 [P] [US5] Write `apps/board/tests/e2e/sections.spec.ts` — each section collapses and expands independently and the ones below reflow; all four collapsed, every question is still answered by headers alone; a report arriving mid-read leaves both the arrangement and the scroll offset untouched
 
 ---
 
 ## Phase 7: Polish & the two absences
 
-- [ ] T023 [P] Write `apps/board/tests/e2e/only-reported.spec.ts` — the comparison test (SC-005): push a known payload, walk the rendered view field by field, and assert every value on screen traces to a field in the report. Then 500 tasks stay navigable with an accurate header summary (SC-009), a 200-character status and a 500-character path truncate legibly with the full text retrievable, and prose containing `<script>` renders as visible characters (SC-008)
-- [ ] T024 [P] Document the status vocabulary and the `note`-flags-a-file rule in `docs/design/push-schema.md`, `specs/001-push-contract-service/data-model.md` and `specs/002-mcp-server-cli/contracts/client-surface.md` — an agent cannot flag a file it has not been told how to flag
+- [x] T023 [P] Write `apps/board/tests/e2e/only-reported.spec.ts` — the comparison test (SC-005): push a known payload, walk the rendered view field by field, and assert every value on screen traces to a field in the report. Then 500 tasks stay navigable with an accurate header summary (SC-009), a 200-character status and a 500-character path truncate legibly with the full text retrievable, and prose containing `<script>` renders as visible characters (SC-008)
+- [x] T024 [P] Document the status vocabulary and the `note`-flags-a-file rule in `docs/design/push-schema.md`, `specs/001-push-contract-service/data-model.md` and `specs/002-mcp-server-cli/contracts/client-surface.md` — an agent cannot flag a file it has not been told how to flag
 - [ ] T025 Walk the `stacks/vite-react.md` checklist — no colour literal outside `tokens.css`, no `node:` import in the renderer, no timer that fetches, stable keys, nothing derived that was stored
 - [ ] T026 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged build, then walk the seven scenarios in [quickstart.md](quickstart.md)
 - [ ] T027 [P] Update `CHANGELOG.md` and `STATUS.md`
