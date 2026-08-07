@@ -1,3 +1,6 @@
+import { rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { expect, test } from '@playwright/test';
 
 import { envelope, launchBoard, type Board } from './board.js';
@@ -310,5 +313,65 @@ test.describe('Plan — the sequence being worked through', () => {
 
     await expect(page.getByTestId('section-spec')).toBeVisible();
     await expect(page.getByTestId('section-plan')).toHaveCount(0);
+  });
+});
+
+test.describe('Changed files — what the agent says it touched', () => {
+  const FILES = [
+    { path: 'src/hooks/useSession.ts', change: 'added', added: 48 },
+    { path: 'src/routes/index.tsx', change: 'modified', added: 21, removed: 18 },
+    { path: 'src/api/client.ts', change: 'modified', added: 17, removed: 13, note: 'conflict' },
+  ];
+
+  test('lists each file with its path and the kind of change reported', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), changedFiles: FILES });
+
+    await expect(page.getByTestId('changed-0')).toContainText('src/hooks/useSession.ts');
+    await expect(page.getByTestId('changed-0')).toContainText('added');
+    await expect(page.getByTestId('changed-1')).toContainText('+21');
+    await expect(page.getByTestId('changed-1')).toContainText('−18');
+  });
+
+  test('distinguishes a file the agent flagged', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), changedFiles: FILES });
+
+    await expect(page.getByTestId('changed-2')).toHaveAttribute('data-flagged', 'true');
+    await expect(page.getByTestId('changed-1')).toHaveAttribute('data-flagged', 'false');
+    await expect(page.getByTestId('changed-note-2')).toHaveText('conflict');
+  });
+
+  test('carries an aggregate in the header that agrees with the rows', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), changedFiles: FILES });
+
+    const summary = page.getByTestId('section-summary-changed');
+    await expect(summary).toContainText('+86');
+    await expect(summary).toContainText('−31');
+  });
+
+  test('shows nothing at all when the repository changes underneath it', async () => {
+    const { page } = board;
+
+    await board.push({ ...envelope(), changedFiles: FILES });
+    await expect(page.getByTestId('changed-0')).toContainText('src/hooks/useSession.ts');
+
+    const before = await page.getByTestId('section-changed').innerText();
+
+    // Write a real file into the repository the session named. The board never
+    // reads the repository, so this must produce no change of any kind: what is
+    // on screen is a record of what was said, not a view of what is on disk.
+    const scratch = join(process.cwd(), `cocopilot-e2e-${process.pid}.tmp`);
+    writeFileSync(scratch, 'touched outside the agent');
+    try {
+      await page.waitForTimeout(1_500);
+      expect(await page.getByTestId('section-changed').innerText()).toBe(before);
+    } finally {
+      rmSync(scratch, { force: true });
+    }
   });
 });

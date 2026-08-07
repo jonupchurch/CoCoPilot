@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
+import { ChangedFilesSection } from './ChangedFilesSection.js';
 import { FocusSection } from './FocusSection.js';
 import { PlanSection } from './PlanSection.js';
 import { SpecSection } from './SpecSection.js';
@@ -77,6 +78,14 @@ export function OverviewView({
         open={open.plan}
         onToggle={() => {
           toggle('plan');
+        }}
+      />
+
+      <ChangedFilesSection
+        files={session.changedFiles}
+        open={open.changed}
+        onToggle={() => {
+          toggle('changed');
         }}
       />
     </div>

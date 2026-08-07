@@ -16,7 +16,7 @@ import { isActive, isDone } from './vocabulary.js';
  */
 
 /** U+2212, not a hyphen. It sits with `+` at the same optical weight. */
-const MINUS = '−';
+export const MINUS = '−';
 
 export function focusSummary(focus: Focus | null, reportedAt: number | null, now: number): string {
   if (focus === null || focus.task === null || focus.task.trim() === '') return 'none reported';
