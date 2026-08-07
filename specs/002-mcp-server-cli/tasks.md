@@ -74,11 +74,11 @@ the desktop application behind it.
 
 ## Phase 1: Setup
 
-- [ ] T001 Create `packages/clients/package.json` — name `@cocopilot/mcp` (decision 27's `npx -y @cocopilot/mcp`), `bin` entries `cocopilot-mcp` → `dist/mcp/server.js` and `cocopilot` → `dist/cli/index.js`, dependency on `@cocopilot/contract` and `@modelcontextprotocol/sdk`, devDependency on `@cocopilot/board`, `files: ["dist"]`
-- [ ] T002 [P] Create `packages/clients/tsconfig.json` (src + tests, path mapping for `@cocopilot/contract` and `@cocopilot/board`) and `packages/clients/tsconfig.build.json` (emit `dist` from `src` only)
-- [ ] T003 [P] Drop `"private": true` from `packages/contract/package.json` — a published client cannot depend on an unpublishable package
-- [ ] T004 Add a `@cocopilot/board` alias to the root `vitest.config.ts` pointing at `apps/board/src/main/index.ts`, and extend the `unit`/`integration` include globs to reach `packages/clients/tests`
-- [ ] T005 Run `npm install` at the root and confirm `npm run typecheck` and `npm test` are still clean
+- [x] T001 Create `packages/clients/package.json` — name `@cocopilot/mcp` (decision 27's `npx -y @cocopilot/mcp`), `bin` entries `cocopilot-mcp` → `dist/mcp/server.js` and `cocopilot` → `dist/cli/index.js`, dependency on `@cocopilot/contract` and `@modelcontextprotocol/sdk`, devDependency on `@cocopilot/board`, `files: ["dist"]`
+- [x] T002 [P] Create `packages/clients/tsconfig.json` (src + tests, path mapping for `@cocopilot/contract` and `@cocopilot/board`) and `packages/clients/tsconfig.build.json` (emit `dist` from `src` only)
+- [x] T003 [P] Drop `"private": true` from `packages/contract/package.json` — a published client cannot depend on an unpublishable package
+- [x] T004 Add a `@cocopilot/board` alias to the root `vitest.config.ts` pointing at `apps/board/src/main/index.ts`, and extend the `unit`/`integration` include globs to reach `packages/clients/tests`
+- [x] T005 Run `npm install` at the root and confirm `npm run typecheck` and `npm test` are still clean
 
 ---
 
@@ -86,12 +86,12 @@ the desktop application behind it.
 
 **⚠️ CRITICAL**: No user story can begin until this phase completes.
 
-- [ ] T006 [P] Create `packages/clients/src/messages.ts` — `BOARD_ABSENT` exactly as `client-surface.md` words it, plus the not-a-repository and version-mismatch messages. Its wording is a behavioural requirement, not copy: an agent reading "continue working, no need to retry" behaves differently from one reading `ECONNREFUSED`
-- [ ] T007 Create `packages/clients/src/identity.ts` — walk up from a starting directory for `.git` (resolving the `gitdir:` form used by worktrees), read `HEAD` for the branch, fall back to the raw SHA when detached; derive a `sessionId` stable for the process lifetime; return a discriminated result so "not inside a repository" is a value rather than a throw
-- [ ] T008 Create `packages/clients/src/discover.ts` — probe an ordered port list, `GET /v1/health` on each, accept the first whose body satisfies `isCoCoPilotHealth`, transmit nothing to anything else, conclude absence when the list is exhausted. Takes the port list and a deadline as parameters so tests do not fight a real board
-- [ ] T009 Create `packages/clients/src/transport.ts` — one overall call budget for discovery plus delivery, so SC-003's two-second bound holds even when every port black-holes rather than refusing; no caching between calls, no retry, no queue
-- [ ] T010 Create `packages/clients/src/client.ts` — `report()` and `note()` returning a discriminated result (`delivered` | `no-board` | `rejected` | `not-a-repo` | `version-mismatch`), which is the one surface both binaries wrap
-- [ ] T011 Create `packages/clients/tests/helpers/harness.ts` — start a real 001 service on a chosen port, start a stub server that answers `200 {}`, and expose the port list to hand to discovery
+- [x] T006 [P] Create `packages/clients/src/messages.ts` — `BOARD_ABSENT` exactly as `client-surface.md` words it, plus the not-a-repository and version-mismatch messages. Its wording is a behavioural requirement, not copy: an agent reading "continue working, no need to retry" behaves differently from one reading `ECONNREFUSED`
+- [x] T007 Create `packages/clients/src/identity.ts` — walk up from a starting directory for `.git` (resolving the `gitdir:` form used by worktrees), read `HEAD` for the branch, fall back to the raw SHA when detached; derive a `sessionId` stable for the process lifetime; return a discriminated result so "not inside a repository" is a value rather than a throw
+- [x] T008 Create `packages/clients/src/discover.ts` — probe an ordered port list, `GET /v1/health` on each, accept the first whose body satisfies `isCoCoPilotHealth`, transmit nothing to anything else, conclude absence when the list is exhausted. Takes the port list and a deadline as parameters so tests do not fight a real board
+- [x] T009 Create `packages/clients/src/transport.ts` — one overall call budget for discovery plus delivery, so SC-003's two-second bound holds even when every port black-holes rather than refusing; no caching between calls, no retry, no queue
+- [x] T010 Create `packages/clients/src/client.ts` — `report()` and `note()` returning a discriminated result (`delivered` | `no-board` | `rejected` | `not-a-repo` | `version-mismatch`), which is the one surface both binaries wrap
+- [x] T011 Create `packages/clients/tests/helpers/harness.ts` — start a real 001 service on a chosen port, start a stub server that answers `200 {}`, and expose the port list to hand to discovery
 
 **Checkpoint**: Both binaries can be built on top of one shared, tested core.
 
@@ -115,15 +115,15 @@ tools are listed, then start a service and call a tool **without restarting**.
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Write `packages/clients/tests/integration/no-board-startup.test.ts` — construct the MCP server with nothing listening anywhere in the range and assert it initialises and lists both tools; assert no network call was made during initialisation
-- [ ] T013 [P] [US2] Write `packages/clients/tests/integration/late-board.test.ts` — with the same server instance, call a tool (board-absent), then start a service, then call again and assert delivery, with no restart in between
-- [ ] T014 [P] [US2] Write `packages/clients/tests/unit/discover.test.ts` — finds a board on the first port, on the last port, and reports absence when none answers; a board that has moved between calls is found without intervention
+- [x] T012 [P] [US2] Write `packages/clients/tests/integration/no-board-startup.test.ts` — construct the MCP server with nothing listening anywhere in the range and assert it initialises and lists both tools; assert no network call was made during initialisation
+- [x] T013 [P] [US2] Write `packages/clients/tests/integration/late-board.test.ts` — with the same server instance, call a tool (board-absent), then start a service, then call again and assert delivery, with no restart in between
+- [x] T014 [P] [US2] Write `packages/clients/tests/unit/discover.test.ts` — finds a board on the first port, on the last port, and reports absence when none answers; a board that has moved between calls is found without intervention
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Create `packages/clients/src/mcp/tools.ts` — `cocopilot_report` and `cocopilot_note` as static definitions with zod input schemas built from `packages/contract`; `repo`, `branch` and `sessionId` are deliberately **not** parameters
-- [ ] T016 [US2] Create `packages/clients/src/mcp/server.ts` — register tools from T015 and connect stdio, touching the network nowhere in this file; every tool call is an independent attempt
-- [ ] T017 [US2] Add `#!/usr/bin/env node` to `packages/clients/src/mcp/server.ts` and a `build` script to `packages/clients/package.json`, and confirm `dist/mcp/server.js` runs
+- [x] T015 [US2] Create `packages/clients/src/mcp/tools.ts` — `cocopilot_report` and `cocopilot_note` as static definitions with zod input schemas built from `packages/contract`; `repo`, `branch` and `sessionId` are deliberately **not** parameters
+- [x] T016 [US2] Create `packages/clients/src/mcp/server.ts` — register tools from T015 and connect stdio, touching the network nowhere in this file; every tool call is an independent attempt
+- [x] T017 [US2] Add `#!/usr/bin/env node` to `packages/clients/src/mcp/server.ts` and a `build` script to `packages/clients/package.json`, and confirm `dist/mcp/server.js` runs
 
 **Checkpoint**: The behaviour with the least visible failure mode is proven.
 
@@ -142,15 +142,15 @@ branch that the agent never supplied.
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Write `packages/clients/tests/unit/identity.test.ts` — resolves the repository root by walking up; reads the branch from `HEAD`; handles a detached HEAD and the `gitdir:` worktree form; returns not-a-repository rather than throwing; the session id is stable across calls in one process
-- [ ] T019 [P] [US1] Write `packages/clients/tests/integration/against-service.test.ts` — a report carrying only `task`, `note` and `chip` reaches a real service with repo and branch filled in; a second call updates the same session rather than creating another; a note is appended; two client instances in one repository produce two sessions
-- [ ] T020 [P] [US1] Write `packages/clients/tests/unit/tools.test.ts` — the tool schemas expose no `repo`, `branch` or `sessionId`, and both descriptions state the two facts an agent cannot infer: that `needs-you` is the only way to ask for a human, and that notes are cleared when the window closes (FR-019)
+- [x] T018 [P] [US1] Write `packages/clients/tests/unit/identity.test.ts` — resolves the repository root by walking up; reads the branch from `HEAD`; handles a detached HEAD and the `gitdir:` worktree form; returns not-a-repository rather than throwing; the session id is stable across calls in one process
+- [x] T019 [P] [US1] Write `packages/clients/tests/integration/against-service.test.ts` — a report carrying only `task`, `note` and `chip` reaches a real service with repo and branch filled in; a second call updates the same session rather than creating another; a note is appended; two client instances in one repository produce two sessions
+- [x] T020 [P] [US1] Write `packages/clients/tests/unit/tools.test.ts` — the tool schemas expose no `repo`, `branch` or `sessionId`, and both descriptions state the two facts an agent cannot infer: that `needs-you` is the only way to ask for a human, and that notes are cleared when the window closes (FR-019)
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Wire the `cocopilot_report` handler in `packages/clients/src/mcp/tools.ts` to `client.report()`, merging derived identity with model-composed content
-- [ ] T022 [US1] Wire the `cocopilot_note` handler in `packages/clients/src/mcp/tools.ts` to `client.note()`
-- [ ] T023 [US1] Return a confirmation the agent does not have to act on, and never content that invites a follow-up call
+- [x] T021 [US1] Wire the `cocopilot_report` handler in `packages/clients/src/mcp/tools.ts` to `client.report()`, merging derived identity with model-composed content
+- [x] T022 [US1] Wire the `cocopilot_note` handler in `packages/clients/src/mcp/tools.ts` to `client.note()`
+- [x] T023 [US1] Return a confirmation the agent does not have to act on, and never content that invites a follow-up call
 
 **Checkpoint**: The path essentially every report takes works end to end.
 
@@ -168,15 +168,15 @@ states the board is absent and directs the caller to continue.
 
 ### Tests for User Story 3
 
-- [ ] T024 [P] [US3] Write `packages/clients/tests/unit/messages.test.ts` — `BOARD_ABSENT` says all three things it has to: the board is absent, this is not a failure of your work, and retrying will not help
-- [ ] T025 [P] [US3] Write `packages/clients/tests/integration/no-board.test.ts` — the return value is the `BOARD_ABSENT` constant verbatim; the call completes well under two seconds; nothing is queued and no second attempt is made
-- [ ] T026 [P] [US3] Write `packages/clients/tests/integration/wrong-responder.test.ts` — a stub answering `200 {}` on the first port receives **zero** POSTs, and discovery continues to the next port. This is the only test that fails if someone simplifies discovery to "did it answer"
-- [ ] T027 [P] [US3] Write `packages/clients/tests/integration/rejection.test.ts` — a note of 4,001 characters is rejected by the service and the reason reaches the caller intact, naming the field, rather than flattened into "request failed" (FR-013, SC-008)
+- [x] T024 [P] [US3] Write `packages/clients/tests/unit/messages.test.ts` — `BOARD_ABSENT` says all three things it has to: the board is absent, this is not a failure of your work, and retrying will not help
+- [x] T025 [P] [US3] Write `packages/clients/tests/integration/no-board.test.ts` — the return value is the `BOARD_ABSENT` constant verbatim; the call completes well under two seconds; nothing is queued and no second attempt is made
+- [x] T026 [P] [US3] Write `packages/clients/tests/integration/wrong-responder.test.ts` — a stub answering `200 {}` on the first port receives **zero** POSTs, and discovery continues to the next port. This is the only test that fails if someone simplifies discovery to "did it answer"
+- [x] T027 [P] [US3] Write `packages/clients/tests/integration/rejection.test.ts` — a note of 4,001 characters is rejected by the service and the reason reaches the caller intact, naming the field, rather than flattened into "request failed" (FR-013, SC-008)
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Enforce the overall call budget in `packages/clients/src/transport.ts` so a black-holed port cannot blow SC-003's bound, and assert it with a deliberately unresponsive listener
-- [ ] T029 [US3] Map every failure to a soft result in `packages/clients/src/client.ts` — no throw reaches a tool handler, and no failure path launches, queues or retries anything
+- [x] T028 [US3] Enforce the overall call budget in `packages/clients/src/transport.ts` so a black-holed port cannot blow SC-003's bound, and assert it with a deliberately unresponsive listener
+- [x] T029 [US3] Map every failure to a soft result in `packages/clients/src/client.ts` — no throw reaches a tool handler, and no failure path launches, queues or retries anything
 
 **Checkpoint**: The product is safe to leave installed.
 
@@ -194,15 +194,15 @@ and confirm a session appears attributed as a script rather than as an agent.
 
 ### Tests for User Story 4
 
-- [ ] T030 [P] [US4] Write `packages/clients/tests/integration/cli.test.ts` — `report` and `note` reach a real service with repo and branch filled in from the working directory; the session is the unattributed one; eleven invocations produce exactly one session, not eleven (SC-006)
-- [ ] T031 [P] [US4] Write `packages/clients/tests/unit/cli-args.test.ts` — argument parsing for both subcommands, and that unknown flags and a missing note argument are usage errors
-- [ ] T032 [P] [US4] Write `packages/clients/tests/integration/cli-exit-codes.test.ts` — 0 when delivered, **0 when no board is running**, 1 for invalid usage or outside a repository, 2 for a service rejection with the reason on stderr
+- [x] T030 [P] [US4] Write `packages/clients/tests/integration/cli.test.ts` — `report` and `note` reach a real service with repo and branch filled in from the working directory; the session is the unattributed one; eleven invocations produce exactly one session, not eleven (SC-006)
+- [x] T031 [P] [US4] Write `packages/clients/tests/unit/cli-args.test.ts` — argument parsing for both subcommands, and that unknown flags and a missing note argument are usage errors
+- [x] T032 [P] [US4] Write `packages/clients/tests/integration/cli-exit-codes.test.ts` — 0 when delivered, **0 when no board is running**, 1 for invalid usage or outside a repository, 2 for a service rejection with the reason on stderr
 
 ### Implementation for User Story 4
 
-- [ ] T033 [US4] Create `packages/clients/src/cli/index.ts` — `report [--task ID] [--note TEXT] [--chip STATE]` and `note TEXT [--source TEXT]` using `node:util`'s `parseArgs`; no CLI framework, because two subcommands do not warrant one
-- [ ] T034 [US4] Send the literal `unattributed` session id from the CLI, which the service maps to one shared session per repository — so a hook firing per tool call groups rather than filling the switcher with one-shot entries
-- [ ] T035 [US4] Exit 0 when the board is absent, deliberately, and print the absence to stdout rather than stderr — a hook that failed because a dashboard was closed would be a monitoring tool breaking the work it monitors
+- [x] T033 [US4] Create `packages/clients/src/cli/index.ts` — `report [--task ID] [--note TEXT] [--chip STATE]` and `note TEXT [--source TEXT]` using `node:util`'s `parseArgs`; no CLI framework, because two subcommands do not warrant one
+- [x] T034 [US4] Send the literal `unattributed` session id from the CLI, which the service maps to one shared session per repository — so a hook firing per tool call groups rather than filling the switcher with one-shot entries
+- [x] T035 [US4] Exit 0 when the board is absent, deliberately, and print the absence to stdout rather than stderr — a hook that failed because a dashboard was closed would be a monitoring tool breaking the work it monitors
 
 **Checkpoint**: The contract has a second consumer, which is what keeps it honest.
 
@@ -220,24 +220,24 @@ application; confirm the tools appear and fail soft on a machine with no board.
 
 ### Tests for User Story 5
 
-- [ ] T036 [P] [US5] Write `packages/clients/tests/unit/version.test.ts` — a board reporting a different contract version yields the version-mismatch message naming both versions, rather than an obscure failure; a matching version proceeds
-- [ ] T037 [P] [US5] Write `packages/clients/tests/unit/packaging.test.ts` — `packages/clients/package.json` declares both bins, ships only `dist`, carries no dependency on `@cocopilot/board` outside `devDependencies`, and the documented configuration entry in the README contains no filesystem path
+- [x] T036 [P] [US5] Write `packages/clients/tests/unit/version.test.ts` — a board reporting a different contract version yields the version-mismatch message naming both versions, rather than an obscure failure; a matching version proceeds
+- [x] T037 [P] [US5] Write `packages/clients/tests/unit/packaging.test.ts` — `packages/clients/package.json` declares both bins, ships only `dist`, carries no dependency on `@cocopilot/board` outside `devDependencies`, and the documented configuration entry in the README contains no filesystem path
 
 ### Implementation for User Story 5
 
-- [ ] T038 [US5] Surface a contract-version mismatch in `packages/clients/src/discover.ts` as a distinct result rather than treating the board as absent — decision 27 accepts that a published client can drift from the installed app, and drift is only worth accepting if it is detectable
-- [ ] T039 [US5] Write `packages/clients/README.md` with the `.mcp.json` entry (`npx -y @cocopilot/mcp`), the CLI usage, the exit-code table, and an explicit note that no path to the desktop application is involved
+- [x] T038 [US5] Surface a contract-version mismatch in `packages/clients/src/discover.ts` as a distinct result rather than treating the board as absent — decision 27 accepts that a published client can drift from the installed app, and drift is only worth accepting if it is detectable
+- [x] T039 [US5] Write `packages/clients/README.md` with the `.mcp.json` entry (`npx -y @cocopilot/mcp`), the CLI usage, the exit-code table, and an explicit note that no path to the desktop application is involved
 
 ---
 
 ## Phase 8: Polish & cross-cutting concerns
 
-- [ ] T040 [P] Write `packages/clients/tests/integration/no-writes.test.ts` — across a full exercise of both clients, zero filesystem writes anywhere and zero reads inside the reported repository other than the `.git` metadata identity needs (SC-009). Mirrors feature 001's absence test, and is checked for teeth the same way
-- [ ] T041 [P] Correct `specs/002-mcp-server-cli/contracts/client-surface.md` — identity comes from the filesystem, not from `git rev-parse`, for the reason stated at the top of this file
-- [ ] T042 Run `npm run typecheck`, the full suite, and `npm run build`, then walk all six scenarios in [quickstart.md](quickstart.md) by hand — scenario 2 first
-- [ ] T043 [P] Update `CHANGELOG.md` and `STATUS.md` for feature 002, recording the two contradictions and how they were resolved
-- [ ] T044 Exercise the built binaries end to end against a real board on the real port range, outside the test harness
-- [ ] T045 Read back the full diff, then merge the feature branch
+- [x] T040 [P] Write `packages/clients/tests/integration/no-writes.test.ts` — across a full exercise of both clients, zero filesystem writes anywhere and zero reads inside the reported repository other than the `.git` metadata identity needs (SC-009). Mirrors feature 001's absence test, and is checked for teeth the same way
+- [x] T041 [P] Correct `specs/002-mcp-server-cli/contracts/client-surface.md` — identity comes from the filesystem, not from `git rev-parse`, for the reason stated at the top of this file
+- [x] T042 Run `npm run typecheck`, the full suite, and `npm run build`, then walk all six scenarios in [quickstart.md](quickstart.md) by hand — scenario 2 first
+- [x] T043 [P] Update `CHANGELOG.md` and `STATUS.md` for feature 002, recording the two contradictions and how they were resolved
+- [x] T044 Exercise the built binaries end to end against a real board on the real port range, outside the test harness
+- [x] T045 Read back the full diff, then merge the feature branch
 
 ---
 

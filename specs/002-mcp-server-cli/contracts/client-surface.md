@@ -52,8 +52,8 @@ cocopilot report [--task ID] [--note TEXT] [--chip STATE]
 cocopilot note TEXT [--source TEXT]
 ```
 
-Both derive `repo` from `git rev-parse --show-toplevel` and `branch` from the
-current checkout. Both report as the unattributed session for that repository.
+Both derive `repo` and `branch` from the working directory — see *Identity*
+below. Both report as the unattributed session for that repository.
 
 **Exit codes**
 
@@ -77,6 +77,39 @@ One constant, used by both clients:
 
 Its exact wording is a behavioural requirement. It has to say three things: the
 board is absent, this is not a failure of your work, and retrying will not help.
+
+---
+
+## Identity
+
+**Corrected during implementation.** This document originally said to derive
+`repo` from `git rev-parse --show-toplevel`. It does not: identity is read from
+the filesystem instead.
+
+1. Walk up from the working directory looking for `.git`, resolving the
+   `gitdir:` pointer a worktree or submodule leaves in place of a directory.
+2. Read `HEAD` for the branch. A detached HEAD reports the abbreviated commit,
+   not the literal string `HEAD` that `git rev-parse --abbrev-ref` would give —
+   in a board's branch slot that reads as a bug rather than as information.
+3. No repository above the working directory is a *value*, not a failure: the
+   CLI exits 1 saying so, and the MCP tools return the same explanation.
+
+Why not run `git`: FR-011 says the clients must not launch "the desktop
+application **or any other process**", and US3's third acceptance scenario says
+"nothing is launched — no window opens and no process starts". A `git`
+subprocess on every call is inside that. FR-018 permits *determining the path
+and current branch* without prescribing how. Reading the files also costs no
+process spawn on a path SC-003 bounds at two seconds, and does not assume `git`
+is on `PATH` — which the MCP server, launched by a host rather than by a shell,
+cannot.
+
+Nothing outside `.git` is ever read.
+
+The MCP server's session id is a value generated once per process, matching one
+agent session. The CLI sends **no** session id at all, and the service assigns
+the shared unattributed one — sending the literal string would be recorded as an
+agent narrating, because the service derives attribution from the *absence* of
+an id (001 FR-004).
 
 ---
 

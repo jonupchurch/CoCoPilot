@@ -5,11 +5,11 @@ information straight while working with Claude on a GitHub Spec-Kit repository.
 An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
 
-**Phase:** Implementation. Design is settled (28 decisions below), all nine
-features are specced and planned, and feature 001 is built and verified. Rule 7
-is satisfied, so the remaining eight are ordinary feature work.
+**Phase:** Implementation. Design is settled (31 decisions below), all nine
+features are specced and planned, and features 001 and 002 are built and
+verified. Rule 7 is satisfied, so the remaining seven are ordinary feature work.
 
-**Last updated:** 2026-08-06 (feature 001 implemented; decisions 29–30 added)
+**Last updated:** 2026-08-06 (features 001 and 002 implemented; decisions 29–31 added)
 
 ## Where things stand
 
@@ -24,7 +24,7 @@ is satisfied, so the remaining eight are ordinary feature work.
 | Direction of flow | ✅ One-way, agent → board. Never writes to the user's repo (decision 11) |
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
-| Architecture — everything else | ✅ Settled across decisions 1–30; no open design questions remain |
+| Architecture — everything else | ✅ Settled across decisions 1–31; no open design questions remain |
 | Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
 | Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against every UI-affecting decision; canon per decision 8 |
 | Design revisions owed | ✅ None outstanding |
@@ -32,7 +32,7 @@ is satisfied, so the remaining eight are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — feature 001 complete on `001-push-contract-service`; 002–009 not started |
+| Implementation | 🟡 **Started** — features 001 and 002 complete and merged; 003–009 not started |
 
 ## What this is
 
@@ -459,6 +459,23 @@ their head across a long agent session.
       header.
     - *Cost:* a client shelling out with `curl` must remember the header. The
       CLI and MCP server set it, so this only bites hand-written probes.
+31. **The clients read `.git` directly; they never run `git`.** Found while
+    implementing feature 002. `contracts/client-surface.md` had said to derive
+    the repository from `git rev-parse --show-toplevel`, but feature 002's
+    FR-011 forbids the clients from launching "the desktop application **or any
+    other process**", and its US3 says "nothing is launched — no window opens and
+    no process starts". FR-018 permits *determining the path and current branch*
+    without saying how.
+    - *Also cheaper and more available:* no process spawn on a path SC-003
+      bounds at two seconds, and no assumption that `git` is on `PATH` — which
+      the MCP server, launched by a host rather than by a shell, cannot make.
+    - *Cost:* we reimplement a small slice of git — walking up for `.git`,
+      resolving the `gitdir:` worktree pointer, reading `HEAD`. Any repository
+      layout those three do not cover reports `unknown` rather than being
+      correct. Accepted; the alternative was a subprocess per call.
+    - *Consequence:* a detached HEAD reports the abbreviated commit rather than
+      the literal `HEAD` that `git rev-parse --abbrev-ref` returns, because
+      `HEAD` in a board's branch slot reads as a bug rather than as information.
 
 ## What survives the restart
 
