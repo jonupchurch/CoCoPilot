@@ -16,5 +16,11 @@
 Thumbs.db
 *.pem
 
-# Stack-specific ignores (node_modules, build output, test artifacts) get added
-# once the stack is chosen -- see docs/design/architecture.md.
+# Node / TypeScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Vitest
+.vitest/

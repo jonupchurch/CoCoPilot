@@ -5,10 +5,11 @@ information straight while working with Claude on a GitHub Spec-Kit repository.
 An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
 
-**Phase:** Design, **restarted 2026-08-06**. No implementation code, and none
-should be written until the design docs exist and are reviewed.
+**Phase:** Implementation. Design is settled (28 decisions below), all nine
+features are specced and planned, and feature 001 is built and verified. Rule 7
+is satisfied, so the remaining eight are ordinary feature work.
 
-**Last updated:** 2026-08-06 (state ownership and push model settled)
+**Last updated:** 2026-08-06 (feature 001 implemented; decisions 29–30 added)
 
 ## Where things stand
 
@@ -23,15 +24,15 @@ should be written until the design docs exist and are reviewed.
 | Direction of flow | ✅ One-way, agent → board. Never writes to the user's repo (decision 11) |
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
-| Architecture — everything else | ✅ Settled across decisions 1–27; no open design questions remain |
+| Architecture — everything else | ✅ Settled across decisions 1–30; no open design questions remain |
 | Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
-| Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against all 27 decisions; canon per decision 8 |
+| Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against every UI-affecting decision; canon per decision 8 |
 | Design revisions owed | ✅ None outstanding |
 | Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟢 **Unblocked** — rule 7 satisfied; start at feature 001 on a branch |
+| Implementation | 🟡 **Started** — feature 001 complete on `001-push-contract-service`; 002–009 not started |
 
 ## What this is
 
@@ -435,6 +436,29 @@ their head across a long agent session.
       viewing out.
     - *Left open by the specs on purpose,* and decided here before planning so
       that features 1 and 3 through 8 do not each assume something different.
+29. **A request body is capped at 1 MiB, checked before parsing.** Found while
+    implementing feature 001, not on paper. The per-field and per-collection
+    caps do not bound a request on their own: 500 tasks each carrying 50 checks
+    of 4,000 characters is legal by every individual cap and still roughly
+    127 MB, and 100 sessions of that is 20 GB. The spec's edge case claiming
+    "collection caps bound the total" was simply not true until this existed.
+    - *Cost:* a report that is legal by every individual cap can still be
+      refused for total size. It answers 413 naming the ceiling, so the caller
+      can act on it, and 1 MiB is around ten times a realistic full report.
+    - *Where it lives:* `MAX_BODY_BYTES` in `packages/contract`, alongside every
+      other cap, so a client can refuse before a round trip.
+30. **The service requires `content-type: application/json`, answering 415
+    otherwise.** Decision 18 accepts that any local *process* may report — being
+    on the box is not authorization, and the blast radius is misleading text.
+    It does not follow that any web page the user happens to have open may
+    report. Requiring a content type that is not CORS-simple forces a browser to
+    preflight, and nothing here answers a preflight.
+    - *Cheaper than the alternative:* the same hole could be closed by checking
+      the `Origin` header, but that is a header check, and decision 18 is
+      explicit that the localhost guarantee is a bind address rather than a
+      header.
+    - *Cost:* a client shelling out with `curl` must remember the header. The
+      CLI and MCP server set it, so this only bites hand-written probes.
 
 ## What survives the restart
 

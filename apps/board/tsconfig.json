@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@cocopilot/contract": ["../../packages/contract/src/index.ts"]
+    }
+  },
+  "include": ["src", "tests"]
+}

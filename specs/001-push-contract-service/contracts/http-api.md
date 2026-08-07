@@ -40,7 +40,7 @@ A full snapshot, replacing whatever was held for this session (FR-001).
   "feature": { "id": "002", "title": "Share one session fetch", "specPath": "specs/002/spec.md" },
   "stories": [ { "id": "US-002", "title": "…", "criteria": ["…"], "taskIds": ["T012"] } ],
   "tasks":   [ { "id": "T012", "storyId": "US-002", "title": "…", "status": "waiting on CI", "checks": [], "files": [] } ],
-  "plan":    { "steps": [ { "text": "Read the call sites", "status": "done" } ] },
+  "plan":    [ { "text": "Read the call sites", "status": "done" } ],
   "focus":   { "task": "T012", "note": "blocked — the harness never sets the cookie", "chip": "needs-you" },
   "changedFiles": [ { "path": "src/api/client.ts", "change": "modified", "added": 21, "removed": 18 } ]
 }
@@ -71,6 +71,28 @@ correct the request from the response alone (SC-007).
 ```json
 { "ok": false, "error": "session_limit", "message": "100 sessions held; dismiss one to make room" }
 ```
+
+**413** — the body exceeds `MAX_BODY_BYTES` (1 MiB), checked before parsing.
+```json
+{ "ok": false, "error": "payload_too_large", "field": "(body)", "message": "request body exceeds 1048576 bytes" }
+```
+
+The per-field and per-collection caps do not bound a request on their own: 500
+tasks each carrying 50 checks of 4,000 characters is legal by every individual
+cap and still around 127 MB. This ceiling is what makes the spec's "a report
+cannot be enormous while every field is legal" actually true. Added during
+implementation of feature 001.
+
+**415** — the request did not declare `content-type: application/json`.
+```json
+{ "ok": false, "error": "unsupported_media_type", "field": "(headers)", "message": "content-type must be application/json" }
+```
+
+Requiring the content type is what forces a browser to send a CORS preflight
+before it can reach this service cross-origin, and nothing here answers a
+preflight. Decision 18 accepts that any *local process* may report; it does not
+accept that any page the user happens to have open may. Also added during
+implementation.
 
 ---
 
@@ -118,6 +140,8 @@ read agent prompt text over a socket, which nothing currently requires.
 | Store text verbatim | FR-014 — escaping happens at render |
 | Reject, never truncate | FR-011 |
 | Localhost only | Decision 18 — bind address, not a header check |
+| Require a JSON content type | Not reachable from a browser page without a preflight |
+| Cap the body before parsing | The field caps alone do not bound a request |
 
 ---
 
