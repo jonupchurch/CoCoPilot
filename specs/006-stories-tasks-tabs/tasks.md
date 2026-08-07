@@ -165,7 +165,7 @@ intact across the boundary.
 
 - [x] T021 [US4] Create the collapsed list for the narrow story view, showing id, title and task summary so items are distinguishable (US4 scenario 4) — now `components/ScopePicker.tsx`, shared with the Tasks tab per T016
 - [x] T022 [US4] Wire both views to `useIsNarrow` — Stories swaps its list for the picker, Tasks stacks its list above the detail. **Both CSS files carry the comment explaining why they differ**, because without it this reads as an inconsistency someone will helpfully unify
-- [ ] T023 [P] [US4] Write `apps/board/tests/e2e/breakpoint.spec.ts` — each arrangement at each side of 640; a selection made wide survives narrow and back (SC-004); every item selectable from each picker; and **no horizontal scroll at the window minimum on either tab**, asserted the way feature 004 does it, on `scrollWidth` rather than by eye
+- [x] T023 [P] [US4] Write `apps/board/tests/e2e/breakpoint.spec.ts` — each arrangement at each side of 640; a selection made wide survives narrow and back (SC-004); every item selectable from each picker; and **no horizontal scroll at the window minimum on either tab**, asserted the way feature 004 does it, on `scrollWidth` rather than by eye. The resize helper **asserts the width it actually got**: at a 1.5 display scale an odd content width rounds up (639 → 640) and the renderer sees a resize a beat late, so a spec that trusted its own argument was testing 642 and 452 rather than the boundary and the floor
 
 ---
 
