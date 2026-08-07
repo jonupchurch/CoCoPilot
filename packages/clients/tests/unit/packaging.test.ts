@@ -79,6 +79,82 @@ describe('the documented configuration entry', () => {
   });
 });
 
+/**
+ * Every package that will be published, checked as a set.
+ *
+ * Read from disk rather than imported, because what matters is what npm will
+ * see. The three are not equals: `contract` exists so two others can agree,
+ * `clients` is what an agent fetches and must stay runtime-free, and `runner`
+ * is what a human fetches and is allowed to be large.
+ */
+const PUBLISHED = ['contract', 'clients', 'runner'].map((name) => {
+  const path = join(root, '..', name, 'package.json');
+  return {
+    name,
+    manifest: JSON.parse(readFileSync(path, 'utf8')) as {
+      name: string;
+      version: string;
+      files?: string[];
+      publishConfig?: { access?: string };
+      scripts?: Record<string, string>;
+      dependencies?: Record<string, string>;
+      engines?: Record<string, string>;
+      bin?: Record<string, string>;
+    },
+  };
+});
+
+describe('every published package can actually be published', () => {
+  it('declares public access, without which a scoped publish is a billing error', () => {
+    // The most common first-publish failure there is: a scoped package defaults
+    // to *restricted*, so `npm publish` fails asking for a paid plan rather
+    // than saying anything about configuration.
+    for (const { name, manifest } of PUBLISHED) {
+      expect(manifest.publishConfig?.access, name).toBe('public');
+    }
+  });
+
+  it('builds on prepublishOnly, so a stale or absent dist cannot ship', () => {
+    // `files` ships whatever is on disk, including nothing at all.
+    for (const { name, manifest } of PUBLISHED) {
+      expect(typeof manifest.scripts?.prepublishOnly, name).toBe('string');
+    }
+  });
+
+  it('restricts what it ships, and agrees on a version', () => {
+    for (const { name, manifest } of PUBLISHED) {
+      expect(manifest.files?.length ?? 0, name).toBeGreaterThan(0);
+    }
+
+    // The client pins the contract *exactly*, so a drift is a 404 at install
+    // time rather than a warning.
+    expect(new Set(PUBLISHED.map((p) => p.manifest.version)).size).toBe(1);
+  });
+});
+
+describe('the runner carries the product, and the client stays out of it', () => {
+  const runner = PUBLISHED.find((p) => p.name === 'runner')?.manifest;
+
+  it('declares Electron as a real dependency, which is why it is its own package', () => {
+    // `electron-builder` requires Electron in devDependencies because it
+    // bundles the runtime itself; this route requires the opposite so that
+    // `npm install` fetches it. One manifest cannot be both.
+    expect(Object.keys(runner?.dependencies ?? {}).sort()).toEqual([
+      '@cocopilot/mcp',
+      'electron',
+    ]);
+    expect(runner?.bin?.['cocopilot-board']).toBe('bin/cocopilot-board.mjs');
+    expect(runner?.engines?.['node']).toBeTruthy();
+  });
+
+  it('keeps the arrow pointing one way', () => {
+    // The runner depends on the client. The moment that reverses, an agent
+    // starts downloading a browser in order to report a task.
+    expect(Object.keys(manifest.dependencies)).not.toContain('cocopilot-board');
+    expect(Object.keys(manifest.devDependencies)).not.toContain('cocopilot-board');
+  });
+});
+
 describe('version drift', () => {
   it('names both sides, so a mismatch is fixable rather than merely confusing', () => {
     const message = versionMismatch('v1', 'v9');
