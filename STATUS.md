@@ -32,7 +32,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 **Started** — features 001–008 complete and merged; **009 (packaging) is all that remains** |
+| Implementation | 🟡 features 001–008 complete and merged; **009's npm route built, nothing published**; its installer half specified and deferred behind signing credentials |
 
 ## What this is
 

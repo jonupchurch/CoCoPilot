@@ -8,6 +8,47 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 009 (part) — Publishable packages.** Three packages that pack,
+  install and run: `cocopilot-board` (the whole product, one command),
+  `@cocopilot/mcp` (the reporting tools alone) and `@cocopilot/contract`.
+  **Nothing is published** — the work ends at a release script that would.
+  - **Re-specified first.** The original spec had one route, signed installers,
+    and made them a hard requirement — which put the product's availability
+    behind an Apple developer account and a Windows certificate. There are two
+    routes now over one build, cheapest first, with the installers demoted to
+    P3 and their requirements unchanged. Deferred visibly rather than dropped.
+  - `packages/runner` is a separate package rather than `apps/board`
+    un-privated, because `electron-builder` requires `electron` in
+    devDependencies and the npm route requires it as a dependency. One manifest
+    cannot be both, so the application is untouched and both routes package the
+    same `out/`.
+  - **`scripts/pack-check.mjs` is the rehearsal for a thing that cannot be
+    undone.** It packs everything, installs the runner into a clean directory,
+    starts it, and separately installs the client alone to prove it still drags
+    no browser runtime behind it.
+  - It earned itself immediately: the published command opened a window onto a
+    file-not-found. Electron had been handed the entry *file* rather than the
+    package directory, so `app.getAppPath()` came back one level too deep. Every
+    file was present, both binaries resolved, the process stayed up — and only
+    the window was wrong. The check now starts the installed board and fails if
+    it cannot load itself, because **a package that installs is not a package
+    that runs**.
+  - **`scripts/release.mjs` refuses rather than recovers**, since a published
+    version cannot be replaced: dirty tree, version disagreement, a pin naming
+    the wrong version, a manifest missing `publishConfig.access` or
+    `prepublishOnly`. Each refusal verified by causing it. It builds from
+    scratch, rehearses the install, and prints the publish commands in
+    dependency order — and does not publish even with `--publish`.
+  - Housekeeping the repository had been missing: a root `README.md`, a
+    `LICENSE` file (five manifests claimed MIT with no licence anywhere), and
+    `publishConfig.access: public` — a scoped package defaults to *restricted*
+    and fails with a billing error, which is the most common first-publish
+    surprise.
+  - The naming decision is deliberately left open and documented: `cocopilot`
+    unscoped is an npm security holding package, so `npx cocopilot` is
+    unavailable; the scoped names need an organisation whose availability
+    cannot be checked without a login, and the fallback rename is recorded.
+
 - **Feature 008 — Multiple sessions.** Every view showed `sessions[0]` until
   now, so a developer's second agent was invisible. A switcher row appears when
   a second session declares itself, holds a pill per session in declaration
