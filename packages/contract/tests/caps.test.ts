@@ -27,7 +27,7 @@ const task = (status = 'todo'): Record<string, unknown> => ({
 
 const story = (): Record<string, unknown> => ({ id: 'US-001', title: 'A story' });
 
-function push(overrides: Record<string, unknown>): unknown {
+function push(overrides: Record<string, unknown>): Record<string, unknown> {
   return { repo: 'D:\\Codelib\\example', branch: 'main', ...overrides };
 }
 
