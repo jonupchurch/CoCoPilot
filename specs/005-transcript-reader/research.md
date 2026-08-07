@@ -9,6 +9,11 @@ files**, not assumed from what the shape ought to be.
 **Verified against** `C:\Users\<user>\.claude\projects\d--Codelib-skmc\*.jsonl`
 — a real 384 KB session transcript, 143 records.
 
+**Re-verified 2026-08-07**, before implementing, against an 11 MB / 3,757-record
+transcript and all 16 project slugs on this machine. Four claims below were
+**wrong** and are corrected in place, each marked ⚠️. This is why the document
+says re-verify rather than trust.
+
 > Everything below is **empirical and unstable**. It describes what one version
 > of one tool wrote on one day. Feature 005's whole design is that when this
 > stops being true, three sections report unavailability and nothing else
@@ -20,23 +25,37 @@ files**, not assumed from what the shape ought to be.
 
 Transcripts live at `~/.claude/projects/<slug>/<sessionId>.jsonl`.
 
-The slug is the absolute project path, lowercased, with the drive colon and every
-separator replaced by a hyphen:
+⚠️ **Corrected.** The rule is not about drive letters and separators. **Every
+character that is not `[A-Za-z0-9]` becomes a hyphen.** Case is preserved
+throughout — including the drive letter, which is simply left as typed.
 
 ```
-d:\Codelib\skmc   →   d--Codelib-skmc
+d:\Codelib\skmc        →   d--Codelib-skmc
+d:\Codelib\CoCoPilot   →   d--Codelib-CoCoPilot
 ```
 
-`d:` → `d-`, then `\` → `-`, giving the doubled hyphen. Case is preserved after
-the drive letter.
+The doubled hyphen is just `:` and `\` each mapping to `-`. Verified against all
+16 slugs on this machine, three of which settle it beyond the separator reading:
+
+| Real path | Slug |
+|---|---|
+| `d:\Codelib\D&D` | `d--Codelib-D-D` |
+| `d:\Codelib\fitt.d` | `d--Codelib-fitt-d` |
+| `d:\Codelib\t@nk.r` | `d--Codelib-t-nk-r` |
+| `d:\Codelib\playm8z` | `d--Codelib-playm8z` |
+
+`&`, `.` and `@` are none of them separators, and all three become hyphens.
+Digits survive.
 
 **Consequence**: a reported `repo` resolves to a directory with no configuration
 (FR-001), and the filename *is* the session identifier — so a session maps to
 exactly one file with no scanning.
 
-**Risk**: this rule is inferred from one platform's paths. Verify on macOS and
-Linux before relying on it; a wrong slug means unavailability, which is the
-designed failure rather than a crash.
+**The macOS/Linux risk is smaller than it looked**, because the corrected rule
+has no Windows-specific component left: `/home/u/proj` → `-home-u-proj` falls
+out of the same substitution. Still not verified on those platforms
+empirically — but there is no longer a drive-letter special case to get wrong,
+and a wrong slug means unavailability, which is the designed failure.
 
 ---
 
@@ -57,9 +76,16 @@ Types observed, with counts from the sample:
 | `file-history-delta` | 8 | Ignore |
 | `file-history-snapshot` | 4 | Ignore |
 
+⚠️ **The list already grew.** The 2026-08-07 transcript contains a ninth type,
+`system` (compaction metadata), that did not exist in the first sample. Counts
+there, for scale: `assistant` 1702, `user` 1128, `last-prompt` 217, `ai-title`
+217, `attachment` 190, `file-history-delta` 182, `queue-operation` 88,
+`file-history-snapshot` 31, `system` 2.
+
 **Unknown types must be skipped, not treated as errors** (FR-012). This list will
 grow; a reader that rejects what it does not recognise breaks on the next
-release of someone else's software.
+release of someone else's software. It grew between two samples a day apart,
+which is the whole argument in one observation.
 
 ---
 
@@ -86,11 +112,44 @@ Two candidate discriminators were checked, and **only one works**:
 prompt carries text blocks, a tool result carries `tool_result` blocks. Never by
 record type alone.
 
-**Also filter `isSidechain === true`.** The sample contains none because no
-subagents ran, but subagent turns land in the same file. Unfiltered, a developer
-would see an agent's internal delegation presented as their own instructions.
-Untested here, and flagged for verification against a transcript with subagent
-activity.
+⚠️ **`message.content` is not always an array.** In the 2026-08-07 sample, 10 of
+1,129 `user` records carry `content` as a plain **string**. The classifier must
+accept both shapes; treating a string as unparseable would silently drop real
+prompts.
+
+⚠️ **Block inspection is necessary and not sufficient.** Filtering `user`
+records down to text-only content leaves 74 records, of which **17 are still not
+prompts**:
+
+| Count | What it is |
+|---|---|
+| 57 | An actual human prompt |
+| 9 | A skill instruction payload — begins `Base directory for this skill:`, or contains `(Re-invocation of` |
+| 4 | A local-command echo — `<local-command-caveat>` or `<local-command-stdout>` |
+| 2 | An interrupt marker — `[Request interrupted…` |
+| 2 | A command invocation — `<command-name>` / `<command-message>` |
+
+**57 real prompts out of 1,134 `user` records.** The original finding said the
+obvious reading is wrong; the correction is that the *second* reading is wrong
+too. A prompt is a text-only `user` record that is **also** not one of the four
+wrapper shapes above, and each of those needs its own named test case.
+
+⚠️ **`isSidechain: true` never appears — including when subagents do run.** The
+2026-08-07 session ran several subagents, and all 3,022 records carrying the
+field are `false`. Subagent transcripts are written elsewhere (a per-task file
+under the session's temp directory), **not** into the project transcript. So the
+plan's statement that "subagent turns land in the same file" is false for this
+version.
+
+Keep the filter regardless: it costs one comparison, it is correct if the
+behaviour returns, and unfiltered it would show an agent's internal delegation
+as the developer's own instructions. But it is currently **inert**, and a test
+asserting it filters anything would be testing a fixture rather than reality.
+
+**No `<system-reminder>` text is persisted inside a stored prompt.** Injected
+context appears at request time and not in the record, so a stored prompt is
+exactly what the developer typed — which is what makes SC-002's character-for-
+character copy achievable.
 
 ---
 
@@ -116,6 +175,12 @@ defensively and treat any missing field as unavailable rather than zero.
 FR-003, but it is a convenience record whose semantics are unclear (10 records
 for ~10 prompts is suggestive, not proof). **Derive the latest prompt from the
 prompt list instead** — one code path, one set of assumptions.
+
+⚠️ **Now proven not to be one-per-prompt.** The 2026-08-07 sample holds **217
+`last-prompt` records against 57 real prompts**. The first sample's 10-for-10
+was a coincidence of a short session. Using it as a shortcut would have
+overstated the history nearly fourfold — the existing decision was right, and
+this is the evidence it lacked.
 
 ---
 
@@ -153,17 +218,22 @@ and the board keeps working.
 
 | Unknown | Resolution |
 |---|---|
-| Location | `~/.claude/projects/<slug>/<sessionId>.jsonl`, slug rule above |
-| Format | JSONL, `type`-discriminated, unknown types skipped |
-| Prompt identification | `message.content` block inspection — **not** record type |
-| Subagent turns | Filter `isSidechain` — unverified, must be tested |
+| Location | `~/.claude/projects/<slug>/<sessionId>.jsonl`; slug = every non-alphanumeric character replaced by `-` |
+| Format | JSONL, `type`-discriminated, unknown types skipped (9 types seen, and counting) |
+| Prompt identification | Text-only `message.content` — accepting **string or array** — *and* none of the four wrapper shapes |
+| Subagent turns | Filter `isSidechain`, but it is inert: subagent transcripts are written elsewhere |
 | Token counts | `assistant.message.usage`, read defensively |
 | Large files | Incremental append-only reads, in the main process |
 
 ## Still open
 
-- **Verify the slug rule on macOS and Linux.** Windows only, so far.
-- **Verify `isSidechain` filtering** against a transcript containing subagent
-  activity. The sample had none.
+- **Verify the slug rule on macOS and Linux.** Windows only, so far — though the
+  corrected rule no longer has a platform-specific clause to get wrong.
 - **How many prompts to list before summarising** — a display choice for the
   view, not a reading concern.
+
+## Closed since the first pass
+
+- ~~Verify `isSidechain` filtering against a transcript with subagent
+  activity.~~ Done: subagent activity does not reach this file at all. The
+  filter stays as cheap insurance and is documented as inert.
