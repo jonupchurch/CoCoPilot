@@ -34,6 +34,17 @@ export default defineConfig({
         },
       },
       {
+        // Repo-wide checks belonging to no package. Kept separate so it is
+        // obvious where a cross-cutting invariant goes, rather than being
+        // wedged into whichever workspace happened to be open.
+        test: {
+          name: 'repo',
+          environment: 'node',
+          include: ['tests/**/*.test.ts'],
+          exclude: NEVER,
+        },
+      },
+      {
         resolve: { alias },
         test: {
           name: 'integration',

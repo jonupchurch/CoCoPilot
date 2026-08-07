@@ -1,0 +1,70 @@
+.taskrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 2px;
+  /* Transparent rather than absent, so the focused row's rule does not shift
+     every other row sideways by two pixels when the marker moves. */
+  border-left: 2px solid transparent;
+}
+
+/*
+ * The focus marker, straight from the export: a teal rule pulled into the
+ * section's own padding. It marks *which task is being worked on*, which the
+ * contract tracks separately from what state that task is in -- with open-ended
+ * status strings there is no value the board could read "current" out of.
+ */
+.taskrow[data-focused='true'] {
+  border-left-color: var(--teal);
+  margin-left: -8px;
+  padding-left: 6px;
+}
+
+/*
+ * `flex: none` would be right for the short identifiers everyone actually
+ * sends, and wrong for the 200 characters the cap permits: with nothing able to
+ * shrink, one long id pushes the row past the panel and the window scrolls
+ * sideways, which FR-019 forbids at any width. It shrinks last, after the
+ * title, and keeps a legible floor.
+ */
+.taskrow__id {
+  flex: 0 1 auto;
+  min-width: 3ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+/*
+ * The row's only flexible cell. `min-width: 0` is what lets it ellipsise instead
+ * of pushing the status and the elapsed tag off the edge; the full title stays
+ * retrievable through the `title` attribute (FR-009).
+ */
+.taskrow__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.taskrow[data-focused='true'] .taskrow__title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.taskrow__elapsed {
+  flex: none;
+  min-width: 24px;
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+}

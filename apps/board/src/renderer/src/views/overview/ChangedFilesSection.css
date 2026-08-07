@@ -1,0 +1,93 @@
+/*
+ * Rows run to the panel edge, so the flagged row's fill reads as a band rather
+ * than a floating strip. The section's own body padding is cancelled here and
+ * repaid per row.
+ */
+.section[data-testid='section-changed'] .section__body {
+  gap: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.changed__row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px;
+}
+
+.changed__row[data-flagged='true'] {
+  background: var(--raised);
+}
+
+.changed__flag {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--ember);
+}
+
+/*
+ * The change kind, as reported. The export shows a single `A`/`M` letter, which
+ * implies a closed set of kinds the contract does not have -- `change` is free
+ * text, exactly like `status`. Rather than invent a second vocabulary to colour
+ * it, the word is shown as written in a neutral treatment; the counts beside it
+ * already carry the teal-and-ember signal the letters were doing.
+ */
+.changed__kind {
+  flex: none;
+  max-width: 22%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+}
+
+/*
+ * Ellipsised at the end, plainly. Truncating from the left would keep the
+ * filename and lose the directories, which reads better -- but every CSS trick
+ * for it reorders the string visually, and this text was composed by an agent
+ * and must render as written. The full path is on `title` (FR-009).
+ */
+.changed__path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  color: var(--ink);
+}
+
+.changed__counts {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.changed__added {
+  color: var(--teal);
+}
+
+.changed__removed {
+  color: var(--ember);
+}
+
+.changed__note {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ember);
+}

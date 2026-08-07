@@ -32,3 +32,19 @@ export function elapsed(since: number, now: number): string {
 export function heardAgo(since: number, now: number): string {
   return `heard ${elapsed(since, now)} ago`;
 }
+
+/**
+ * The focus tag: `now`, then `4m`, `2h`, `3d`.
+ *
+ * Coarser than the title bar on purpose. "How long since the agent said
+ * anything at all" is worth watching second by second — it is the liveness
+ * reading. "How long since it said which task it was on" is not: a report every
+ * few seconds would make the tag flicker through a range nobody is reading,
+ * and the design has never shown a seconds value here.
+ *
+ * Still a measurement, and still no threshold. `now` is a band, not a verdict
+ * about freshness, and nothing about the tag's appearance changes when it ends.
+ */
+export function focusAge(since: number, now: number): string {
+  return Math.max(0, now - since) < MINUTE ? 'now' : elapsed(since, now);
+}

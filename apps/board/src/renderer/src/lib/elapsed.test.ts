@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { elapsed, heardAgo } from './elapsed.js';
+import { elapsed, focusAge, heardAgo } from './elapsed.js';
 
 const at = (ms: number): string => elapsed(0, ms);
 
@@ -45,5 +45,31 @@ describe('elapsed', () => {
 
   it('phrases the title bar without editorialising', () => {
     expect(heardAgo(0, 40_000)).toBe('heard 40s ago');
+  });
+});
+
+describe('focusAge', () => {
+  it('reads "now" for the whole first minute', () => {
+    expect(focusAge(0, 0)).toBe('now');
+    expect(focusAge(0, 40_000)).toBe('now');
+    expect(focusAge(0, 59_999)).toBe('now');
+  });
+
+  it('counts from a minute onwards, exactly as the title bar does', () => {
+    expect(focusAge(0, 60_000)).toBe('1m');
+    expect(focusAge(0, 4 * 60_000)).toBe('4m');
+    expect(focusAge(0, 2 * 60 * 60_000)).toBe('2h');
+    expect(focusAge(0, 3 * 24 * 60 * 60_000)).toBe('3d');
+  });
+
+  it('is coarser than the title bar within that first minute', () => {
+    // Liveness is watched second by second; which task is being worked on is
+    // not, and a report every few seconds would make this flicker.
+    expect(elapsed(0, 40_000)).toBe('40s');
+    expect(focusAge(0, 40_000)).toBe('now');
+  });
+
+  it('stays a measurement at absurd durations', () => {
+    expect(focusAge(0, 400 * 24 * 60 * 60_000)).toBe('400d');
   });
 });

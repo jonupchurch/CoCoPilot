@@ -1,0 +1,64 @@
+/* The export's card: a raised surface inside the panel, bordered rather than
+   shadowed, because only the window itself floats. */
+.focus__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.focus__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.focus__task {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+}
+
+/*
+ * Tabular figures and a floor on the width, so `9s` becoming `10s` does not
+ * shift the row. It counts; it never changes treatment.
+ */
+.focus__elapsed {
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+  min-width: 24px;
+  text-align: right;
+}
+
+/*
+ * The agent's prose, verbatim. `overflow-wrap` because a model will eventually
+ * emit a 400-character unbroken path and the panel must not scroll sideways
+ * because of it.
+ */
+.focus__note {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.focus__absent {
+  margin: 0;
+  font-size: var(--text-body);
+  color: var(--muted);
+}

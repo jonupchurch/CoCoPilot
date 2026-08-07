@@ -1,0 +1,83 @@
+/* The header pill, which the export gives only to a plan with a step in
+   progress. Nothing in progress, nothing to point at. */
+.plan__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--blue-tint);
+  color: var(--blue);
+  font-family: var(--font-prose);
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+.plan__pip {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: currentcolor;
+}
+
+.plan__rail {
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.plan__fill {
+  display: block;
+  width: var(--plan-progress, 0%);
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--blue);
+}
+
+.plan__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* The disc sits on the first line of text rather than centred on a step that
+   wrapped to three. */
+.plan__step .disc {
+  margin-top: 1px;
+}
+
+.plan__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+/*
+ * Wraps rather than truncates. A plan step is a sentence, and a sentence cut at
+ * the panel's edge stops being one -- unlike a task title, which sits in a row
+ * with a status and an elapsed tag competing for the same width.
+ */
+.plan__label {
+  font-size: var(--text-body);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.plan__step:has(.disc--active) .plan__label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.plan__detail {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.plan__step:has(.disc--active) .plan__detail {
+  color: var(--blue);
+}

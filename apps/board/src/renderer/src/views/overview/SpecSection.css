@@ -1,0 +1,41 @@
+.spec__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.spec__id {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  overflow-wrap: anywhere;
+}
+
+.spec__title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Wraps rather than ellipsises: a spec path is the one value here someone might
+ * want to read in full, and the card has room for two lines where a row does
+ * not. The `title` attribute carries it either way.
+ */
+.spec__path {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.spec__tasks {
+  display: flex;
+  flex-direction: column;
+}

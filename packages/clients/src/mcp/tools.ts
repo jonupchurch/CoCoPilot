@@ -44,6 +44,16 @@ export const NOTE_DESCRIPTION = [
 ].join('\n');
 
 /**
+ * Status is free text and stays free text. Saying so matters because the
+ * alternative failure is silent: an agent that assumes a closed set will either
+ * force its real state into the nearest listed word or avoid reporting status at
+ * all, and both put something less true on the board than the string it had.
+ */
+const STATUS_NOTE =
+  'status is any text. "done", "active", "blocked", "todo" and obvious synonyms get colour; ' +
+  'anything else shows as written, in grey, which is fine. Use the words you would use.';
+
+/**
  * `repo`, `branch` and `sessionId` are deliberately absent. Exposing them would
  * be three more chances for a model to get identity wrong mid-task, for no
  * benefit — the client already knows all three (FR-002, FR-004).
@@ -60,9 +70,19 @@ export const reportInputShape = {
     .describe('Your state. "needs-you" is the only way to request a human.'),
   feature: ReportedFeature.optional().describe('The feature being worked'),
   stories: z.array(Story).max(MAX_STORIES).optional(),
-  tasks: z.array(Task).max(MAX_TASKS).optional(),
-  plan: z.array(PlanStep).max(MAX_PLAN_STEPS).optional(),
-  changedFiles: z.array(ChangedFile).max(MAX_CHANGED_FILES).optional(),
+  // The status note appears on `tasks` and `plan` rather than once, because a
+  // model reads the parameter it is filling in and not the one above it.
+  tasks: z.array(Task).max(MAX_TASKS).optional().describe(STATUS_NOTE),
+  plan: z.array(PlanStep).max(MAX_PLAN_STEPS).optional().describe(STATUS_NOTE),
+  changedFiles: z
+    .array(ChangedFile)
+    .max(MAX_CHANGED_FILES)
+    .optional()
+    .describe(
+      'Files you changed. Set note on one to flag it for the human — the note is why it ' +
+        'wants their eye ("conflict", "regenerated, check the diff"), and it is the only way ' +
+        'to single a file out.',
+    ),
 };
 
 export const noteInputShape = {

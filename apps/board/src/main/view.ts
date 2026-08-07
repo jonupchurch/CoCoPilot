@@ -1,6 +1,13 @@
 import { basename } from 'node:path';
 
-import type { Chip } from '@cocopilot/contract';
+import type {
+  ChangedFile,
+  Chip,
+  Focus,
+  PlanStep,
+  ReportedFeature,
+  Task,
+} from '@cocopilot/contract';
 
 import type { Session, Store } from './store.js';
 
@@ -29,6 +36,29 @@ export interface SessionView {
   storyCount: number;
   taskCount: number;
   noteCount: number;
+
+  /**
+   * When the last *report* arrived, or null until one has.
+   *
+   * Deliberately not `lastHeardAt`, which a note also moves: the Overview tab's
+   * focus tag says how long ago the agent reported what it is working on, and a
+   * note arriving must not reset that to zero.
+   */
+  reportedAt: number | null;
+
+  /**
+   * The reported body, listed field by field rather than carried as a whole.
+   *
+   * Naming each one is the point: a field added to the store does not reach a
+   * window rendering agent-composed text until someone writes it down here.
+   * `stories` is absent for exactly that reason — the User Stories tab is
+   * feature 006, and until then the renderer has no business seeing them.
+   */
+  feature: ReportedFeature | null;
+  tasks: Task[];
+  plan: PlanStep[];
+  focus: Focus | null;
+  changedFiles: ChangedFile[];
 }
 
 export interface BoardState {
@@ -51,6 +81,8 @@ export function toBoardState(store: Store): BoardState {
 }
 
 function toSessionView(session: Session): SessionView {
+  const report = session.report;
+
   return {
     repo: session.repoPath,
     repoName: basename(session.repoPath) || session.repoPath,
@@ -58,11 +90,20 @@ function toSessionView(session: Session): SessionView {
     lastHeardAt: session.lastHeardAt,
     // Defaults to `thinking` only because a session created by a note alone has
     // no report to have carried one. Still reported, never inferred.
-    chip: session.report?.focus?.chip ?? 'thinking',
+    chip: report?.focus?.chip ?? 'thinking',
     attributed: session.attributed,
-    hasReport: session.report !== null,
-    storyCount: session.report?.stories.length ?? 0,
-    taskCount: session.report?.tasks.length ?? 0,
+    hasReport: report !== null,
+    storyCount: report?.stories.length ?? 0,
+    taskCount: report?.tasks.length ?? 0,
     noteCount: session.notes.length,
+
+    reportedAt: report?.receivedAt ?? null,
+    feature: report?.feature ?? null,
+    // Empty rather than null where the payload's own default is empty, so the
+    // renderer has one absence to handle per field instead of two.
+    tasks: report?.tasks ?? [],
+    plan: report?.plan ?? [],
+    focus: report?.focus ?? null,
+    changedFiles: report?.changedFiles ?? [],
   };
 }
