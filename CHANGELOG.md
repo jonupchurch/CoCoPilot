@@ -8,6 +8,30 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 003 — window shell.** The first feature a person can see. One
+  Electron window with `contextIsolation` on, `nodeIntegration` off and
+  `sandbox` on, rendering identity, liveness, navigation and emptiness from the
+  store in feature 001 — read once on mount, pushed to thereafter, and never
+  polled.
+  - `tokens.css` transcribes the round 1–3 design exports, which are canon for
+    look and feel. The title bar carries the repository as well as the branch:
+    the export shows only the branch, but FR-001 requires both, and decision 8
+    makes this repository's docs authoritative on incidental content.
+  - Elapsed time is derived at render and never stored. It stays a
+    *measurement* at any duration — the board never says stalled, stuck or
+    failed, because a healthy agent goes quiet for minutes during a typecheck.
+  - The waiting state is a primary layout, not a fallback: nothing survives a
+    restart, so it is seen on every launch. The tab strip is hidden entirely
+    rather than offering four dead ends, and each tab appears only once its view
+    has content.
+  - 20 Playwright tests against the built app, two of them absences — nothing
+    changes on a timer beyond the elapsed counter, and agent-composed markup
+    renders as visible characters and executes nothing.
+  - Main is bundled as CommonJS. Worth knowing for anyone who hits it: ESM
+    appeared to be the problem, but the actual cause was `ELECTRON_RUN_AS_NODE`
+    set in the environment, which makes `electron.exe` run as plain Node so its
+    built-in module is never registered. The E2E helper strips it.
+
 - **Feature 002 — MCP server and CLI.** `packages/clients`, published as
   `@cocopilot/mcp` and fetched by `npx`, carrying both binaries. Two thin
   clients over feature 001's contract: neither holds state, both derive

@@ -64,22 +64,22 @@ apps/board/src/
 
 ## Phase 1: Setup
 
-- [ ] T001 Add `electron-vite` config at `apps/board/electron.vite.config.ts` with three builds — main, preload, renderer — and the React plugin
-- [ ] T002 [P] Split `apps/board/tsconfig.json` into `tsconfig.node.json` (main + preload, Node libs) and `tsconfig.web.json` (renderer, DOM libs, no `node:`), per the stack pack's three-tsconfigs rule
-- [ ] T003 [P] Add `dev`, `build`, `start` and `test:e2e` scripts to `apps/board/package.json`, and `test:e2e` at the root
-- [ ] T004 [P] Add `playwright.config.ts` at the repository root, configured for Electron with no web server
-- [ ] T005 Confirm `npm run typecheck` and `npm test` are still clean with the new configs
+- [x] T001 Add `electron-vite` config at `apps/board/electron.vite.config.ts` with three builds — main, preload, renderer — and the React plugin
+- [x] T002 [P] Split `apps/board/tsconfig.json` into `tsconfig.node.json` (main + preload, Node libs) and `tsconfig.web.json` (renderer, DOM libs, no `node:`), per the stack pack's three-tsconfigs rule
+- [x] T003 [P] Add `dev`, `build`, `start` and `test:e2e` scripts to `apps/board/package.json`, and `test:e2e` at the root
+- [x] T004 [P] Add `playwright.config.ts` at the repository root, configured for Electron with no web server
+- [x] T005 Confirm `npm run typecheck` and `npm test` are still clean with the new configs
 
 ---
 
 ## Phase 2: Foundational
 
-- [ ] T006 [P] Create `apps/board/src/renderer/src/tokens.css` — the table above, transcribed. Every value a CSS variable; a hex literal anywhere else is a bug
-- [ ] T007 Create `apps/board/src/preload/index.ts` — `contextBridge.exposeInMainWorld('cocopilot', { getState, subscribe })`. Functions only, never `ipcRenderer`, no logic: it is a wire, not a layer
-- [ ] T008 Create `apps/board/src/main/window.ts` — one `BrowserWindow` with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, a minimum size, and no code path that resizes it
-- [ ] T009 Wire the service into `apps/board/src/main/app.ts` — start `createService()`, register `ipcMain.handle` for the initial read, and forward `store.subscribe()` to `webContents.send`
-- [ ] T010 [P] Create `apps/board/src/renderer/src/lib/elapsed.ts` — a timestamp to `40s`, `4m`, `2h`, `3d`. Pure, and a *measurement*: it never returns a judgement at any duration
-- [ ] T011 Create `apps/board/src/renderer/src/state/useBoardState.ts` — one subscription, fetched once on mount then updated by push. The only entry point, because a component fetching its own copy would reintroduce polling by the back door
+- [x] T006 [P] Create `apps/board/src/renderer/src/tokens.css` — the table above, transcribed. Every value a CSS variable; a hex literal anywhere else is a bug
+- [x] T007 Create `apps/board/src/preload/index.ts` — `contextBridge.exposeInMainWorld('cocopilot', { getState, subscribe })`. Functions only, never `ipcRenderer`, no logic: it is a wire, not a layer
+- [x] T008 Create `apps/board/src/main/window.ts` — one `BrowserWindow` with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, a minimum size, and no code path that resizes it
+- [x] T009 Wire the service into `apps/board/src/main/app.ts` — start `createService()`, register `ipcMain.handle` for the initial read, and forward `store.subscribe()` to `webContents.send`
+- [x] T010 [P] Create `apps/board/src/renderer/src/lib/elapsed.ts` — a timestamp to `40s`, `4m`, `2h`, `3d`. Pure, and a *measurement*: it never returns a judgement at any duration
+- [x] T011 Create `apps/board/src/renderer/src/state/useBoardState.ts` — one subscription, fetched once on mount then updated by push. The only entry point, because a component fetching its own copy would reintroduce polling by the back door
 
 **Checkpoint**: A window opens and can read held state.
 
@@ -92,11 +92,11 @@ attention is wanted — all readable at a glance, none of it inferred.
 
 **Covers**: FR-001, FR-002, FR-003, FR-004, FR-005, FR-020, SC-001, SC-002
 
-- [ ] T012 [P] [US1] Write `apps/board/src/renderer/src/lib/elapsed.test.ts` — every band, the boundaries between them, and that a very large elapsed time stays a measurement rather than becoming "stalled"
-- [ ] T013 [US1] Create `apps/board/src/renderer/src/app/TitleBar.tsx` — the brand mark, repository, branch, elapsed, and the chip, laid out per the export
-- [ ] T014 [US1] Create `apps/board/src/renderer/src/app/Chip.tsx` — the four reported states with their tint/ink pairs, rendering only what the agent reported and deriving nothing
-- [ ] T015 [US1] Tick the elapsed display on a coarse interval in `useBoardState.ts`, **fetching nothing**. The one permitted timer, and it must never be allowed to grow into a refresh
-- [ ] T016 [P] [US1] Write `apps/board/src/renderer/tests/e2e/identity.spec.ts` — report a session, assert repository, branch, elapsed and chip; assert `needs-you` is visually distinct from `watching`
+- [x] T012 [P] [US1] Write `apps/board/src/renderer/src/lib/elapsed.test.ts` — every band, the boundaries between them, and that a very large elapsed time stays a measurement rather than becoming "stalled"
+- [x] T013 [US1] Create `apps/board/src/renderer/src/app/TitleBar.tsx` — the brand mark, repository, branch, elapsed, and the chip, laid out per the export
+- [x] T014 [US1] Create `apps/board/src/renderer/src/app/Chip.tsx` — the four reported states with their tint/ink pairs, rendering only what the agent reported and deriving nothing
+- [x] T015 [US1] Tick the elapsed display on a coarse interval in `useBoardState.ts`, **fetching nothing**. The one permitted timer, and it must never be allowed to grow into a refresh
+- [x] T016 [P] [US1] Write `apps/board/src/renderer/tests/e2e/identity.spec.ts` — report a session, assert repository, branch, elapsed and chip; assert `needs-you` is visually distinct from `watching`
 
 ---
 
@@ -107,10 +107,10 @@ so it is a primary layout, not a fallback.
 
 **Covers**: FR-007, FR-008, FR-009, FR-010, FR-011, SC-005, SC-007
 
-- [ ] T017 [US2] Create `apps/board/src/renderer/src/app/WaitingState.tsx` — "Waiting for an agent", the listening pill, and the line stating the agent supplies everything and there is nothing to set up
-- [ ] T018 [US2] Create `apps/board/src/renderer/src/app/TabStrip.tsx` — hidden **entirely** when nothing has been reported. Four tabs leading to four empty views would be four dead ends
-- [ ] T019 [US2] Create `apps/board/src/renderer/src/app/App.tsx` — the shell choosing between the waiting state and the populated frame
-- [ ] T020 [P] [US2] Write `apps/board/src/renderer/tests/e2e/waiting-state.spec.ts` — launched empty it says it is waiting and offers no tab strip; a first report populates it with no restart; the title bar says "nothing heard yet" rather than a fake elapsed time
+- [x] T017 [US2] Create `apps/board/src/renderer/src/app/WaitingState.tsx` — "Waiting for an agent", the listening pill, and the line stating the agent supplies everything and there is nothing to set up
+- [x] T018 [US2] Create `apps/board/src/renderer/src/app/TabStrip.tsx` — hidden **entirely** when nothing has been reported. Four tabs leading to four empty views would be four dead ends
+- [x] T019 [US2] Create `apps/board/src/renderer/src/app/App.tsx` — the shell choosing between the waiting state and the populated frame
+- [x] T020 [P] [US2] Write `apps/board/src/renderer/tests/e2e/waiting-state.spec.ts` — launched empty it says it is waiting and offers no tab strip; a first report populates it with no restart; the title bar says "nothing heard yet" rather than a fake elapsed time
 
 ---
 
@@ -118,8 +118,8 @@ so it is a primary layout, not a fallback.
 
 **Covers**: FR-012, FR-013, FR-014, FR-017, FR-019, SC-003, SC-008
 
-- [ ] T021 [US3] Hold the active tab in `App.tsx` as view state, not a route — giving tabs URLs would invent history and back semantics a single desktop panel does not have
-- [ ] T022 [P] [US3] Write `apps/board/src/renderer/tests/e2e/resize.spec.ts` — width survives every tab switch; a resize is honoured; the minimum is enforced; an arriving report leaves the active tab and scroll position alone
+- [x] T021 [US3] Hold the active tab in `App.tsx` as view state, not a route — giving tabs URLs would invent history and back semantics a single desktop panel does not have
+- [x] T022 [P] [US3] Write `apps/board/src/renderer/tests/e2e/resize.spec.ts` — width survives every tab switch; a resize is honoured; the minimum is enforced; an arriving report leaves the active tab and scroll position alone
 
 ---
 
@@ -127,19 +127,19 @@ so it is a primary layout, not a fallback.
 
 **Covers**: FR-015, FR-016, SC-004
 
-- [ ] T023 [US4] Make the body the one scroll container in `App.tsx`, with the title bar and tab strip fixed above it, and section headers sticky so a section's label and summary stay legible while its contents pass behind
-- [ ] T024 [P] [US4] Write `apps/board/src/renderer/tests/e2e/layout.spec.ts` — at the minimum size, no horizontal scroll anywhere and no clipped content; a long repository path and branch degrade without breaking identity or liveness
+- [x] T023 [US4] Make the body the one scroll container in `App.tsx`, with the title bar and tab strip fixed above it, and section headers sticky so a section's label and summary stay legible while its contents pass behind
+- [x] T024 [P] [US4] Write `apps/board/src/renderer/tests/e2e/layout.spec.ts` — at the minimum size, no horizontal scroll anywhere and no clipped content; a long repository path and branch degrade without breaking identity or liveness
 
 ---
 
 ## Phase 7: Polish & the two absences
 
-- [ ] T025 [P] Write `apps/board/src/renderer/tests/e2e/no-timer-changes.spec.ts` — report once, then leave the window alone: the **only** thing that changes is the elapsed counter, and no IPC or network traffic occurs meanwhile. This is what catches a polling loop or a staleness badge added later as an apparent improvement (SC-006)
-- [ ] T026 [P] Write `apps/board/src/renderer/tests/e2e/inert-text.spec.ts` — a branch, prose and a task title each containing `<script>` render as visible characters and execute nothing; assert no `dangerouslySetInnerHTML` exists anywhere in the renderer source (SC-009)
-- [ ] T027 Walk both stack-pack checklists: no `node:` import resolves in the renderer build, no colour literal outside `tokens.css`, no timer fetches data, and the app quits without an orphaned server
-- [ ] T028 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged `build`, then walk the six scenarios in [quickstart.md](quickstart.md)
-- [ ] T029 [P] Update `CHANGELOG.md` and `STATUS.md`
-- [ ] T030 Read back the full diff, then merge
+- [x] T025 [P] Write `apps/board/src/renderer/tests/e2e/no-timer-changes.spec.ts` — report once, then leave the window alone: the **only** thing that changes is the elapsed counter, and no IPC or network traffic occurs meanwhile. This is what catches a polling loop or a staleness badge added later as an apparent improvement (SC-006)
+- [x] T026 [P] Write `apps/board/src/renderer/tests/e2e/inert-text.spec.ts` — a branch, prose and a task title each containing `<script>` render as visible characters and execute nothing; assert no `dangerouslySetInnerHTML` exists anywhere in the renderer source (SC-009)
+- [x] T027 Walk both stack-pack checklists: no `node:` import resolves in the renderer build, no colour literal outside `tokens.css`, no timer fetches data, and the app quits without an orphaned server
+- [x] T028 Run `npm run typecheck`, the full suite, the Playwright suite and a packaged `build`, then walk the six scenarios in [quickstart.md](quickstart.md)
+- [x] T029 [P] Update `CHANGELOG.md` and `STATUS.md`
+- [x] T030 Read back the full diff, then merge
 
 ---
 
