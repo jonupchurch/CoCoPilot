@@ -125,9 +125,14 @@ export function ContextSection({
  */
 function display(path: string, repo: string): string {
   const normal = (value: string): string => value.replaceAll('\\', '/').toLowerCase();
-  const prefix = `${normal(repo).replace(/\/$/, '')}/`;
+  const root = repo.replace(/[\\/]+$/u, '');
+  const prefix = `${normal(root)}/`;
 
-  return normal(path).startsWith(prefix) ? path.slice(prefix.length) : path;
+  // Sliced by the *original* root's length, not the normalised prefix's.
+  // `toLowerCase` is not length-preserving for every character — `İ` becomes two
+  // — so a repository path containing one would otherwise cut the wrong number
+  // of characters off every row and do it silently.
+  return normal(path).startsWith(prefix) ? path.slice(root.length + 1) : path;
 }
 
 function summary(context: Availability<ContextView>): string | React.JSX.Element {

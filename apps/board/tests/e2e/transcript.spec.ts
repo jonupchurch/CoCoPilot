@@ -723,7 +723,11 @@ test.describe('what the agent is holding', () => {
     await board.push(session());
 
     await expect(board.page.locator('.context__path')).toContainText('<script>');
-    await expect(board.page.locator('.context .img, .context img')).toHaveCount(0);
+    // `.overview`, not `.context` — there is no element with that class, so the
+    // assertion this replaces was counting zero of nothing and would have passed
+    // however the markup was rendered.
+    await expect(board.page.locator('.overview img')).toHaveCount(0);
+    await expect(board.page.locator('.overview script')).toHaveCount(0);
     expect(
       await board.page.evaluate(() => (window as { __pwned?: boolean }).__pwned),
     ).toBeUndefined();

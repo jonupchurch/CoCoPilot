@@ -186,7 +186,7 @@ export class TranscriptSource {
       tracked.context.observe(record);
     }
 
-    this.#publish(key, fromList(tracked.prompts.slice()), context(tracked.context.view()));
+    this.#publish(key, fromList(tracked.prompts.slice()), toAvailability(tracked.context.view()));
   }
 
   #publish(
@@ -221,7 +221,7 @@ export class TranscriptSource {
  * files are not is still telling the developer something, and calling it empty
  * would throw that away.
  */
-function context(view: ContextView): Availability<ContextView> {
+function toAvailability(view: ContextView): Availability<ContextView> {
   return view.files.length === 0 && view.tokens === null ? empty() : available(view);
 }
 
