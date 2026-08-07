@@ -15,8 +15,12 @@ test.afterEach(async () => {
   await board.close();
 });
 
-/** Some non-zero count of seconds — the counter has moved off `0s`. */
-const ADVANCED = /^[1-9]\d*s$/;
+/**
+ * The title bar, having counted past zero. Matched as a band rather than an
+ * exact tick, so a loaded machine cannot miss the one-second window and fail
+ * for a reason that has nothing to do with the code.
+ */
+const ADVANCED_PHRASE = /^heard [1-9]\d*s ago$/;
 
 test.describe('Focus — what the agent is doing right now', () => {
   test('shows the current task and the agent prose about it', async () => {
@@ -68,46 +72,47 @@ test.describe('Focus — what the agent is doing right now', () => {
     await expect(page.getByTestId('section-summary-focus')).toHaveText('none reported');
   });
 
-  test('states elapsed time without changing its treatment as time passes', async () => {
+  test('states a duration and never changes treatment while time passes', async () => {
     const { page } = board;
 
     await board.push({ ...envelope(), focus: { task: 'T-013', note: 'Reading the middleware.' } });
 
     const tag = page.getByTestId('focus-elapsed');
-    await expect(tag).toHaveText('0s');
+    const treatment = async (): Promise<Record<string, string>> =>
+      tag.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { color: style.color, weight: style.fontWeight, opacity: style.opacity };
+      });
 
-    const before = await tag.evaluate((el) => {
-      const style = getComputedStyle(el);
-      return { color: style.color, weight: style.fontWeight, opacity: style.opacity };
-    });
+    await expect(tag).toHaveText('now');
+    const before = await treatment();
 
-    // Not a threshold test -- there are no thresholds. It asserts that the only
-    // thing which changes is the number, which is what FR-003 asks for. Matched
-    // as "some non-zero count of seconds" rather than an exact tick, so a slow
-    // machine cannot miss the one-second window and fail for the wrong reason.
-    await expect(tag).toHaveText(ADVANCED, { timeout: 5_000 });
+    // The clock is ticking -- the title bar proves it -- and the focus tag is
+    // unmoved and unrestyled. There is no threshold here to test *at*; the band
+    // boundaries are covered exhaustively in `lib/elapsed.test.ts`, and what
+    // matters at this level is that nothing about the tag's appearance is a
+    // function of age (FR-003).
+    await expect(page.getByTestId('elapsed')).toHaveText(ADVANCED_PHRASE, { timeout: 5_000 });
 
-    const after = await tag.evaluate((el) => {
-      const style = getComputedStyle(el);
-      return { color: style.color, weight: style.fontWeight, opacity: style.opacity };
-    });
-
-    expect(after).toEqual(before);
+    await expect(tag).toHaveText('now');
+    expect(await treatment()).toEqual(before);
     await expect(page.getByTestId('focus-note')).toBeVisible();
   });
 
-  test('does not reset the elapsed tag when a note arrives', async () => {
+  test('keeps showing the focus when a note arrives', async () => {
     const { page } = board;
 
     await board.push({ ...envelope(), focus: { task: 'T-013' } });
-    await expect(page.getByTestId('focus-elapsed')).toHaveText(ADVANCED, { timeout: 5_000 });
-
     await board.note({ ...envelope(), text: 'noticed while editing' });
 
-    // The title bar heard something; the focus tag reports when the agent last
-    // said what it was working on, which was not now.
+    // A note moves `lastHeardAt` and must not move `reportedAt` -- the tag says
+    // how long since the agent said what it was *working on*. Within the first
+    // minute both read as fresh, so the discriminating assertion is the unit
+    // test in `tests/unit/view.test.ts`; what this covers is that a note does
+    // not blank or replace the focus that a report established.
     await expect(page.getByTestId('elapsed')).toHaveText('heard 0s ago');
-    await expect(page.getByTestId('focus-elapsed')).toHaveText(ADVANCED);
+    await expect(page.getByTestId('focus-task')).toHaveText('T-013');
+    await expect(page.getByTestId('focus-elapsed')).toHaveText('now');
   });
 });
 

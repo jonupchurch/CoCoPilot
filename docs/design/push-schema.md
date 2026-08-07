@@ -72,6 +72,37 @@ else in neutral grey with the text shown as-is. An arbitrary string cannot
 honestly be assigned a signal colour when teal, blue and ember each mean
 something specific.
 
+**The recognised set, in full** (feature 004,
+`apps/board/src/renderer/src/lib/vocabulary.ts`):
+
+| Renders as | Terms |
+|---|---|
+| done — teal ✓ | `done`, `complete`, `completed`, `finished` |
+| active — blue ring | `active`, `in progress`, `in-progress`, `wip`, `doing`, `working`, `started` |
+| blocked — ember | `blocked`, `blocker`, `stuck` |
+| todo — grey outline | `todo`, `to do`, `to-do`, `pending`, `not started`, `queued` |
+
+Matching ignores case and surrounding whitespace, and **nothing else**. No
+prefix matching, no stemming, no edit distance: `donee` renders neutral, not
+done. Anything unrecognised is shown in grey with its text intact and no disc at
+all — an outline circle would say "not started", which is a claim about a string
+the board cannot read.
+
+Sending a status outside this list is fine and always will be. The text is
+displayed exactly as sent, including for recognised terms — an agent that writes
+`wip` sees `wip`, coloured as active, never rewritten to `active`.
+
+### `changedFiles[].note` is how a file asks for attention
+
+A changed file carrying a `note` is rendered as flagged: the row takes a raised
+fill and the note text appears in ember in place of the line counts. So the note
+is *why this file wants your eye* — `conflict`, `regenerated, check the diff` —
+not a description of the change, which is what `change` is for.
+
+Absent a note, a file is an ordinary change. The board does not infer attention
+from the size of a diff or from anything else; the agent flags it or nobody
+does.
+
 ### `focus` is not a status
 
 Which task is being worked on is tracked separately from what state that task is

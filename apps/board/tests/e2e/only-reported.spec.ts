@@ -70,7 +70,7 @@ const DERIVED: readonly RegExp[] = [
   /Step \d+ of \d+/g, // plan position
   /\d+ of \d+ done/g, // completion counts
   /[+−]\d+/g, // line-count sums and per-file counts
-  /\b\d+[smhd]\b/g, // elapsed tags
+  /\b\d+[smhd]\b|\bnow\b/g, // elapsed tags, and the focus tag's first band
 ];
 
 test.describe('the view shows only what was reported', () => {

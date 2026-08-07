@@ -30,6 +30,18 @@ wrong mid-task, for no benefit.
 
 **Returns**: confirmation, or the board-absent message.
 
+**Two things the description should also say**, because an agent cannot use a
+convention it has not been told about (both settled by feature 004, and
+specified in [`docs/design/push-schema.md`](../../../docs/design/push-schema.md)):
+
+- A task, story or plan `status` may be any text. `done`, `active`, `blocked`,
+  `todo` and their listed synonyms take signal colours; everything else renders
+  neutral with its text intact, which is a supported outcome rather than a
+  failure. Case and surrounding whitespace are ignored; nothing else is.
+- A `changedFiles` entry carrying a `note` is shown as flagged. The note is
+  *why this file wants your eye* — `conflict`, `regenerated, check the diff` —
+  and it is the only way to draw attention to one file among many.
+
 ### `cocopilot_note`
 
 Record a note for the human.

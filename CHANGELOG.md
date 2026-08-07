@@ -8,6 +8,37 @@ this project is pre-release and not yet versioned.
 
 ### Added
 
+- **Feature 004 — Overview tab.** The default view: Focus, Spec, Plan and
+  Changed files, each a collapsible section whose header carries its own
+  summary, so a developer with everything closed can still read the feature's
+  completion, the position in the plan and the volume of change.
+  - `Section` **requires** a summary, typed so neither `null` nor `undefined`
+    satisfies it. A section without one fails to compile, which is what makes
+    "every header answers its question" structural rather than a convention that
+    decays by feature 006.
+  - The status vocabulary lives in the renderer, not the contract. `done`,
+    `active`, `blocked`, `todo` and their listed synonyms take signal colours;
+    everything else renders grey with its text intact and no disc at all.
+    Matching normalises case and surrounding whitespace and **nothing else** —
+    `donee` is not `done`. The full table is in
+    [`docs/design/push-schema.md`](docs/design/push-schema.md).
+  - `changedFiles[].note` now has a stated meaning: *why this file wants your
+    eye*. Its presence is what flags a file. The field had a cap and no
+    documented purpose; the MCP tool description says so now, because an agent
+    cannot use a convention nobody told it about.
+  - The focus tag counts from the report, not from when the task became current.
+    Tracking the latter would mean carrying state across snapshots, which is the
+    merge path decision 26 refuses. A note arriving does not reset it.
+  - Two departures from the design export, both content rather than look and
+    feel: status text appears on **every** task row, because a disc cannot carry
+    a status the board does not recognise; and there is a Focus section, which
+    the export does not have, because the export marks focus only on a task row
+    and that leaves the agent's prose nowhere to go.
+  - 30 more Playwright tests. The one that matters subtracts every reported
+    value and every *declared* derivation from the rendered text and asserts
+    nothing remains — so a derived percentage or an invented count cannot be
+    added later without someone writing it down and justifying it.
+
 - **Feature 003 — window shell.** The first feature a person can see. One
   Electron window with `contextIsolation` on, `nodeIntegration` off and
   `sandbox` on, rendering identity, liveness, navigation and emptiness from the

@@ -1,7 +1,7 @@
 import type { Focus } from '@cocopilot/contract';
 
 import { Section } from '../../components/Section.js';
-import { elapsed } from '../../lib/elapsed.js';
+import { focusAge } from '../../lib/elapsed.js';
 import { focusSummary } from '../../lib/summarise.js';
 
 import './FocusSection.css';
@@ -60,7 +60,7 @@ export function FocusSection({
               </span>
               {reportedAt === null ? null : (
                 <span className="focus__elapsed" data-testid="focus-elapsed">
-                  {elapsed(reportedAt, now)}
+                  {focusAge(reportedAt, now)}
                 </span>
               )}
             </div>

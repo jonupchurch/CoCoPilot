@@ -147,6 +147,15 @@ Defaults to `thinking` when a report omits it.
 | `added` / `removed` | number \| null | — |
 | `note` | string \| null | 200 |
 
+`change` is free text like `status`, not a closed set of git letters, so the
+board renders the word as sent rather than colouring it.
+
+`note` is **why this file wants your eye**, not a description of the change. Its
+presence is what flags a file: feature 004 renders a file carrying a note with a
+raised fill and the note in ember, in place of the line counts. Absent a note, a
+file is an ordinary change — the board never infers attention from a diff's
+size or from anything else.
+
 ---
 
 ## Note

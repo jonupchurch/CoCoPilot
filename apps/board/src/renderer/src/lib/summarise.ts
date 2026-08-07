@@ -1,6 +1,6 @@
 import type { ChangedFile, Focus, PlanStep, ReportedFeature, Task } from '@cocopilot/contract';
 
-import { elapsed } from './elapsed.js';
+import { focusAge } from './elapsed.js';
 import { isActive, isDone } from './vocabulary.js';
 
 /**
@@ -21,7 +21,7 @@ export const MINUS = '−';
 export function focusSummary(focus: Focus | null, reportedAt: number | null, now: number): string {
   if (focus === null || focus.task === null || focus.task.trim() === '') return 'none reported';
   if (reportedAt === null) return focus.task;
-  return `${focus.task} · ${elapsed(reportedAt, now)}`;
+  return `${focus.task} · ${focusAge(reportedAt, now)}`;
 }
 
 /**

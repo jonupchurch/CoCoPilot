@@ -42,6 +42,11 @@ describe('focusSummary', () => {
     expect(focusSummary(focus({ task: 'T-013' }), 0, 240_000)).toBe('T-013 · 4m');
   });
 
+  it('reads "now" for the first minute rather than counting seconds', () => {
+    expect(focusSummary(focus({ task: 'T-013' }), 0, 0)).toBe('T-013 · now');
+    expect(focusSummary(focus({ task: 'T-013' }), 0, 40_000)).toBe('T-013 · now');
+  });
+
   it('says so when no current task was reported', () => {
     expect(focusSummary(null, 0, 0)).toBe('none reported');
     expect(focusSummary(focus(), 0, 0)).toBe('none reported');

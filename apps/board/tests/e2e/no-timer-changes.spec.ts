@@ -31,11 +31,29 @@ test.describe('nothing changes on a timer', () => {
     });
     await expect(page.getByTestId('identity')).toBeVisible();
 
-    const snapshot = async (): Promise<string> => {
-      // Everything except the elapsed figure, which is supposed to advance.
-      const html = await page.locator('.app').innerHTML();
-      return html.replace(/heard \d+[smhd] ago/g, 'heard <elapsed> ago');
-    };
+    /**
+     * Everything except the elapsed figures, which are supposed to advance.
+     *
+     * The exemption is a list of specific elements rather than a pattern applied
+     * to the whole tree, which is what keeps the test honest: a new counter, a
+     * staleness badge or an age-driven class lands outside the list and fails
+     * here. Feature 004 added three entries to it, deliberately and visibly.
+     */
+    const snapshot = async (): Promise<string> =>
+      page.evaluate(() => {
+        const root = document.querySelector('.app')?.cloneNode(true) as HTMLElement;
+        const allowedToTick = [
+          '[data-testid="elapsed"]', // the title bar
+          '[data-testid="focus-elapsed"]', // the Focus card
+          '[data-testid^="task-elapsed-"]', // the focused task row
+          '[data-testid="section-summary-focus"]', // the Focus header summary
+        ].join(',');
+
+        for (const el of root.querySelectorAll(allowedToTick)) {
+          el.textContent = (el.textContent ?? '').replace(/\b\d+[smhd]\b/g, '<elapsed>');
+        }
+        return root.innerHTML;
+      });
 
     const before = await snapshot();
     const elapsedBefore = await page.getByTestId('elapsed').innerText();
