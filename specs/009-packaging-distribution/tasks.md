@@ -50,7 +50,7 @@ bytes. No new packages yet.
 
 ## Phase 2: User Story 1 — Run the whole product with one command (Priority: P1) 🎯 MVP
 
-**Goal**: `npx cocoapilot` opens the board on a machine with nothing
+**Goal**: `npx cocoapilot-board` opens the board on a machine with nothing
 installed.
 
 **Covers**: FR-001, FR-002, FR-003, FR-006, FR-025

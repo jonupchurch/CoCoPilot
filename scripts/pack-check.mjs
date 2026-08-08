@@ -118,7 +118,7 @@ try {
     }
   }
 
-  const staged = join(runnerDir, 'node_modules', 'cocoapilot', 'out', 'main', 'app.cjs');
+  const staged = join(runnerDir, 'node_modules', 'cocoapilot-board', 'out', 'main', 'app.cjs');
   if (existsSync(staged)) note('the built application is inside the package');
   else failures.push('the runner package does not contain the built application');
 
@@ -132,7 +132,7 @@ try {
    * build agree rather than checking that a file exists somewhere.
    */
   for (const icon of ['icon.ico', 'icon.png']) {
-    const path = join(runnerDir, 'node_modules', 'cocoapilot', 'out', 'main', '..', '..', 'resources', icon);
+    const path = join(runnerDir, 'node_modules', 'cocoapilot-board', 'out', 'main', '..', '..', 'resources', icon);
     if (existsSync(path)) note(`${icon} is where the built code looks for it`);
     else failures.push(`the runner package ships no ${icon}, so the board would show Electron's logo`);
   }
@@ -150,7 +150,7 @@ try {
    * Which is the lesson: a package that installs is not a package that runs.
    */
   process.stdout.write('\nStarting the installed board:\n');
-  const launcher = join(runnerDir, 'node_modules', 'cocoapilot', 'bin', 'cocoapilot-board.mjs');
+  const launcher = join(runnerDir, 'node_modules', 'cocoapilot-board', 'bin', 'cocoapilot-board.mjs');
   const board = spawn(process.execPath, [launcher], {
     cwd: runnerDir,
     stdio: ['ignore', 'pipe', 'pipe'],

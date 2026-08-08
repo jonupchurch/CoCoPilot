@@ -112,5 +112,5 @@ nothing that pulls in a browser runtime. It is what an agent needs, and it is
 around 21 KB.
 
 If you also want the board itself, the window that displays what your agent
-reports, run `npx cocoapilot` instead. That package brings these tools with
+reports, run `npx cocoapilot-board` instead. That package brings these tools with
 it, so you never need both.

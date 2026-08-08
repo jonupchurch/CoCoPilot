@@ -74,6 +74,15 @@ manifests, build from scratch rather than trusting `dist/`, verify the packed
 contents, and publish in dependency order so a half-finished release never
 leaves a package pointing at one that does not exist.
 
+> **Corrected 2026-08-08 — the claim below is wrong, and how it went wrong is
+> the point.** The security holding package is **`cocopilot`**, the spelling
+> this product used until 2026-08-07. The rename commit replaced `cocopilot`
+> with `cocoapilot` everywhere, which silently turned a *true* statement about
+> the old name into a *false* one about the new one. A blanket rename can
+> invert a verified fact without touching a line of code; re-check external
+> facts after one rather than carrying them across. The decision this section
+> defers has since been made — see [quickstart.md](quickstart.md).
+
 **Naming is the one decision this feature does not make.** The unscoped name
 `cocoapilot` is an npm security holding package and cannot be had, so `npx
 cocoapilot` is unavailable whatever else is decided. Beyond that there are two
@@ -121,8 +130,11 @@ path. It is specified and left.
 Recorded rather than researched afresh, because they were established by direct
 check on 2026-08-07:
 
-- `cocoapilot` on npm is a **security holding package** (`0.0.1-security`, no
-  maintainer). Unavailable.
+- `cocopilot` on npm is a **security holding package** (`0.0.1-security`, no
+  maintainer). Unavailable. *(Reads `cocoapilot` in earlier revisions of this
+  file — that was the rename overwriting a fact about the old spelling.
+  `cocoapilot` itself is free, and is deliberately not being taken; see
+  [quickstart.md](quickstart.md).)*
 - `cocoapilot-board`, `cocoapilot-mcp`, `cocoapilot-contract`, `cocoapilot-app`,
   `cocoapilot-cli` and `co-copilot` are all free.
 - `cocoapilot-mcp` does not exist; whether the `@cocoapilot` **organisation** is

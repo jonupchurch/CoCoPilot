@@ -12,7 +12,7 @@ from your repository.
 ## Running it
 
 ```bash
-npx cocoapilot
+npx cocoapilot-board
 ```
 
 The same command on Windows, macOS and Linux. Requires **Node 22 or newer**.
@@ -64,7 +64,7 @@ shows it there without the board switching to it.
 
 | Package | What it is | Size |
 |---|---|---|
-| `cocoapilot` | The board, and the tools with it. What `npx` fetches | ~150 MB installed |
+| `cocoapilot-board` | The board, and the tools with it. What `npx` fetches | ~150 MB installed |
 | `cocoapilot-mcp` | The MCP server and CLI, on their own. What an agent needs | ~21 KB |
 | `cocoapilot-contract` | The shared payload definition. An implementation detail of the two above | ~9 KB |
 

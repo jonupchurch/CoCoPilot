@@ -150,8 +150,8 @@ describe('the runner carries the product, and the client stays out of it', () =>
   it('keeps the arrow pointing one way', () => {
     // The runner depends on the client. The moment that reverses, an agent
     // starts downloading a browser in order to report a task.
-    expect(Object.keys(manifest.dependencies)).not.toContain('cocoapilot');
-    expect(Object.keys(manifest.devDependencies)).not.toContain('cocoapilot');
+    expect(Object.keys(manifest.dependencies)).not.toContain('cocoapilot-board');
+    expect(Object.keys(manifest.devDependencies)).not.toContain('cocoapilot-board');
   });
 });
 

@@ -1,10 +1,10 @@
-# cocoapilot
+# cocoapilot-board
 
 Run the [CoCoapilot](https://github.com/jonupchurch/CoCoPilot) board — a display
 panel for watching an AI agent work a Spec-Kit repository — with one command:
 
 ```bash
-npx cocoapilot
+npx cocoapilot-board
 ```
 
 Same command on Windows, macOS and Linux.

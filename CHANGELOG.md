@@ -23,23 +23,28 @@ this project is pre-release and not yet versioned.
     in `resources/`, which are delivered artefacts named for the round that
     produced them.
 - **Dropped the npm scope**, so the three published names are flat:
-  `cocoapilot` (the board), `cocoapilot-mcp` and `cocoapilot-contract`. All
-  three were confirmed absent from the registry on 2026-08-08. No organisation
-  has to exist for the release to proceed, which removes the one step that
-  could have blocked on someone else's answer.
-  - **The board takes `cocoapilot` itself**, so the command is `npx cocoapilot`.
-    This became possible only by accident: `cocopilot`, the pre-rename
-    spelling, is an npm security holding package, and the rename moved the
-    product off it. The earlier note claiming `cocoapilot` was the held name
-    was reading the old spelling.
-  - **The binary stays `cocoapilot-board`** even though the package is now
-    `cocoapilot`, because the client package already ships a binary called
-    `cocoapilot` — the reporting CLI — and the runner depends on the client, so
-    two bins of the same name would collide on install and one would silently
-    win. `npx cocoapilot` still works: with no bin matching the package name,
-    npx runs the package's only binary. Verified rather than assumed.
+  `cocoapilot-board`, `cocoapilot-mcp` and `cocoapilot-contract`. All three
+  were confirmed absent from the registry on 2026-08-08. No organisation has to
+  exist for the release to proceed, which removes the one step that could have
+  blocked on someone else's answer.
+  - **The unscoped `cocoapilot` is free, and is deliberately left alone.** It
+    became free by accident — `cocopilot`, the pre-rename spelling, is an npm
+    security holding package, and the rename moved the product off it. The
+    earlier note claiming `cocoapilot` was the held name was reading the old
+    spelling.
+  - **Not taken, because of where the risk lands.** npm refuses names too
+    similar to an existing one, and `cocoapilot` is one letter from
+    `cocopilot`. That check runs registry-side at publish time only, and the
+    board is the *last* package dependency order publishes — so a refusal would
+    arrive after the other two were permanent. Seven characters buy certainty
+    at the one step that cannot be undone.
+  - **Package and binary now agree.** The binary was always `cocoapilot-board`,
+    so `npx cocoapilot-board` resolves by exact name match rather than by npm's
+    single-bin fallback, and the client's `cocoapilot` binary — the reporting
+    CLI — no longer shares a name with any published package.
   - `@cocoapilot/board` keeps its scope: `private: true`, never published.
-  - **Not done here:** renaming the repository or the working directory.
+  - **Not done here:** renaming the repository or the working directory, and
+    claiming `cocoapilot` as a placeholder.
 
 ### Added
 
@@ -57,7 +62,7 @@ this project is pre-release and not yet versioned.
     exist at the path the built bundle computes. Third time this feature that
     the failure was in what you see rather than in whether it starts.
 - **Feature 009 (part) — Publishable packages.** Three packages that pack,
-  install and run: `cocoapilot` (the whole product, one command),
+  install and run: `cocoapilot-board` (the whole product, one command),
   `cocoapilot-mcp` (the reporting tools alone) and `cocoapilot-contract`.
   **Nothing is published** — the work ends at a release script that would.
   - **Re-specified first.** The original spec had one route, signed installers,

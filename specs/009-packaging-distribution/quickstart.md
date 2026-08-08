@@ -26,7 +26,7 @@ only thing standing between a mistake and a permanent one.
 ### 1. One command runs the product (US1)
 
 ```bash
-npx cocoapilot
+npx cocoapilot-board
 ```
 
 - The board opens and shows its waiting state.
@@ -79,7 +79,7 @@ version cannot be replaced, and unpublishing is limited to 72 hours.
 
    | Package | Command |
    |---|---|
-   | `cocoapilot` | `npx cocoapilot` — the board, the whole product |
+   | `cocoapilot-board` | `npx cocoapilot-board` — the board, the whole product |
    | `cocoapilot-mcp` | `npx -y cocoapilot-mcp` — the reporting tools alone |
    | `cocoapilot-contract` | not run directly; the shared payload definition |
 
@@ -89,36 +89,29 @@ version cannot be replaced, and unpublishing is limited to 72 hours.
      wrong in the direction that costs a name. It said `cocoapilot` was an npm
      *security holding package*. The holding package is **`cocopilot`** — the
      spelling this product used before 2026-08-07. Renaming to CoCoapilot moved
-     the product off the taken name without anyone noticing that it also made
-     `npx cocoapilot` available.
-   - **`npm` may still refuse `cocoapilot` as too similar to `cocopilot`.** One
-     letter apart, and the similarity check runs registry-side at publish time
-     only — `npm publish --dry-run` will not tell you, and there is no way to
-     ask beforehand. Note where that lands: `cocoapilot` is the *runner*, which
-     dependency order publishes **last**, so a refusal arrives after the other
-     two are permanently published.
-     - That is survivable, and it is why the order is still right. Nothing
-       depends on the runner, so `cocoapilot-contract` and `cocoapilot-mcp`
-       stay correct and installable whatever happens to the third name.
-     - **Fallback:** `cocoapilot-board`, still free, and the binary is already
-       called that — so only the runner's `name` field and the `npx` line in
-       the two READMEs change. Do not renumber the version to retry.
+     the product off the taken name, and nobody noticed that it also freed
+     `cocoapilot`.
+   - **`cocoapilot` is free, and is deliberately not being taken.** npm refuses
+     names it judges too similar to an existing one, and `cocoapilot` is a
+     single letter from `cocopilot`. That check runs registry-side at publish
+     time only: `npm publish --dry-run` cannot detect it and there is no way to
+     ask beforehand. The runner is the **last** package dependency order
+     publishes, so a refusal would arrive *after* the other two are permanent —
+     a coin-flip resolved at the least recoverable moment. `cocoapilot-board`
+     costs seven characters and removes the flip entirely.
+     - It is also the name the binary already had, so package and binary now
+       agree and `npx cocoapilot-board` resolves by exact name match rather
+       than by npm's single-bin fallback.
+     - **`cocoapilot` stays unclaimed**, which means someone else can take it.
+       If that matters, publish a placeholder under it separately — but not as
+       part of this release, and not before the three above are up.
    - `@cocoapilot/board` keeps its scope. It is `private: true`, never reaches
      the registry, and renaming it would be churn across 33 references for no
      effect.
-   - **The board's binary stays `cocoapilot-board`** even though its package is
-     now `cocoapilot`, because the client already ships a binary called
-     `cocoapilot` — the reporting CLI — and the runner depends on the client.
-     Two bins of one name collide on install and one silently wins.
-     `npx cocoapilot` still opens the board: npm picks the binary from the
-     *requested package's* manifest, and `cocoapilot` declares exactly one.
-     (`libnpmexec/lib/get-bin-from-manifest.js`, read rather than assumed.)
-     - **One exception, and it is inherent to the name.** `npx` resolves a
-       local `node_modules/.bin/<name>` before it fetches anything. So in a
-       project that has run `npm install cocoapilot-mcp`, `npx cocoapilot`
-       runs that project's **CLI**, not the board. Nothing to fix — the
-       documented MCP entry is `npx -y cocoapilot-mcp`, which installs nothing
-       locally — but it is the one place the two meanings of the word meet.
+   - **The client still ships a binary called `cocoapilot`** — the reporting
+     CLI — and that is now unambiguous: no published package shares the name,
+     so nothing collides on install and `cocoapilot` on the path always means
+     the CLI.
 3. **`npm login`** on the release machine, or mint a granular token for CI.
 4. **`npm run release`** and read every line. It builds from scratch and
    rehearses the install.

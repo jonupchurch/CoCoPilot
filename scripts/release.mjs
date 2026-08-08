@@ -126,7 +126,7 @@ function main() {
    * commit this script just verified is clean.
    */
   execFileSync(process.execPath, [String(npmCli), 'run', 'build'], { cwd: root, stdio: 'inherit' });
-  execFileSync(process.execPath, [String(npmCli), 'run', 'build', '--workspace', 'cocoapilot'], {
+  execFileSync(process.execPath, [String(npmCli), 'run', 'build', '--workspace', 'cocoapilot-board'], {
     cwd: root,
     stdio: 'inherit',
   });

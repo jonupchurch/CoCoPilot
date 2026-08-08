@@ -1,5 +1,5 @@
 {
-  "name": "cocoapilot",
+  "name": "cocoapilot-board",
   "version": "0.1.0",
   "type": "module",
   "description": "Run the CoCoapilot board with one command. Brings the MCP server and CLI with it.",

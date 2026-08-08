@@ -34,7 +34,7 @@ for (const { name, from, to } of sources) {
 
   if (!existsSync(source)) {
     process.stderr.write(
-      `cocoapilot: apps/board has no ${name}/.\n` +
+      `cocoapilot-board: apps/board has no ${name}/.\n` +
         (name === 'out'
           ? 'Run `npm run build --workspace @cocoapilot/board` first — refusing to stage nothing.\n'
           : 'Run `node scripts/build-icons.mjs` first — refusing to stage an iconless package.\n'),
@@ -45,5 +45,5 @@ for (const { name, from, to } of sources) {
   rmSync(destination, { recursive: true, force: true });
   cpSync(source, destination, { recursive: true });
 
-  process.stdout.write(`cocoapilot: staged ${source}\n`);
+  process.stdout.write(`cocoapilot-board: staged ${source}\n`);
 }
