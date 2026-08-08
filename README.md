@@ -17,11 +17,13 @@ npx cocoapilot-board
 
 The same command on Windows, macOS and Linux. Requires **Node 22 or newer**.
 
-> **The first run downloads about 150 MB.** The board is an Electron
-> application, so the package carries a browser runtime. It happens once per
-> machine and npm caches it afterwards. If you only want the reporting tools
-> for your agent and not the window, install `cocoapilot-mcp` instead — around
-> 20 KB, and it pulls in no runtime at all.
+> **The first run downloads about 150 MB.** The package itself is 163 kB — the
+> weight is Electron, which the board is built on. Its runtime is fetched
+> separately from GitHub's release downloads rather than from npm, and cached
+> per machine, so it happens once. Two consequences worth knowing: a locked-down
+> network needs both `registry.npmjs.org` and `github.com` reachable, and if you
+> only want the reporting tools for your agent and not the window, install
+> `cocoapilot-mcp` instead — 22 kB, and it pulls in no runtime at all.
 
 ## Telling your agent about it
 
@@ -62,11 +64,17 @@ shows it there without the board switching to it.
 
 ## The packages
 
-| Package | What it is | Size |
-|---|---|---|
-| `cocoapilot-board` | The board, and the tools with it. What `npx` fetches | ~150 MB installed |
-| `cocoapilot-mcp` | The MCP server and CLI, on their own. What an agent needs | ~21 KB |
-| `cocoapilot-contract` | The shared payload definition. An implementation detail of the two above | ~9 KB |
+All three are published at **0.1.0**.
+
+| Package | What it is | Download | On disk |
+|---|---|---|---|
+| [`cocoapilot-board`](https://www.npmjs.com/package/cocoapilot-board) | The board, and the tools with it. What `npx` fetches | 163 kB | 1.1 MB, plus ~150 MB of Electron |
+| [`cocoapilot-mcp`](https://www.npmjs.com/package/cocoapilot-mcp) | The MCP server and CLI, on their own. What an agent needs | 22 kB | 69 kB |
+| [`cocoapilot-contract`](https://www.npmjs.com/package/cocoapilot-contract) | The shared payload definition. An implementation detail of the two above | 13 kB | 49 kB |
+
+They install in that order of dependency — the board brings the other two, and
+`cocoapilot-mcp` brings only the contract. Nothing an agent installs can drag in
+a browser runtime.
 
 ## Development
 
@@ -100,11 +108,16 @@ Electron's own logo.
 
 ## Status
 
-Features 001–008 are built and merged: the contract and service, the MCP server
-and CLI, the window, all four tabs, the transcript reader, and multiple
-sessions. Feature 009 is packaging — the npm route described above, with signed
-desktop installers specified and deferred until there are certificates to test
-them against.
+**0.1.0 is published.** Features 001–008 are built and merged: the contract and
+service, the MCP server and CLI, the window, all four tabs, the transcript
+reader, and multiple sessions. Feature 009 is packaging — the npm route above is
+released, with signed desktop installers specified and deferred until there are
+certificates to test them against.
+
+It is a first release and says so: the version is deliberately below 1.0, and
+the only platform it has been exercised on is Windows. The command and the
+packaging are identical on macOS and Linux, but "identical" there is a claim
+about the design rather than a report from a test.
 
 See [STATUS.md](STATUS.md) for the architecture decisions, each with its
 rationale *and* its cost, and [CHANGELOG.md](CHANGELOG.md) for what each feature
