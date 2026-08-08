@@ -15,7 +15,7 @@ const resolve = (path: string): string => fileURLToPath(new URL(path, import.met
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
-    resolve: { alias: { '@cocoapilot/contract': resolve('../../packages/contract/src/index.ts') } },
+    resolve: { alias: { 'cocoapilot-contract': resolve('../../packages/contract/src/index.ts') } },
     build: {
       lib: { entry: resolve('./src/main/app.ts') },
       outDir: 'out/main',

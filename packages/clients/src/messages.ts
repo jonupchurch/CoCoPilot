@@ -13,14 +13,14 @@
  * work, and retrying will not help.
  */
 export const BOARD_ABSENT =
-  'CoCoaPilot board is not running — continue working, no need to retry.';
+  'CoCoapilot board is not running — continue working, no need to retry.';
 
 /** The CLI was run somewhere with no repository above it. */
 export const NOT_A_REPOSITORY =
-  'Not inside a git repository — CoCoaPilot reports are per repository, so there is nothing to report against.';
+  'Not inside a git repository — CoCoapilot reports are per repository, so there is nothing to report against.';
 
 /** Delivery succeeded. Deliberately says nothing the caller has to act on. */
-export const DELIVERED = 'Reported to the CoCoaPilot board.';
+export const DELIVERED = 'Reported to the CoCoapilot board.';
 
 /**
  * Decision 27 accepts that a published client can drift from the installed app.
@@ -29,7 +29,7 @@ export const DELIVERED = 'Reported to the CoCoaPilot board.';
  */
 export function versionMismatch(clientContract: string, boardContract: string): string {
   return (
-    `CoCoaPilot version mismatch: this client speaks contract ${clientContract}, ` +
+    `CoCoapilot version mismatch: this client speaks contract ${clientContract}, ` +
     `the board speaks ${boardContract}. Nothing was sent. ` +
     'Update whichever is older — continue working, no need to retry.'
   );
@@ -37,5 +37,5 @@ export function versionMismatch(clientContract: string, boardContract: string): 
 
 /** A rejection from the service, passed through rather than flattened. */
 export function rejected(field: string, message: string): string {
-  return `CoCoaPilot rejected this report: ${field} — ${message}`;
+  return `CoCoapilot rejected this report: ${field} — ${message}`;
 }

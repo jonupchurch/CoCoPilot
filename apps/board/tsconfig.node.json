@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "types": ["node"],
     "paths": {
-      "@cocoapilot/contract": ["../../packages/contract/src/index.ts"]
+      "cocoapilot-contract": ["../../packages/contract/src/index.ts"]
     }
   },
   "include": ["src/main", "src/preload", "tests/unit", "tests/integration", "tests/helpers", "electron.vite.config.ts"]

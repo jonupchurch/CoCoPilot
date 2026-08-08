@@ -586,7 +586,7 @@ test.describe('density never costs the ability to tell sessions apart', () => {
     await expect(page.locator('.pill__branch')).toHaveCount(0);
     // `CoCoPilot` is this checkout's directory name, not the product's — the
     // repository was never renamed alongside the product, so do not "correct"
-    // it to CoCoaPilot. It comes from `process.cwd()` via REPO_A.
+    // it to CoCoapilot. It comes from `process.cwd()` via REPO_A.
     await expect(page.locator('.pill__repo')).toHaveText([
       'CoCoPilot',
       'apps',

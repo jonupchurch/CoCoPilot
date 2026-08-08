@@ -1,4 +1,4 @@
-import { NoteRequest, PushRequest } from '@cocoapilot/contract';
+import { NoteRequest, PushRequest } from 'cocoapilot-contract';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { sessionKey, Store } from '../../src/main/store.js';

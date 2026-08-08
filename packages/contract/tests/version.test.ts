@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { PORT_BASE, PORT_COUNT, PORT_RANGE } from '../src/ports.js';
-import { APP_NAME, healthPayload, isCoCoaPilotHealth } from '../src/version.js';
+import { APP_NAME, healthPayload, isCoCoapilotHealth } from '../src/version.js';
 
 /**
  * Probing a range means knocking on ports owned by unrelated local software. A
@@ -9,29 +9,29 @@ import { APP_NAME, healthPayload, isCoCoaPilotHealth } from '../src/version.js';
  * file paths into whatever else happened to answer, so identification is the
  * point of the endpoint and a 200 is not evidence of anything.
  */
-describe('isCoCoaPilotHealth', () => {
+describe('isCoCoapilotHealth', () => {
   it('accepts what the board actually serves', () => {
-    expect(isCoCoaPilotHealth(healthPayload())).toBe(true);
+    expect(isCoCoapilotHealth(healthPayload())).toBe(true);
     expect(healthPayload().app).toBe(APP_NAME);
   });
 
   it('rejects a bare 200 body', () => {
-    expect(isCoCoaPilotHealth({})).toBe(false);
+    expect(isCoCoapilotHealth({})).toBe(false);
   });
 
   it('rejects another program that happens to answer', () => {
-    expect(isCoCoaPilotHealth({ app: 'grafana', version: '11.0.0', contract: 'v1' })).toBe(false);
-    expect(isCoCoaPilotHealth({ status: 'ok' })).toBe(false);
-    expect(isCoCoaPilotHealth('OK')).toBe(false);
-    expect(isCoCoaPilotHealth(null)).toBe(false);
-    expect(isCoCoaPilotHealth(undefined)).toBe(false);
+    expect(isCoCoapilotHealth({ app: 'grafana', version: '11.0.0', contract: 'v1' })).toBe(false);
+    expect(isCoCoapilotHealth({ status: 'ok' })).toBe(false);
+    expect(isCoCoapilotHealth('OK')).toBe(false);
+    expect(isCoCoapilotHealth(null)).toBe(false);
+    expect(isCoCoapilotHealth(undefined)).toBe(false);
   });
 
   it('rejects a payload naming us but carrying nothing to compare versions with', () => {
     // Decision 27 accepts that a published client can drift from the installed
     // app. Drift is only detectable if the version is actually there.
-    expect(isCoCoaPilotHealth({ app: APP_NAME })).toBe(false);
-    expect(isCoCoaPilotHealth({ app: APP_NAME, version: '', contract: 'v1' })).toBe(false);
+    expect(isCoCoapilotHealth({ app: APP_NAME })).toBe(false);
+    expect(isCoCoapilotHealth({ app: APP_NAME, version: '', contract: 'v1' })).toBe(false);
   });
 });
 

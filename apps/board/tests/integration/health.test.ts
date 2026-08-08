@@ -1,6 +1,6 @@
 import { createServer, type Server } from 'node:http';
 
-import { APP_NAME, CONTRACT_VERSION, isCoCoaPilotHealth } from '@cocoapilot/contract';
+import { APP_NAME, CONTRACT_VERSION, isCoCoapilotHealth } from 'cocoapilot-contract';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { envelope, startTestService, type TestService } from '../helpers/service.js';
@@ -26,7 +26,7 @@ describe('GET /v1/health', () => {
 
   it('satisfies the guard a probing client uses', async () => {
     const response = await service.get('/v1/health');
-    expect(isCoCoaPilotHealth(response.body)).toBe(true);
+    expect(isCoCoapilotHealth(response.body)).toBe(true);
   });
 
   it('needs no body, and answers before anything has been pushed', async () => {
@@ -72,6 +72,6 @@ describe('a client probing the range', () => {
     const response = await fetch(`http://127.0.0.1:${stubPort}/v1/health`);
 
     expect(response.status).toBe(200);
-    expect(isCoCoaPilotHealth(await response.json())).toBe(false);
+    expect(isCoCoapilotHealth(await response.json())).toBe(false);
   });
 });

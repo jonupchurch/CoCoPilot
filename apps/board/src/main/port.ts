@@ -1,6 +1,6 @@
 import type { Server } from 'node:http';
 
-import { HOST } from '@cocoapilot/contract';
+import { HOST } from 'cocoapilot-contract';
 
 /** Every port in the range was taken. The board cannot start. */
 export class PortRangeExhaustedError extends Error {
@@ -17,7 +17,7 @@ export class PortRangeExhaustedError extends Error {
  * Claim the first free port in the list, in order.
  *
  * A client probes the same list in the same order and takes the first responder
- * that identifies itself as CoCoaPilot, so this ordering is the whole discovery
+ * that identifies itself as CoCoapilot, so this ordering is the whole discovery
  * mechanism — nothing is written to disk to record the choice (decision 21).
  *
  * A port of `0` asks the OS for an ephemeral one, which is how the test suite

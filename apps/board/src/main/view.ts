@@ -8,7 +8,7 @@ import type {
   ReportedFeature,
   Story,
   Task,
-} from '@cocoapilot/contract';
+} from 'cocoapilot-contract';
 
 import { sessionKey, type Note, type Session, type Store } from './store.js';
 import type { Availability } from './transcript/availability.js';

@@ -1,4 +1,4 @@
-import { APP_VERSION } from '@cocoapilot/contract';
+import { APP_VERSION } from 'cocoapilot-contract';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { registerTools, type ToolOptions } from './tools.js';

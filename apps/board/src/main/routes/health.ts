@@ -1,4 +1,4 @@
-import { healthPayload } from '@cocoapilot/contract';
+import { healthPayload } from 'cocoapilot-contract';
 
 import type { HttpResult } from '../server.js';
 

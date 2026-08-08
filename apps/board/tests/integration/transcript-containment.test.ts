@@ -46,7 +46,7 @@ const { homedir, tmpdir } = await import('node:os');
 const { join } = await import('node:path');
 const { fileURLToPath } = await import('node:url');
 
-const { PushRequest } = await import('@cocoapilot/contract');
+const { PushRequest } = await import('cocoapilot-contract');
 const { normalise, pathish, WRITE_APIS } = await import('../helpers/fs-calls.js');
 const { sessionKey, Store } = await import('../../src/main/store.js');
 const { TranscriptSource } = await import('../../src/main/transcript/index.js');

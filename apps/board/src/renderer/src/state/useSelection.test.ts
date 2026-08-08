@@ -1,4 +1,4 @@
-import type { Story, Task } from '@cocoapilot/contract';
+import type { Story, Task } from 'cocoapilot-contract';
 import { describe, expect, it } from 'vitest';
 
 import { buildScopes, resolve, UNASSIGNED } from './useSelection.js';

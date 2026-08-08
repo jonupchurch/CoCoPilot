@@ -1,4 +1,4 @@
-import type { Focus } from '@cocoapilot/contract';
+import type { Focus } from 'cocoapilot-contract';
 
 import { Section } from '../../components/Section.js';
 import { focusAge } from '../../lib/elapsed.js';

@@ -1,4 +1,4 @@
-# CoCoaPilot — design round 2 (revision brief)
+# CoCoapilot — design round 2 (revision brief)
 
 Run this in Claude Design with the round 1 exports attached: **CoCoPilot
 Brand**, **CoCoPilot Design System**, **CoCoPilot Overview Panel**.
@@ -7,7 +7,7 @@ This is a revision, not a restart. Round 1 is good and most of it is now
 locked. What follows is the short list of things that changed underneath the
 design, and why.
 
-## What CoCoaPilot is
+## What CoCoapilot is
 
 A desktop board that sits beside an editor while an AI agent works a GitHub
 Spec-Kit repository. The agent reports what it is doing; a human watches. It
@@ -81,7 +81,7 @@ status is fourteen characters instead of a dot?
 
 That section is titled as the four things a panel actually shows, and three of
 them are now wrong. The suggestion card with Apply/Skip, and the attention block
-with Re-read/Discard, describe a tool that acts on the user's code. CoCoaPilot
+with Re-read/Discard, describe a tool that acts on the user's code. CoCoapilot
 does not — it is one-way and read-only.
 
 Please retitle and repopulate that section with what the board really shows:

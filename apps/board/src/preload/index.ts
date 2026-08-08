@@ -55,4 +55,4 @@ const api = {
 
 contextBridge.exposeInMainWorld('cocoapilot', api);
 
-export type CoCoaPilotBridge = typeof api;
+export type CoCoapilotBridge = typeof api;

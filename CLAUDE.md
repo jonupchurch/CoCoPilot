@@ -7,7 +7,7 @@ live in `@AGENTS.md` — read them; they govern how to work here.
 
 ## What this project is
 
-**CoCoaPilot** (as in *Co-Copilot*): an MCP server + HTTP API + CLI + desktop
+**CoCoapilot** (as in *Co-Copilot*): an MCP server + HTTP API + CLI + desktop
 board for working with GitHub Spec-Kit repositories, so a human can watch a
 board while an AI agent implements tasks — the tool that keeps the information
 straight that the developer would otherwise track in their head. The stack is

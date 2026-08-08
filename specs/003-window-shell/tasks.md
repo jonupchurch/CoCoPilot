@@ -44,7 +44,7 @@ Controls: 28px standard height, and hit targets stay 28px.
 ## One conflict with the export, resolved
 
 **The title bar shows the repository as well as the branch.** Round 3's export
-shows `CoCoaPilot · feat/session-hook` — brand and branch, no repository. FR-001
+shows `CoCoapilot · feat/session-hook` — brand and branch, no repository. FR-001
 requires both. Decision 8 makes the exports canon for look and feel and the docs
 authoritative on incidental content, so the repository goes in the same slot with
 the same treatment: mono, `--muted`, ellipsised, `min-width: 0`. Its basename

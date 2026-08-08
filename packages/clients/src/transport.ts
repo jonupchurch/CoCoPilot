@@ -1,4 +1,4 @@
-import { CONTRACT_VERSION, HOST } from '@cocoapilot/contract';
+import { CONTRACT_VERSION, HOST } from 'cocoapilot-contract';
 
 import { CALL_BUDGET_MS, Deadline } from './deadline.js';
 import { discover } from './discover.js';

@@ -31,6 +31,9 @@ test-results/
 playwright-report/
 .playwright/
 
-# Staged copy of the board's build, produced by packages/runner/scripts/stage.mjs.
-# One build feeds both distribution routes; this is the copy, not the source.
+# Staged copies of the board's build, produced by packages/runner/scripts/stage.mjs.
+# One build feeds both distribution routes; these are the copy, not the source.
+# `resources/` is staged alongside `out/` because electron-vite's `?asset` imports
+# resolve to it at runtime — see the note in stage.mjs.
 packages/runner/out/
+packages/runner/resources/

@@ -83,7 +83,7 @@ shapes, and the choice is irreversible in the way publishing is:
 |---|---|---|
 | Entry point | `npx @cocoapilot/board` | `npx cocoapilot-board` |
 | Needs an npm organisation | **Yes**, and its availability could not be verified without a login | No |
-| Churn to adopt | None | 52 files import `@cocoapilot/contract` |
+| Churn to adopt | None | 52 files import `cocoapilot-contract` |
 
 **Nothing here is built against that choice.** The runner package, the release
 script, the manifest hygiene and the tests are all name-agnostic, and the new
@@ -125,9 +125,9 @@ check on 2026-08-07:
   maintainer). Unavailable.
 - `cocoapilot-board`, `cocoapilot-mcp`, `cocoapilot-contract`, `cocoapilot-app`,
   `cocoapilot-cli` and `co-copilot` are all free.
-- `@cocoapilot/mcp` does not exist; whether the `@cocoapilot` **organisation** is
+- `cocoapilot-mcp` does not exist; whether the `@cocoapilot` **organisation** is
   free could not be determined without an authenticated session.
-- `@cocoapilot/mcp` packs to 21.4 kB over 46 files and installs cleanly with both
-  binaries working — but only alongside `@cocoapilot/contract`, which is pinned
+- `cocoapilot-mcp` packs to 21.4 kB over 46 files and installs cleanly with both
+  binaries working — but only alongside `cocoapilot-contract`, which is pinned
   exactly and unpublished, so installing the client alone fails with a 404.
 - No npm credentials are present on the development machine.

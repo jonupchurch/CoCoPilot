@@ -1,4 +1,4 @@
-import type { Chip as ChipValue } from '@cocoapilot/contract';
+import type { Chip as ChipValue } from 'cocoapilot-contract';
 
 import './Chip.css';
 

@@ -1,4 +1,4 @@
-# CoCoaPilot — design round 3 (revision brief)
+# CoCoapilot — design round 3 (revision brief)
 
 Run this in Claude Design with the round 2 exports attached: **CoCoPilot Brand**,
 **CoCoPilot Design System**, **CoCoPilot Overview Panel**, **CoCoPilot Round 2**.

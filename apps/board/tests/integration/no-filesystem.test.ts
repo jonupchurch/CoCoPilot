@@ -5,7 +5,7 @@ import type { FsCall } from '../helpers/fs-calls.js';
 /**
  * The two guarantees the whole product rests on, asserted as absences.
  *
- * CoCoaPilot never writes anything anywhere (SC-004) and never reads inside the
+ * CoCoapilot never writes anything anywhere (SC-004) and never reads inside the
  * repository it is told about (SC-005). Both are stated in prose all over the
  * design documents, and prose is exactly what erodes: a cache file added for a
  * good reason, or a convenience read of `tasks.md`, would pass review unnoticed

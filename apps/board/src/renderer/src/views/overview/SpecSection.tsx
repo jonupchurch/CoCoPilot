@@ -1,4 +1,4 @@
-import type { Focus, ReportedFeature, Task } from '@cocoapilot/contract';
+import type { Focus, ReportedFeature, Task } from 'cocoapilot-contract';
 
 import { Section } from '../../components/Section.js';
 import { TaskRow } from '../../components/TaskRow.js';

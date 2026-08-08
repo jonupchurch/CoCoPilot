@@ -1,4 +1,4 @@
-import type { Task } from '@cocoapilot/contract';
+import type { Task } from 'cocoapilot-contract';
 
 import { StatusDisc, StatusLabel } from '../../components/StatusLabel.js';
 

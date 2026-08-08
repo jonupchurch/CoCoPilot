@@ -1,6 +1,6 @@
-# @cocoapilot/mcp
+# cocoapilot-mcp
 
-The MCP server and CLI that report to a [CoCoaPilot](https://github.com/jonupchurch/CoCoPilot)
+The MCP server and CLI that report to a [CoCoapilot](https://github.com/jonupchurch/CoCoPilot)
 board — a window a human watches while an AI agent works a Spec-Kit repository.
 
 Both are thin. They derive which repository, which branch and which session you
@@ -15,7 +15,7 @@ There is nothing to install. Add this to your `.mcp.json`:
   "mcpServers": {
     "cocoapilot": {
       "command": "npx",
-      "args": ["-y", "@cocoapilot/mcp"]
+      "args": ["-y", "cocoapilot-mcp"]
     }
   }
 }
@@ -58,8 +58,8 @@ them would be three more chances to get identity wrong mid-task, for no benefit.
 For hooks and build scripts:
 
 ```sh
-npx @cocoapilot/mcp cocoapilot report --task T033 --note "build finished" --chip idle
-npx @cocoapilot/mcp cocoapilot note "coverage dropped below 80%" --source "noticed in CI"
+npx cocoapilot-mcp cocoapilot report --task T033 --note "build finished" --chip idle
+npx cocoapilot-mcp cocoapilot note "coverage dropped below 80%" --source "noticed in CI"
 ```
 
 | Exit code | Meaning |
@@ -90,7 +90,7 @@ Nothing is ever launched.
 
 ## When the board is not running
 
-> CoCoaPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 That is the whole failure mode. It is not an error, it costs you nothing, and
 the next call will work if the board is open by then — with no restart of
@@ -112,5 +112,5 @@ nothing that pulls in a browser runtime. It is what an agent needs, and it is
 around 21 KB.
 
 If you also want the board itself, the window that displays what your agent
-reports, run `npx cocoapilot-board` instead. That package brings these tools with
+reports, run `npx cocoapilot` instead. That package brings these tools with
 it, so you never need both.

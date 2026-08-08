@@ -1,4 +1,4 @@
-# CoCoaPilot
+# CoCoapilot
 
 A display panel for watching an AI agent work a
 [Spec-Kit](https://github.com/github/spec-kit) repository — the tool that keeps
@@ -12,7 +12,7 @@ from your repository.
 ## Running it
 
 ```bash
-npx cocoapilot-board
+npx cocoapilot
 ```
 
 The same command on Windows, macOS and Linux. Requires **Node 22 or newer**.
@@ -20,7 +20,7 @@ The same command on Windows, macOS and Linux. Requires **Node 22 or newer**.
 > **The first run downloads about 150 MB.** The board is an Electron
 > application, so the package carries a browser runtime. It happens once per
 > machine and npm caches it afterwards. If you only want the reporting tools
-> for your agent and not the window, install `@cocoapilot/mcp` instead — around
+> for your agent and not the window, install `cocoapilot-mcp` instead — around
 > 20 KB, and it pulls in no runtime at all.
 
 ## Telling your agent about it
@@ -33,7 +33,7 @@ contains no path to anything:
   "mcpServers": {
     "cocoapilot": {
       "command": "npx",
-      "args": ["-y", "@cocoapilot/mcp"]
+      "args": ["-y", "cocoapilot-mcp"]
     }
   }
 }
@@ -41,7 +41,7 @@ contains no path to anything:
 
 Your agent then has two tools — one to report what it is working on, one to
 leave a note. Both fail soft: if no board is running, the agent is told
-`CoCoaPilot board is not running — continue working, no need to retry.` and
+`CoCoapilot board is not running — continue working, no need to retry.` and
 carries on. Nothing about your agent depends on this being installed.
 
 Two things an agent cannot infer and that the tool descriptions state outright:
@@ -64,9 +64,9 @@ shows it there without the board switching to it.
 
 | Package | What it is | Size |
 |---|---|---|
-| `cocoapilot-board` | The board, and the tools with it. What `npx` fetches | ~150 MB installed |
-| `@cocoapilot/mcp` | The MCP server and CLI, on their own. What an agent needs | ~21 KB |
-| `@cocoapilot/contract` | The shared payload definition. An implementation detail of the two above | ~9 KB |
+| `cocoapilot` | The board, and the tools with it. What `npx` fetches | ~150 MB installed |
+| `cocoapilot-mcp` | The MCP server and CLI, on their own. What an agent needs | ~21 KB |
+| `cocoapilot-contract` | The shared payload definition. An implementation detail of the two above | ~9 KB |
 
 ## Development
 
@@ -81,6 +81,22 @@ npm run pack:check   # pack, install and launch every package, cleanly
 
 The end-to-end suite drives the **built** application, so `npm run build` has to
 happen first or it tests the previous build.
+
+### The icon
+
+`apps/board/resources/icon.ico` and `icon.png` are generated from
+`resources/cocoapilot-mark.svg` and committed. After changing the mark:
+
+```bash
+node scripts/build-icons.mjs
+```
+
+It is not part of `npm run build` on purpose — committing the output keeps the
+rasteriser out of the publish path, so a release cannot fail on a native module
+that will not install on the release machine. `npm run pack:check` asserts both
+files reach the published package, because Electron ignores an icon path that
+does not exist without erroring: the board would run perfectly and simply show
+Electron's own logo.
 
 ## Status
 

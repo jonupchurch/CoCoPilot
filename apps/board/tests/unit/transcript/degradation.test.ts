@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PushRequest } from '@cocoapilot/contract';
+import { PushRequest } from 'cocoapilot-contract';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Store, type Session, type TranscriptState } from '../../../src/main/store.js';

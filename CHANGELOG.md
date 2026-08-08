@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to CoCoaPilot are recorded here.
+All notable changes to CoCoapilot are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 this project is pre-release and not yet versioned.
 
@@ -8,13 +8,13 @@ this project is pre-release and not yet versioned.
 
 ### Changed
 
-- **Renamed to CoCoaPilot**, from CoCoPilot. Free to do because nothing has been
-  published: the change reaches the npm scope (`@cocoapilot/*`), the runnable
-  package (`cocoapilot-board`), both client binaries, the MCP tool names
-  (`cocoapilot_report`, `cocoapilot_note`), the environment variables, the IPC
-  channels, and the identity string the health endpoint answers with — which is
-  what stops port probing from mistaking other software for the board. Board and
-  clients rename together, so that identity stays a matched pair.
+- **Renamed to CoCoapilot**, from CoCoPilot. Free to do because nothing has been
+  published: the change reaches the published package names, both client
+  binaries, the MCP tool names (`cocoapilot_report`, `cocoapilot_note`), the
+  environment variables, the IPC channels, and the identity string the health
+  endpoint answers with — which is what stops port probing from mistaking other
+  software for the board. Board and clients rename together, so that identity
+  stays a matched pair.
   - **Three things deliberately kept the old spelling**, because none of them is
     the product's name: the real filesystem path `d:\Codelib\CoCoPilot` and the
     Claude project slug derived from it (the directory on disk is unchanged, and
@@ -22,15 +22,43 @@ this project is pre-release and not yet versioned.
     `jonupchurch/CoCoPilot`, which has not been renamed; and the design exports
     in `resources/`, which are delivered artefacts named for the round that
     produced them.
-  - **Not done here:** renaming the repository, the working directory, or the
-    npm organisation. `@cocoapilot` has not been checked for availability — the
-    fallback remains a flat `cocoapilot-contract` / `cocoapilot-mcp`.
+- **Dropped the npm scope**, so the three published names are flat:
+  `cocoapilot` (the board), `cocoapilot-mcp` and `cocoapilot-contract`. All
+  three were confirmed absent from the registry on 2026-08-08. No organisation
+  has to exist for the release to proceed, which removes the one step that
+  could have blocked on someone else's answer.
+  - **The board takes `cocoapilot` itself**, so the command is `npx cocoapilot`.
+    This became possible only by accident: `cocopilot`, the pre-rename
+    spelling, is an npm security holding package, and the rename moved the
+    product off it. The earlier note claiming `cocoapilot` was the held name
+    was reading the old spelling.
+  - **The binary stays `cocoapilot-board`** even though the package is now
+    `cocoapilot`, because the client package already ships a binary called
+    `cocoapilot` — the reporting CLI — and the runner depends on the client, so
+    two bins of the same name would collide on install and one would silently
+    win. `npx cocoapilot` still works: with no bin matching the package name,
+    npx runs the package's only binary. Verified rather than assumed.
+  - `@cocoapilot/board` keeps its scope: `private: true`, never published.
+  - **Not done here:** renaming the repository or the working directory.
 
 ### Added
 
+- **An application icon**, in the window, the taskbar and the macOS dock.
+  `scripts/build-icons.mjs` rasterises `resources/cocoapilot-mark.svg` into
+  `icon.ico` (seven sizes, because Windows picks a different one per surface)
+  and a 1024px `icon.png`. Run by hand and committed, so publishing needs no
+  rasteriser and a release cannot fail on a native module.
+  - **Staging had to change with it, and the check exists because of how this
+    fails.** electron-vite compiles an `?asset` import to a path under
+    `resources/` beside `out/` — it rewrites the path but never copies the
+    file. Shipping `out/` alone produced a package that installed, launched and
+    ran perfectly while showing Electron's own logo, because Electron ignores a
+    missing icon path without erroring. `pack:check` now asserts both icons
+    exist at the path the built bundle computes. Third time this feature that
+    the failure was in what you see rather than in whether it starts.
 - **Feature 009 (part) — Publishable packages.** Three packages that pack,
-  install and run: `cocoapilot-board` (the whole product, one command),
-  `@cocoapilot/mcp` (the reporting tools alone) and `@cocoapilot/contract`.
+  install and run: `cocoapilot` (the whole product, one command),
+  `cocoapilot-mcp` (the reporting tools alone) and `cocoapilot-contract`.
   **Nothing is published** — the work ends at a release script that would.
   - **Re-specified first.** The original spec had one route, signed installers,
     and made them a hard requirement — which put the product's availability
@@ -313,7 +341,7 @@ this project is pre-release and not yet versioned.
     built-in module is never registered. The E2E helper strips it.
 
 - **Feature 002 — MCP server and CLI.** `packages/clients`, published as
-  `@cocoapilot/mcp` and fetched by `npx`, carrying both binaries. Two thin
+  `cocoapilot-mcp` and fetched by `npx`, carrying both binaries. Two thin
   clients over feature 001's contract: neither holds state, both derive
   repository, branch and session identity themselves, and both translate every
   failure into a value rather than a throw.
@@ -548,7 +576,7 @@ this project is pre-release and not yet versioned.
   recording. The user never types into the board, so Notes stays inside the
   one-way rule. Notes accumulate where everything else replaces, making them a
   second kind of push.
-- **CoCoaPilot owns no durable state** — it is a display panel. Nothing survives
+- **CoCoapilot owns no durable state** — it is a display panel. Nothing survives
   closing the window; everything on screen is re-derived from disk or was pushed
   since launch. Decision 6 stands with no carve-outs, including for notes.
   Durability is the agent's job: the user asks it to write to the repository

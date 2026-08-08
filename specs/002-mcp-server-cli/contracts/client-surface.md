@@ -85,7 +85,7 @@ it monitors.
 
 One constant, used by both clients:
 
-> CoCoaPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 Its exact wording is a behavioural requirement. It has to say three things: the
 board is absent, this is not a failure of your work, and retrying will not help.

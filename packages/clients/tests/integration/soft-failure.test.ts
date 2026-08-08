@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import type { Service } from '@cocoapilot/board';
-import { MAX_TEXT } from '@cocoapilot/contract';
+import { MAX_TEXT } from 'cocoapilot-contract';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { note, report } from '../../src/client.js';

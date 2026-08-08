@@ -1,5 +1,5 @@
 import type { Service } from '@cocoapilot/board';
-import { CONTRACT_VERSION } from '@cocoapilot/contract';
+import { CONTRACT_VERSION } from 'cocoapilot-contract';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { CALL_BUDGET_MS, Deadline } from '../../src/deadline.js';

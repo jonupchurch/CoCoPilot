@@ -27,8 +27,8 @@ const readme = readFileSync(join(root, 'README.md'), 'utf8').replaceAll('\r\n', 
  */
 describe('the published package', () => {
   it('is the name the documented configuration entry fetches', () => {
-    expect(manifest.name).toBe('@cocoapilot/mcp');
-    expect(readme).toContain('"@cocoapilot/mcp"');
+    expect(manifest.name).toBe('cocoapilot-mcp');
+    expect(readme).toContain('"cocoapilot-mcp"');
   });
 
   it('declares both binaries', () => {
@@ -48,8 +48,8 @@ describe('the published package', () => {
 
   it('depends on nothing that could pull in Electron', () => {
     expect(Object.keys(manifest.dependencies).sort()).toEqual([
-      '@cocoapilot/contract',
       '@modelcontextprotocol/sdk',
+      'cocoapilot-contract',
       'zod',
     ]);
   });
@@ -140,7 +140,7 @@ describe('the runner carries the product, and the client stays out of it', () =>
     // bundles the runtime itself; this route requires the opposite so that
     // `npm install` fetches it. One manifest cannot be both.
     expect(Object.keys(runner?.dependencies ?? {}).sort()).toEqual([
-      '@cocoapilot/mcp',
+      'cocoapilot-mcp',
       'electron',
     ]);
     expect(runner?.bin?.['cocoapilot-board']).toBe('bin/cocoapilot-board.mjs');
@@ -150,8 +150,8 @@ describe('the runner carries the product, and the client stays out of it', () =>
   it('keeps the arrow pointing one way', () => {
     // The runner depends on the client. The moment that reverses, an agent
     // starts downloading a browser in order to report a task.
-    expect(Object.keys(manifest.dependencies)).not.toContain('cocoapilot-board');
-    expect(Object.keys(manifest.devDependencies)).not.toContain('cocoapilot-board');
+    expect(Object.keys(manifest.dependencies)).not.toContain('cocoapilot');
+    expect(Object.keys(manifest.devDependencies)).not.toContain('cocoapilot');
   });
 });
 

@@ -1,13 +1,13 @@
 import { statSync } from 'node:fs';
 
-import { rejection, type Rejection } from '@cocoapilot/contract';
+import { rejection, type Rejection } from 'cocoapilot-contract';
 
 /**
  * Confirm the reported repository path exists — and stop there.
  *
  * This is the *only* filesystem call the service makes, and it touches the path
  * itself and nothing beneath it: no `readdir`, no open, no traversal, no git.
- * CoCoaPilot never reads the user's repository (decision 24), which is why there
+ * CoCoapilot never reads the user's repository (decision 24), which is why there
  * is no `tasks.md` parser, no `specs/` walk and no file watcher anywhere in this
  * codebase — the agent pushes all of it.
  *

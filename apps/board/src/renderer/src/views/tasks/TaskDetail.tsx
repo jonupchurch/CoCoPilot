@@ -1,4 +1,4 @@
-import type { Focus, Task } from '@cocoapilot/contract';
+import type { Focus, Task } from 'cocoapilot-contract';
 
 import { StatusLabel } from '../../components/StatusLabel.js';
 import type { Scope } from '../../state/useSelection.js';

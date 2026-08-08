@@ -1,6 +1,6 @@
 import { parseArgs } from 'node:util';
 
-import { CHIPS, type Chip } from '@cocoapilot/contract';
+import { CHIPS, type Chip } from 'cocoapilot-contract';
 
 import { note, report, type ClientResult } from '../client.js';
 import type { SendOptions } from '../transport.js';

@@ -7,7 +7,7 @@ import { defineConfig } from 'vitest/config';
 const resolve = (path: string): string => fileURLToPath(new URL(path, import.meta.url));
 
 const alias = {
-  '@cocoapilot/contract': resolve('./packages/contract/src/index.ts'),
+  'cocoapilot-contract': resolve('./packages/contract/src/index.ts'),
   // A devDependency of packages/clients, used only to run a real service in
   // integration tests. It must never reach the published dependency tree.
   '@cocoapilot/board': resolve('./apps/board/src/main/index.ts'),

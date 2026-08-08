@@ -196,7 +196,7 @@ Every surface fails the same way: the call errors, nothing is buffered, nothing
 is spawned (decision 6). The message matters, because a monitoring tool that
 derails the work it monitors is worse than no monitoring tool:
 
-> CoCoaPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 ## Validation
 

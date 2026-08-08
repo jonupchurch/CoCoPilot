@@ -1,4 +1,4 @@
-import type { ChangedFile, Focus, PlanStep, ReportedFeature, Task } from '@cocoapilot/contract';
+import type { ChangedFile, Focus, PlanStep, ReportedFeature, Task } from 'cocoapilot-contract';
 
 import { focusAge } from './elapsed.js';
 import { isActive, isDone } from './vocabulary.js';

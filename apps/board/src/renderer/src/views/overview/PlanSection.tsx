@@ -1,4 +1,4 @@
-import type { PlanStep } from '@cocoapilot/contract';
+import type { PlanStep } from 'cocoapilot-contract';
 
 import { StatusDisc, StatusLabel } from '../../components/StatusLabel.js';
 import { Section } from '../../components/Section.js';

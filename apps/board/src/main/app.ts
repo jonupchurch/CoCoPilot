@@ -1,5 +1,7 @@
 import { app, ipcMain, type BrowserWindow } from 'electron';
 
+import iconIco from '../../resources/icon.ico?asset';
+import iconPng from '../../resources/icon.png?asset';
 import { createService, type Service } from './index.js';
 import { TranscriptSource } from './transcript/index.js';
 import { toBoardState } from './view.js';
@@ -74,7 +76,18 @@ async function start(): Promise<void> {
   window = createWindow({
     preload: preloadPath(appPath),
     load: devServer === undefined ? { file: rendererPath(appPath) } : { url: devServer },
+    // Windows picks a size out of the `.ico` per surface — taskbar, title bar,
+    // alt-tab — and scaling one PNG for all three is soft exactly where it is
+    // looked at most. Everywhere else reads the PNG.
+    icon: process.platform === 'win32' ? iconIco : iconPng,
   });
+
+  /*
+   * macOS ignores a window icon entirely; the dock reads the bundle's `.icns`.
+   * Run through `npx` there is no bundle, so the dock would show Electron's own
+   * logo — setting it at runtime is the only lever this distribution route has.
+   */
+  if (process.platform === 'darwin') app.dock?.setIcon(iconPng);
 
   // The one thing the board reads from disk. It follows only sessions the board
   // is already holding, so nothing is scanned and no other session's transcript

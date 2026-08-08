@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@cocoapilot/contract": ["../contract/src/index.ts"],
+      "cocoapilot-contract": ["../contract/src/index.ts"],
       "@cocoapilot/board": ["../../apps/board/src/main/index.ts"]
     }
   },

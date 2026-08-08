@@ -1,8 +1,8 @@
 {
-  "name": "cocoapilot-board",
+  "name": "cocoapilot",
   "version": "0.1.0",
   "type": "module",
-  "description": "Run the CoCoaPilot board with one command. Brings the MCP server and CLI with it.",
+  "description": "Run the CoCoapilot board with one command. Brings the MCP server and CLI with it.",
   "license": "MIT",
   "main": "out/main/app.cjs",
   "engines": {
@@ -13,7 +13,8 @@
   },
   "files": [
     "bin",
-    "out"
+    "out",
+    "resources"
   ],
   "repository": {
     "type": "git",
@@ -36,7 +37,7 @@
     "prepublishOnly": "npm run build --workspace @cocoapilot/board && npm run build"
   },
   "dependencies": {
-    "@cocoapilot/mcp": "0.1.0",
+    "cocoapilot-mcp": "0.1.0",
     "electron": "^43.3.0"
   }
 }

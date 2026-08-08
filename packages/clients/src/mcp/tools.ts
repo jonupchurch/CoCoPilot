@@ -9,7 +9,7 @@ import {
   ReportedFeature,
   Story,
   Task,
-} from '@cocoapilot/contract';
+} from 'cocoapilot-contract';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
@@ -26,7 +26,7 @@ export const NOTE_TOOL = 'cocoapilot_note';
  * because that is the only place the model will read them.
  */
 export const REPORT_DESCRIPTION = [
-  'Report what you are working on right now, for a human watching the CoCoaPilot board.',
+  'Report what you are working on right now, for a human watching the CoCoapilot board.',
   '',
   'This REPLACES your previous report entirely — send the whole current picture, not a delta.',
   'Set chip to "needs-you" when you want the human to look: it is the only way to ask for',
@@ -36,7 +36,7 @@ export const REPORT_DESCRIPTION = [
 ].join('\n');
 
 export const NOTE_DESCRIPTION = [
-  'Record a note for the human on the CoCoaPilot board — because they asked you to, or',
+  'Record a note for the human on the CoCoapilot board — because they asked you to, or',
   'because you judged it worth their attention.',
   '',
   'Notes are CLEARED when the board window closes. They are not storage. Anything worth',
@@ -108,13 +108,13 @@ export function registerTools(server: McpServer, options: ToolOptions = {}): voi
 
   server.registerTool(
     REPORT_TOOL,
-    { title: 'Report to the CoCoaPilot board', description: REPORT_DESCRIPTION, inputSchema: reportInputShape },
+    { title: 'Report to the CoCoapilot board', description: REPORT_DESCRIPTION, inputSchema: reportInputShape },
     async (args) => toToolResult(await report(args, call())),
   );
 
   server.registerTool(
     NOTE_TOOL,
-    { title: 'Note on the CoCoaPilot board', description: NOTE_DESCRIPTION, inputSchema: noteInputShape },
+    { title: 'Note on the CoCoapilot board', description: NOTE_DESCRIPTION, inputSchema: noteInputShape },
     async (args) => toToolResult(await note(args, call())),
   );
 }
