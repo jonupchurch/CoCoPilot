@@ -9,7 +9,7 @@ import { findRepository, processSessionId } from '../../src/identity.js';
 let root: string;
 
 beforeAll(() => {
-  root = mkdtempSync(join(tmpdir(), 'cocopilot-identity-'));
+  root = mkdtempSync(join(tmpdir(), 'cocoapilot-identity-'));
 });
 
 afterAll(() => {
@@ -87,7 +87,7 @@ describe('finding the repository', () => {
   });
 
   it('returns a value rather than throwing when there is no repository', () => {
-    const orphan = mkdtempSync(join(tmpdir(), 'cocopilot-orphan-'));
+    const orphan = mkdtempSync(join(tmpdir(), 'cocoapilot-orphan-'));
     try {
       expect(findRepository(orphan)).toEqual({ ok: false, reason: 'not-a-repository' });
     } finally {

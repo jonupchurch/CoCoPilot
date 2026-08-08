@@ -1,4 +1,4 @@
-import { NoteRequest, rejectionFromZodError } from '@cocopilot/contract';
+import { NoteRequest, rejectionFromZodError } from 'cocoapilot-contract';
 
 import type { HttpResult, ServiceDeps } from '../server.js';
 import { validateRepoPath } from '../validate.js';

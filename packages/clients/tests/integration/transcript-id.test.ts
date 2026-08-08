@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { Service } from '@cocopilot/board';
+import type { Service } from '@cocoapilot/board';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { note, report } from '../../src/client.js';
@@ -28,7 +28,7 @@ const ENV = 'CLAUDE_CODE_SESSION_ID';
 let original: string | undefined;
 
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-transcript-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-transcript-'));
   mkdirSync(join(repo, '.git'), { recursive: true });
   writeFileSync(join(repo, '.git', 'HEAD'), 'ref: refs/heads/main\n');
   original = process.env[ENV];

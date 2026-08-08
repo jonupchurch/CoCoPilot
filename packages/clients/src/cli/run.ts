@@ -1,12 +1,12 @@
 import { parseArgs } from 'node:util';
 
-import { CHIPS, type Chip } from '@cocopilot/contract';
+import { CHIPS, type Chip } from 'cocoapilot-contract';
 
 import { note, report, type ClientResult } from '../client.js';
 import type { SendOptions } from '../transport.js';
 
 /**
- * `cocopilot report` and `cocopilot note`, for hooks and build scripts.
+ * `cocoapilot report` and `cocoapilot note`, for hooks and build scripts.
  *
  * Kept separate from the binary so tests can drive it without spawning a
  * process, and written against injected IO so the exit-code table is assertable
@@ -15,8 +15,8 @@ import type { SendOptions } from '../transport.js';
 
 export const USAGE = [
   'Usage:',
-  '  cocopilot report [--task ID] [--note TEXT] [--chip STATE]',
-  '  cocopilot note TEXT [--source TEXT]',
+  '  cocoapilot report [--task ID] [--note TEXT] [--chip STATE]',
+  '  cocoapilot note TEXT [--source TEXT]',
   '',
   `  --chip  one of: ${CHIPS.join(', ')}`,
   '',

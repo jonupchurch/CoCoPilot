@@ -20,8 +20,8 @@ let repo: string;
  * unwatched.
  */
 test.beforeEach(async () => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-timer-home-'));
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-timer-repo-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-timer-home-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-timer-repo-'));
   const projects = join(home, '.claude', 'projects', repo.replace(/[^A-Za-z0-9]/g, '-'));
   mkdirSync(projects, { recursive: true });
 

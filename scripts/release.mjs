@@ -70,7 +70,7 @@ export function refusalsFor({ dirty, manifests }) {
   const version = manifests[0]?.manifest.version;
   for (const { pkg, manifest: m } of manifests) {
     for (const [dep, range] of Object.entries(m.dependencies ?? {})) {
-      if (!dep.startsWith('@cocopilot/') && !dep.startsWith('cocopilot-')) continue;
+      if (!dep.startsWith('@cocoapilot/') && !dep.startsWith('cocoapilot-')) continue;
       if (range !== version) {
         refusals.push(`${pkg} pins ${dep} at ${range}, but the release is ${version}`);
       }
@@ -126,7 +126,7 @@ function main() {
    * commit this script just verified is clean.
    */
   execFileSync(process.execPath, [String(npmCli), 'run', 'build'], { cwd: root, stdio: 'inherit' });
-  execFileSync(process.execPath, [String(npmCli), 'run', 'build', '--workspace', 'cocopilot-board'], {
+  execFileSync(process.execPath, [String(npmCli), 'run', 'build', '--workspace', 'cocoapilot-board'], {
     cwd: root,
     stdio: 'inherit',
   });

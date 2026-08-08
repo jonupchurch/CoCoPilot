@@ -26,12 +26,12 @@ only thing standing between a mistake and a permanent one.
 ### 1. One command runs the product (US1)
 
 ```bash
-npx cocopilot-board
+npx cocoapilot-board
 ```
 
 - The board opens and shows its waiting state.
 - Same command on all three platforms.
-- The reporting tools arrive with it — `cocopilot` and `cocopilot-mcp` are both
+- The reporting tools arrive with it — `cocoapilot` and `cocoapilot-mcp` are both
   on the path after installing the one package.
 - On Node older than 22, the failure **names the version** rather than throwing
   from inside a dependency.
@@ -43,7 +43,7 @@ are true tests only after publishing.
 
 ### 2. The reporting tools stay small (US2)
 
-- Installing `@cocopilot/mcp` alone brings **no** Electron, Chromium or
+- Installing `cocoapilot-mcp` alone brings **no** Electron, Chromium or
   Playwright — asserted over the installed tree, not the manifest.
 - The CLI runs with no board and says so softly, exiting 0.
 - The configuration entry is unchanged from previous versions and names no path.
@@ -74,16 +74,44 @@ deliberate, not unfinished: see the runbook.
 version cannot be replaced, and unpublishing is limited to 72 hours.
 
 1. **Create an npm account** and enable 2FA. Public packages are free.
-2. **Settle the naming**, which is the one open decision. `cocopilot` unscoped
-   is an npm *security holding package* and cannot be had, so `npx cocopilot` is
-   unavailable whatever else is chosen.
-   - Check whether the **`@cocopilot` organisation** can be created. If it can,
-     nothing changes: publish as-is.
-   - If it cannot, rename the two scoped packages to `cocopilot-contract` and
-     `cocopilot-mcp` — both confirmed free. It is a find-and-replace across 52
-     files that the typechecker verifies completely, plus one assertion in
-     `packaging.test.ts`, one line in the client README and the pin in
-     `packages/runner`. `cocopilot-board` is unscoped already and unaffected.
+2. **The naming is settled** — three flat, unscoped names, so no npm
+   organisation is needed and nothing blocks on one being available:
+
+   | Package | Command |
+   |---|---|
+   | `cocoapilot-board` | `npx cocoapilot-board` — the board, the whole product |
+   | `cocoapilot-mcp` | `npx -y cocoapilot-mcp` — the reporting tools alone |
+   | `cocoapilot-contract` | not run directly; the shared payload definition |
+
+   All three were confirmed absent from the registry on 2026-08-08.
+
+   - **The earlier note here was wrong** and is worth recording, because it was
+     wrong in the direction that costs a name. It said `cocoapilot` was an npm
+     *security holding package*. The holding package is **`cocopilot`** — the
+     spelling this product used before 2026-08-07. Renaming to CoCoapilot moved
+     the product off the taken name, and nobody noticed that it also freed
+     `cocoapilot`.
+   - **`cocoapilot` is free, and is deliberately not being taken.** npm refuses
+     names it judges too similar to an existing one, and `cocoapilot` is a
+     single letter from `cocopilot`. That check runs registry-side at publish
+     time only: `npm publish --dry-run` cannot detect it and there is no way to
+     ask beforehand. The runner is the **last** package dependency order
+     publishes, so a refusal would arrive *after* the other two are permanent —
+     a coin-flip resolved at the least recoverable moment. `cocoapilot-board`
+     costs seven characters and removes the flip entirely.
+     - It is also the name the binary already had, so package and binary now
+       agree and `npx cocoapilot-board` resolves by exact name match rather
+       than by npm's single-bin fallback.
+     - **`cocoapilot` stays unclaimed**, which means someone else can take it.
+       If that matters, publish a placeholder under it separately — but not as
+       part of this release, and not before the three above are up.
+   - `@cocoapilot/board` keeps its scope. It is `private: true`, never reaches
+     the registry, and renaming it would be churn across 33 references for no
+     effect.
+   - **The client still ships a binary called `cocoapilot`** — the reporting
+     CLI — and that is now unambiguous: no published package shares the name,
+     so nothing collides on install and `cocoapilot` on the path always means
+     the CLI.
 3. **`npm login`** on the release machine, or mint a granular token for CI.
 4. **`npm run release`** and read every line. It builds from scratch and
    rehearses the install.

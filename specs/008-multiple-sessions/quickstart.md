@@ -10,7 +10,7 @@ Features 001–007 implemented.
 
 ```bash
 # Playwright drives the built app in apps/board/out, not the source.
-npm run build --workspace @cocopilot/board
+npm run build --workspace @cocoapilot/board
 
 npm test          # 429 unit + integration
 npm run test:e2e  # 209 Playwright

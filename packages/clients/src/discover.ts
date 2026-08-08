@@ -1,10 +1,10 @@
 import {
   CONTRACT_VERSION,
   HOST,
-  isCoCoPilotHealth,
+  isCoCoapilotHealth,
   PORT_RANGE,
   type HealthPayload,
-} from '@cocopilot/contract';
+} from 'cocoapilot-contract';
 
 import { Deadline, PROBE_BUDGET_MS } from './deadline.js';
 
@@ -61,7 +61,7 @@ async function probe(port: number, deadline: Deadline): Promise<HealthPayload | 
     if (!response.ok) return null;
 
     const body: unknown = await response.json();
-    return isCoCoPilotHealth(body) ? body : null;
+    return isCoCoapilotHealth(body) ? body : null;
   } catch {
     // Refused, timed out, or answered with something that is not JSON. All the
     // same thing from here: not the board, keep looking.

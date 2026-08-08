@@ -425,7 +425,9 @@ test.describe('the session switcher shows only what was reported', () => {
     }
 
     // The reported branches, and the repository names the board derived from
-    // the reported paths.
+    // the reported paths. `CoCoPilot` is this checkout's directory name, not
+    // the product's — the repository was never renamed alongside the product,
+    // so do not "correct" it to CoCoapilot.
     for (const value of ['feat/one', 'feat/two', 'CoCoPilot', 'apps']) {
       remaining = remaining.split(value).join(' ');
     }

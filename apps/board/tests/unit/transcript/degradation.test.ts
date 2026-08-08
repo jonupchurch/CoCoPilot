@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PushRequest } from '@cocopilot/contract';
+import { PushRequest } from 'cocoapilot-contract';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Store, type Session, type TranscriptState } from '../../../src/main/store.js';
@@ -71,8 +71,8 @@ let repo: string;
 let projects: string;
 
 beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), 'cocopilot-degradation-home-'));
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-degradation-repo-'));
+  home = mkdtempSync(join(tmpdir(), 'cocoapilot-degradation-home-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-degradation-repo-'));
   projects = join(home, '.claude', 'projects', slug(repo));
   mkdirSync(projects, { recursive: true });
 });

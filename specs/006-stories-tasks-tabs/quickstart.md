@@ -13,7 +13,7 @@ the same `SessionView` projection that the transcript reader added to.
 # Playwright drives the built app in apps/board/out, not the source. Without
 # this the suite tests the previous build and reports missing elements for
 # components that are right there in the tree.
-npm run build --workspace @cocopilot/board
+npm run build --workspace @cocoapilot/board
 
 npm test          # 410 unit + integration
 npm run test:e2e  # 154 Playwright

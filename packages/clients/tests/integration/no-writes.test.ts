@@ -88,7 +88,7 @@ const WRITE_APIS = new Set([
 let repo: string;
 
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-clientfs-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-clientfs-'));
   mkdirSync(join(repo, '.git'), { recursive: true });
   writeFileSync(join(repo, '.git', 'HEAD'), 'ref: refs/heads/main\n');
   // The files a "helpful" change would be tempted to read.

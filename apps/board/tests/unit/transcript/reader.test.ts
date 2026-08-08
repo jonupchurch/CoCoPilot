@@ -10,7 +10,7 @@ let dir: string;
 let path: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'cocopilot-reader-'));
+  dir = mkdtempSync(join(tmpdir(), 'cocoapilot-reader-'));
   path = join(dir, 'session.jsonl');
 });
 

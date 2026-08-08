@@ -77,7 +77,7 @@ const REPORT = {
 
 test('the bridge is two reads, two local writes, and nothing else', async () => {
   const surface = await board.page.evaluate(() => {
-    const api = (window as unknown as { cocopilot: Record<string, unknown> }).cocopilot;
+    const api = (window as unknown as { cocoapilot: Record<string, unknown> }).cocoapilot;
     return Object.keys(api).sort();
   });
 
@@ -129,7 +129,7 @@ test('neither view tree contains a way to send anything', async () => {
   const SENDS = /\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|EventSource|navigator\.send/u;
   // The two members that exist. A call to anything else on the bridge would be
   // a channel this test has never heard of.
-  const BRIDGE = /\bcocopilot\.(?!getState\b|subscribe\b)\w+/u;
+  const BRIDGE = /\bcocoapilot\.(?!getState\b|subscribe\b)\w+/u;
 
   const offenders: string[] = [];
   for await (const file of glob('{views,components,state}/**/*.{ts,tsx}', { cwd: root })) {

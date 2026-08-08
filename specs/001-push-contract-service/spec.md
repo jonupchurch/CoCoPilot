@@ -6,11 +6,11 @@
 
 **Status**: Draft
 
-**Input**: User description: "Push contract and local service — the HTTP API and in-memory state that every other CoCoPilot surface wraps. Serves POST /v1/push (a full snapshot that replaces the board's state for one session), POST /v1/note (append-only), and GET /v1/health (identifies the app so port probing cannot mistake unrelated software for the board). Holds per-session state in memory keyed by repo and sessionId, stamps receipt time itself rather than trusting any client clock, and clears everything when the process exits. Binds to 127.0.0.1 only, with no auth and no TLS. Validates every field regardless, because localhost is not a trust boundary: repo must be an existing path but is never opened, all free text is length-capped and count-capped per collection, unknown keys are ignored so newer clients degrade instead of failing. Never reads the user's repository and never writes anything anywhere."
+**Input**: User description: "Push contract and local service — the HTTP API and in-memory state that every other CoCoapilot surface wraps. Serves POST /v1/push (a full snapshot that replaces the board's state for one session), POST /v1/note (append-only), and GET /v1/health (identifies the app so port probing cannot mistake unrelated software for the board). Holds per-session state in memory keyed by repo and sessionId, stamps receipt time itself rather than trusting any client clock, and clears everything when the process exits. Binds to 127.0.0.1 only, with no auth and no TLS. Validates every field regardless, because localhost is not a trust boundary: repo must be an existing path but is never opened, all free text is length-capped and count-capped per collection, unknown keys are ignored so newer clients degrade instead of failing. Never reads the user's repository and never writes anything anywhere."
 
 ## Context
 
-This is the spine of CoCoPilot. It delivers nothing a person can see — the
+This is the spine of CoCoapilot. It delivers nothing a person can see — the
 window is feature 3 — but every other feature depends on it, so its acceptance
 criteria are stated as **testable** rather than **observable**.
 

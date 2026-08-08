@@ -24,7 +24,7 @@ import { TranscriptReader } from './reader.js';
 
 export interface TranscriptSourceOptions {
   /**
-   * Where `.claude/projects` lives. `COCOPILOT_HOME` overrides it, which is how
+   * Where `.claude/projects` lives. `COCOAPILOT_HOME` overrides it, which is how
    * the end-to-end suite points the reader at fixtures instead of at the
    * developer's own sessions.
    */
@@ -57,7 +57,7 @@ export class TranscriptSource {
 
   constructor(store: Store, options: TranscriptSourceOptions = {}) {
     this.#store = store;
-    this.#home = options.home ?? process.env['COCOPILOT_HOME'] ?? homedir();
+    this.#home = options.home ?? process.env['COCOAPILOT_HOME'] ?? homedir();
     this.#debounceMs = options.debounceMs ?? DEBOUNCE_MS;
     this.#now = options.now ?? ((): number => Date.now());
   }

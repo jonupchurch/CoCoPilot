@@ -14,7 +14,7 @@ the narrow-width check borrows.
 # Playwright drives the built app in apps/board/out, not the source. Without
 # this the suite tests the previous build and reports missing elements for
 # components that are right there in the tree.
-npm run build --workspace @cocopilot/board
+npm run build --workspace @cocoapilot/board
 
 npm test          # 421 unit + integration
 npm run test:e2e  # 180 Playwright

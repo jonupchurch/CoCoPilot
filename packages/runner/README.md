@@ -1,10 +1,10 @@
-# cocopilot-board
+# cocoapilot-board
 
-Run the [CoCoPilot](https://github.com/jonupchurch/CoCoPilot) board — a display
+Run the [CoCoapilot](https://github.com/jonupchurch/CoCoPilot) board — a display
 panel for watching an AI agent work a Spec-Kit repository — with one command:
 
 ```bash
-npx cocopilot-board
+npx cocoapilot-board
 ```
 
 Same command on Windows, macOS and Linux.
@@ -12,7 +12,7 @@ Same command on Windows, macOS and Linux.
 **The first run downloads about 150 MB**, because this package carries the
 Electron runtime the board is built on. That happens once per machine and is
 cached by npm thereafter. If you only want the reporting tools for your agent
-and not the window, install [`@cocopilot/mcp`](https://www.npmjs.com/package/@cocopilot/mcp)
+and not the window, install [`cocoapilot-mcp`](https://www.npmjs.com/package/cocoapilot-mcp)
 instead — it is around 20 KB and pulls in no browser runtime.
 
 Requires Node 22 or newer.

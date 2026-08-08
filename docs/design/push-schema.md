@@ -165,14 +165,14 @@ with no auth and no TLS (decision 18).
 ```
 POST http://127.0.0.1:<port>/v1/push
 POST http://127.0.0.1:<port>/v1/note
-GET  http://127.0.0.1:<port>/v1/health   → { "app": "cocopilot", "version": "…" }
+GET  http://127.0.0.1:<port>/v1/health   → { "app": "cocoapilot", "version": "…" }
 ```
 
-**MCP** — `cocopilot_report` and `cocopilot_note`. The server starts cleanly
+**MCP** — `cocoapilot_report` and `cocoapilot_note`. The server starts cleanly
 whether or not the app is running and connects lazily per call (decision 6),
 because Claude Code discovers an MCP tool list once, at session start.
 
-**CLI** — `cocopilot report` and `cocopilot note "…"`, for hooks and scripts.
+**CLI** — `cocoapilot report` and `cocoapilot note "…"`, for hooks and scripts.
 
 **HTTP** — the full payload, for anything that is neither.
 
@@ -196,7 +196,7 @@ Every surface fails the same way: the call errors, nothing is buffered, nothing
 is spawned (decision 6). The message matters, because a monitoring tool that
 derails the work it monitors is worse than no monitoring tool:
 
-> CoCoPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 ## Validation
 

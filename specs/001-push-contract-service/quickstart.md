@@ -65,7 +65,7 @@ before (SC-003).
 
 ### 4. The service identifies itself (US4)
 
-- `GET /v1/health` returns `app: "cocopilot"` with a version.
+- `GET /v1/health` returns `app: "cocoapilot"` with a version.
 - A stub server returning `200 {}` on the same port is **not** accepted by
   client discovery logic (SC-008).
 

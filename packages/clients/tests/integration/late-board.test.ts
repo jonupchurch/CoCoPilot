@@ -1,4 +1,4 @@
-import type { Service } from '@cocopilot/board';
+import type { Service } from '@cocoapilot/board';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -79,7 +79,7 @@ describe('a board opened after the session began', () => {
 });
 
 async function startBoardOn(port: number): Promise<Service> {
-  const { createService } = await import('@cocopilot/board');
+  const { createService } = await import('@cocoapilot/board');
   return createService({ port });
 }
 

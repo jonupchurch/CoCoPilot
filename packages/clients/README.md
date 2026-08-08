@@ -1,6 +1,6 @@
-# @cocopilot/mcp
+# cocoapilot-mcp
 
-The MCP server and CLI that report to a [CoCoPilot](https://github.com/jonupchurch/CoCoPilot)
+The MCP server and CLI that report to a [CoCoapilot](https://github.com/jonupchurch/CoCoPilot)
 board — a window a human watches while an AI agent works a Spec-Kit repository.
 
 Both are thin. They derive which repository, which branch and which session you
@@ -13,9 +13,9 @@ There is nothing to install. Add this to your `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "cocopilot": {
+    "cocoapilot": {
       "command": "npx",
-      "args": ["-y", "@cocopilot/mcp"]
+      "args": ["-y", "cocoapilot-mcp"]
     }
   }
 }
@@ -28,7 +28,7 @@ report that the board is not running.
 
 ## Tools
 
-### `cocopilot_report`
+### `cocoapilot_report`
 
 What you are working on right now. Replaces your previous report entirely —
 send the whole current picture, not a delta.
@@ -44,7 +44,7 @@ send the whole current picture, not a delta.
 board will never decide on its own that you are stuck — it shows how long it has
 been since it heard from you and lets the person judge.
 
-### `cocopilot_note`
+### `cocoapilot_note`
 
 A note for the human. Notes are **cleared when the board window closes** — they
 are not storage. Anything worth keeping belongs in the repository, written with
@@ -58,8 +58,8 @@ them would be three more chances to get identity wrong mid-task, for no benefit.
 For hooks and build scripts:
 
 ```sh
-npx @cocopilot/mcp cocopilot report --task T033 --note "build finished" --chip idle
-npx @cocopilot/mcp cocopilot note "coverage dropped below 80%" --source "noticed in CI"
+npx cocoapilot-mcp cocoapilot report --task T033 --note "build finished" --chip idle
+npx cocoapilot-mcp cocoapilot note "coverage dropped below 80%" --source "noticed in CI"
 ```
 
 | Exit code | Meaning |
@@ -80,7 +80,7 @@ switcher with one-shot entries.
 
 1. Try `127.0.0.1:41847` through `:41851`, in order.
 2. `GET /v1/health` on each.
-3. Accept the first whose body says `app: "cocopilot"`.
+3. Accept the first whose body says `app: "cocoapilot"`.
 4. Send nothing to anything else — **including anything that returns 200**.
 5. All five exhausted: the board is absent.
 
@@ -90,7 +90,7 @@ Nothing is ever launched.
 
 ## When the board is not running
 
-> CoCoPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 That is the whole failure mode. It is not an error, it costs you nothing, and
 the next call will work if the board is open by then — with no restart of
@@ -112,5 +112,5 @@ nothing that pulls in a browser runtime. It is what an agent needs, and it is
 around 21 KB.
 
 If you also want the board itself, the window that displays what your agent
-reports, run `npx cocopilot-board` instead. That package brings these tools with
+reports, run `npx cocoapilot-board` instead. That package brings these tools with
 it, so you never need both.

@@ -1,5 +1,5 @@
-import type { Service } from '@cocopilot/board';
-import { CONTRACT_VERSION } from '@cocopilot/contract';
+import type { Service } from '@cocoapilot/board';
+import { CONTRACT_VERSION } from 'cocoapilot-contract';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { CALL_BUDGET_MS, Deadline } from '../../src/deadline.js';
@@ -35,7 +35,7 @@ describe('discovery', () => {
     expect(found.ok).toBe(true);
     if (!found.ok) return;
     expect(found.port).toBe(service.port);
-    expect(found.health.app).toBe('cocopilot');
+    expect(found.health.app).toBe('cocoapilot');
   });
 
   it('finds a board on the last port, having walked past the others', async () => {
@@ -100,7 +100,7 @@ describe('discovery', () => {
     // app. Accepting that is only reasonable while the drift is detectable.
     const future = await stub(() => ({
       status: 200,
-      body: JSON.stringify({ app: 'cocopilot', version: '9.0.0', contract: 'v9' }),
+      body: JSON.stringify({ app: 'cocoapilot', version: '9.0.0', contract: 'v9' }),
     }));
 
     const found = await discover({ ports: [future.port], deadline: deadline() });

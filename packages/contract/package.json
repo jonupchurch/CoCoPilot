@@ -1,8 +1,8 @@
 {
-  "name": "@cocopilot/contract",
+  "name": "cocoapilot-contract",
   "version": "0.1.0",
   "type": "module",
-  "description": "The one definition of CoCoPilot's push payload, shared by the service and every client",
+  "description": "The one definition of CoCoapilot's push payload, shared by the service and every client",
   "license": "MIT",
   "exports": {
     ".": {
@@ -21,7 +21,7 @@
   "homepage": "https://github.com/jonupchurch/CoCoPilot#readme",
   "bugs": "https://github.com/jonupchurch/CoCoPilot/issues",
   "keywords": [
-    "cocopilot",
+    "cocoapilot",
     "spec-kit",
     "ai-agent"
   ],

@@ -44,7 +44,7 @@ Controls: 28px standard height, and hit targets stay 28px.
 ## One conflict with the export, resolved
 
 **The title bar shows the repository as well as the branch.** Round 3's export
-shows `CoCoPilot · feat/session-hook` — brand and branch, no repository. FR-001
+shows `CoCoapilot · feat/session-hook` — brand and branch, no repository. FR-001
 requires both. Decision 8 makes the exports canon for look and feel and the docs
 authoritative on incidental content, so the repository goes in the same slot with
 the same treatment: mono, `--muted`, ellipsised, `min-width: 0`. Its basename
@@ -75,7 +75,7 @@ apps/board/src/
 ## Phase 2: Foundational
 
 - [x] T006 [P] Create `apps/board/src/renderer/src/tokens.css` — the table above, transcribed. Every value a CSS variable; a hex literal anywhere else is a bug
-- [x] T007 Create `apps/board/src/preload/index.ts` — `contextBridge.exposeInMainWorld('cocopilot', { getState, subscribe })`. Functions only, never `ipcRenderer`, no logic: it is a wire, not a layer
+- [x] T007 Create `apps/board/src/preload/index.ts` — `contextBridge.exposeInMainWorld('cocoapilot', { getState, subscribe })`. Functions only, never `ipcRenderer`, no logic: it is a wire, not a layer
 - [x] T008 Create `apps/board/src/main/window.ts` — one `BrowserWindow` with `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, a minimum size, and no code path that resizes it
 - [x] T009 Wire the service into `apps/board/src/main/app.ts` — start `createService()`, register `ipcMain.handle` for the initial read, and forward `store.subscribe()` to `webContents.send`
 - [x] T010 [P] Create `apps/board/src/renderer/src/lib/elapsed.ts` — a timestamp to `40s`, `4m`, `2h`, `3d`. Pure, and a *measurement*: it never returns a judgement at any duration

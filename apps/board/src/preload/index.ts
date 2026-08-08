@@ -16,7 +16,7 @@ import { contextBridge, ipcRenderer } from 'electron';
  */
 const api = {
   /** Read held state once, on mount. Without this an idle session shows nothing. */
-  getState: async (): Promise<unknown> => ipcRenderer.invoke('cocopilot:state'),
+  getState: async (): Promise<unknown> => ipcRenderer.invoke('cocoapilot:state'),
 
   /**
    * Show a different held session.
@@ -25,7 +25,7 @@ const api = {
    * change, so there is one path by which this window learns anything.
    */
   select: (key: string): void => {
-    ipcRenderer.send('cocopilot:select', key);
+    ipcRenderer.send('cocoapilot:select', key);
   },
 
   /**
@@ -35,7 +35,7 @@ const api = {
    * here the moment it reports again (decision 17).
    */
   dismiss: (key: string): void => {
-    ipcRenderer.send('cocopilot:dismiss', key);
+    ipcRenderer.send('cocoapilot:dismiss', key);
   },
 
   /**
@@ -46,13 +46,13 @@ const api = {
     const handler = (_event: unknown, state: unknown): void => {
       listener(state);
     };
-    ipcRenderer.on('cocopilot:state', handler);
+    ipcRenderer.on('cocoapilot:state', handler);
     return () => {
-      ipcRenderer.off('cocopilot:state', handler);
+      ipcRenderer.off('cocoapilot:state', handler);
     };
   },
 };
 
-contextBridge.exposeInMainWorld('cocopilot', api);
+contextBridge.exposeInMainWorld('cocoapilot', api);
 
-export type CoCoPilotBridge = typeof api;
+export type CoCoapilotBridge = typeof api;

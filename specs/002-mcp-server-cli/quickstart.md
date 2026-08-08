@@ -18,7 +18,7 @@ npm run typecheck
 
 ### 1. An agent reports without supplying identity (US1)
 
-With a service running, call `cocopilot_report` with `task` and `note` only.
+With a service running, call `cocoapilot_report` with `task` and `note` only.
 
 - The service holds a session for the correct repository and branch.
 - Neither was passed by the caller.
@@ -55,7 +55,7 @@ This is the test that proves discovery checks identity rather than liveness.
 
 ### 4. A hook reports (US4)
 
-Run `cocopilot note "test"` from a shell inside a repository.
+Run `cocoapilot note "test"` from a shell inside a repository.
 
 - A session appears, marked unattributed.
 - Ten more invocations join the *same* session — not eleven sessions.

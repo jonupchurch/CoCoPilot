@@ -1,6 +1,6 @@
 import { createServer, type Server } from 'node:http';
 
-import { HOST } from '@cocopilot/contract';
+import { HOST } from 'cocoapilot-contract';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { listenOnFirstFree, PortRangeExhaustedError } from '../../src/main/port.js';

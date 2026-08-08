@@ -1,4 +1,4 @@
-import type { Chip } from '@cocopilot/contract';
+import type { Chip } from 'cocoapilot-contract';
 
 import { findRepository, transcriptId } from './identity.js';
 import {

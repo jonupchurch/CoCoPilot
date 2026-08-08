@@ -5,7 +5,7 @@ import type { FsCall } from '../helpers/fs-calls.js';
 /**
  * The two guarantees the whole product rests on, asserted as absences.
  *
- * CoCoPilot never writes anything anywhere (SC-004) and never reads inside the
+ * CoCoapilot never writes anything anywhere (SC-004) and never reads inside the
  * repository it is told about (SC-005). Both are stated in prose all over the
  * design documents, and prose is exactly what erodes: a cache file added for a
  * good reason, or a convenience read of `tasks.md`, would pass review unnoticed
@@ -45,7 +45,7 @@ let repo: string;
 beforeAll(() => {
   // A stand-in for the user's repository, with the files a "helpful" future
   // change would be most tempted to read.
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-repo-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-repo-'));
   writeFileSync(join(repo, 'tasks.md'), '- [x] T001 A task\n- [ ] T002 Another\n');
   mkdirSync(join(repo, 'specs'));
   writeFileSync(join(repo, 'specs', 'spec.md'), '# A spec\n');
@@ -89,7 +89,7 @@ describe('the service touches the filesystem exactly once, and never inside the 
       // repo: the service stats whatever path it is told about, so a nested one
       // would look like a read inside the repository when it is nothing of the
       // kind.
-      await service.post('/v1/push', envelope({ repo: join(tmpdir(), 'cocopilot-absent-repo') }));
+      await service.post('/v1/push', envelope({ repo: join(tmpdir(), 'cocoapilot-absent-repo') }));
       await service.post('/v1/push', { ...envelope(), tasks: 'not an array' });
       await service.post('/v1/push', 'not json');
       await service.post('/v1/push', envelope(), { headers: { 'content-type': 'text/plain' } });

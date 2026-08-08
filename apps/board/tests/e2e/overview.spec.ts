@@ -370,7 +370,7 @@ test.describe('Changed files — what the agent says it touched', () => {
     // Write a real file into the repository the session named. The board never
     // reads the repository, so this must produce no change of any kind: what is
     // on screen is a record of what was said, not a view of what is on disk.
-    const scratch = join(process.cwd(), `cocopilot-e2e-${process.pid}.tmp`);
+    const scratch = join(process.cwd(), `cocoapilot-e2e-${process.pid}.tmp`);
     writeFileSync(scratch, 'touched outside the agent');
     try {
       await page.waitForTimeout(1_500);

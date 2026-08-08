@@ -1,4 +1,4 @@
-import type { ChangedFile, Focus, PlanStep, Task } from '@cocopilot/contract';
+import type { ChangedFile, Focus, PlanStep, Task } from 'cocoapilot-contract';
 import { describe, expect, it } from 'vitest';
 
 import {

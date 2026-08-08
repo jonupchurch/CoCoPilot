@@ -1,6 +1,6 @@
 import { createServer, type Server } from 'node:http';
 
-import { createService, type Service } from '@cocopilot/board';
+import { createService, type Service } from '@cocoapilot/board';
 
 /**
  * A real board, and things that are not a board.

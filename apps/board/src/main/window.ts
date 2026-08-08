@@ -27,6 +27,16 @@ export interface WindowOptions {
   preload: string;
   /** A dev-server URL, or a built index.html to load from disk. */
   load: { url: string } | { file: string };
+  /**
+   * The window and taskbar icon.
+   *
+   * Passed in rather than imported here so that this module stays free of build
+   * machinery, the same way it takes its preload path rather than deriving one.
+   * Electron ignores a path that does not exist **without erroring**, so a
+   * missing icon shows up as the default Electron logo and nothing else — which
+   * is why `pack:check` asserts the file is inside the published package.
+   */
+  icon: string;
 }
 
 export function createWindow(options: WindowOptions): BrowserWindow {
@@ -38,6 +48,7 @@ export function createWindow(options: WindowOptions): BrowserWindow {
     show: false,
     backgroundColor: '#0E0D0C',
     autoHideMenuBar: true,
+    icon: options.icon,
     webPreferences: {
       preload: options.preload,
       // Not negotiable: this window renders text composed by an AI agent.

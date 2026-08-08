@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { Service } from '@cocopilot/board';
-import { MAX_TEXT } from '@cocopilot/contract';
+import type { Service } from '@cocoapilot/board';
+import { MAX_TEXT } from 'cocoapilot-contract';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { note, report } from '../../src/client.js';
@@ -14,7 +14,7 @@ let repo: string;
 const open: Array<{ close(): Promise<void> }> = [];
 
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'cocopilot-softfail-'));
+  repo = mkdtempSync(join(tmpdir(), 'cocoapilot-softfail-'));
   mkdirSync(join(repo, '.git'), { recursive: true });
   writeFileSync(join(repo, '.git', 'HEAD'), 'ref: refs/heads/main\n');
 });
@@ -96,7 +96,7 @@ describe('when the board is not running', () => {
     // Something answers health and then is gone. Still soft, still no retry.
     const impostor = await startStub((url) =>
       url === '/v1/health'
-        ? { status: 200, body: JSON.stringify({ app: 'cocopilot', version: '0.1.0', contract: 'v1' }) }
+        ? { status: 200, body: JSON.stringify({ app: 'cocoapilot', version: '0.1.0', contract: 'v1' }) }
         : { status: 500, body: 'gone' },
     );
     open.push(impostor);

@@ -1,6 +1,6 @@
 # Status
 
-**Project:** CoCoPilot (as in *Co-Copilot*) — a tool to help a developer keep
+**Project:** CoCoapilot (as in *Co-Copilot*) — a tool to help a developer keep
 information straight while working with Claude on a GitHub Spec-Kit repository.
 An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
@@ -36,7 +36,7 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 
 ## What this is
 
-Same product as the previous round, renamed. CoCoPilot reads a Spec-Kit
+Same product as the previous round, renamed. CoCoapilot reads a Spec-Kit
 repository's own files for structure and takes live narration pushed by the
 agents doing the work, so a human can watch a board while Claude implements
 tasks. The name change reflects the framing better: it's the *co*-pilot's
@@ -45,7 +45,7 @@ their head across a long agent session.
 
 ## Decisions settled (2026-08-06)
 
-1. **Name: CoCoPilot.** Published to a new **public** repo,
+1. **Name: CoCoapilot.** Published to a new **public** repo,
    `jonupchurch/CoCoPilot`, on 2026-08-06. The previous private `jonupchurch/skmc`
    repo is retained untouched and is still wired up as the `skmc-old` git remote;
    deleting it is a pending user action. Note that the round 1 design exports
@@ -84,7 +84,7 @@ their head across a long agent session.
      cleanly whether or not the app is up, and connect to the HTTP API lazily
      per call — otherwise the tools are missing for the whole session even after
      the board is opened. A failed call returns copy along the lines of
-     *"CoCoPilot board is not running — continue working, no need to retry,"* so
+     *"CoCoapilot board is not running — continue working, no need to retry,"* so
      a monitoring tool never derails the work it monitors.
    - *Cost:* restarting the app loses the narrative history; the board is still
      correct after a re-scan, just without the story. Accepted.
@@ -111,7 +111,7 @@ their head across a long agent session.
      hyphenated `T-011` / `US-002` IDs give way to the real bare and bold `T001`
      forms in the grounding above; the "stalled step older than 60s" acceptance
      criterion gives way to decision 15, which rejects thresholds entirely;
-     and the fixture's mixing of CoCoPilot's own features with a generic sample
+     and the fixture's mixing of CoCoapilot's own features with a generic sample
      app gets separated per the notable wrinkle below.
    - *Not resolved by this rule:* cases where two design files contradict each
      other, or where a design shows data that no decided source can supply. The
@@ -156,7 +156,7 @@ their head across a long agent session.
       Apply / Skip, Re-read / Discard, and "Open in Claude". Those controls stay
       in the design as the visual reference for button, input and chip styling —
       decision 8 still governs look and feel — but no product surface uses them.
-    - *Closes the older question* of whether CoCoPilot ever writes to the user's
+    - *Closes the older question* of whether CoCoapilot ever writes to the user's
       repo: it does not, which restores the "add-on, not source of truth"
       honesty the previous round had.
     - *Still allowed,* because none of it reaches the agent: collapsing a
@@ -308,14 +308,14 @@ their head across a long agent session.
       existing one. See [docs/design/push-schema.md](docs/design/push-schema.md).
     - *Volatile like everything else,* per decision 21. Notes clear when the app
       closes, and the UI must not imply otherwise.
-21. **CoCoPilot owns no durable state. It is a display panel.** Nothing the app
+21. **CoCoapilot owns no durable state. It is a display panel.** Nothing the app
     holds survives closing it — not narration, not notes, not the session list.
     Everything on screen is either re-derived from disk (repo files, git,
     Claude Code transcripts) or was pushed since launch. Decision 6 is absolute,
     with no carve-outs.
     - *Where durability actually lives:* the user asks the **agent** to write it
       into the repository with the agent's own file tools. That is the agent
-      doing what it always does, not CoCoPilot writing — decision 11 is
+      doing what it always does, not CoCoapilot writing — decision 11 is
       untouched — and the result is a file the user owns, reviews and commits,
       which is a better home for anything worth keeping than an app database
       would be.
@@ -329,7 +329,7 @@ their head across a long agent session.
 22. **Port discovery is a fixed port plus a documented fallback range,** resolved
     by a health check. The app claims the fixed port and walks up a short range
     if it is taken; the MCP server and CLI probe the same sequence and use the
-    first that identifies itself as CoCoPilot. Nothing is written to disk, which
+    first that identifies itself as CoCoapilot. Nothing is written to disk, which
     keeps this consistent with decision 21.
     - *The health check must identify us specifically.* Probing a range means
       knocking on ports owned by unrelated local software, so a client that
@@ -408,7 +408,7 @@ their head across a long agent session.
       snapshot would force the agent to carry every note it has ever written
       just to add one.
 27. **The MCP server ships as an npx-able npm package** — `.mcp.json` runs
-    `npx -y @cocopilot/mcp`. The CLI ships the same way, most likely as a second
+    `npx -y cocoapilot-mcp`. The CLI ships the same way, most likely as a second
     binary in the same package.
     - *The real win is code signing.* Decision 6 requires something Claude Code
       can spawn independently of the app, and shipping that as JavaScript takes

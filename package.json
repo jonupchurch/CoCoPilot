@@ -1,5 +1,5 @@
 {
-  "name": "cocopilot",
+  "name": "cocoapilot",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -24,9 +24,11 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "png-to-ico": "^3.0.2",
     "typescript": "^5.7.2",
     "vitest": "^3.0.5"
   }

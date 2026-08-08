@@ -1,9 +1,9 @@
 {
-  "name": "@cocopilot/board",
+  "name": "@cocoapilot/board",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The CoCoPilot desktop board. Feature 001 builds only the local service it hosts.",
+  "description": "The CoCoapilot desktop board. Feature 001 builds only the local service it hosts.",
   "license": "MIT",
   "main": "out/main/app.cjs",
   "scripts": {
@@ -13,7 +13,7 @@
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit && tsc -p tsconfig.e2e.json --noEmit"
   },
   "dependencies": {
-    "@cocopilot/contract": "*",
+    "cocoapilot-contract": "*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zod": "^3.24.1"

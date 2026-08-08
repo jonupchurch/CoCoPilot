@@ -5,7 +5,7 @@ import {
   type ServerResponse,
 } from 'node:http';
 
-import { MAX_BODY_BYTES, rejection, type Rejection } from '@cocopilot/contract';
+import { MAX_BODY_BYTES, rejection, type Rejection } from 'cocoapilot-contract';
 
 import { handleHealth } from './routes/health.js';
 import { handleNote } from './routes/note.js';

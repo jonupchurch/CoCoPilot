@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512" role="img" aria-label="CoCoapilot">
+  <title>CoCoapilot</title>
+  <path d="M50 5C31 16 15 32 15 53C15 77 31 95 50 95Z" fill="#7FB2E8"></path>
+  <path d="M50 5C69 16 85 32 85 53C85 77 69 95 50 95Z" fill="#37BDA9"></path>
+  <path d="M50 5V95" stroke="#0E0D0C" stroke-width="6"></path>
+</svg>

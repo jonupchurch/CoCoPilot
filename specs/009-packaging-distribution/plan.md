@@ -74,26 +74,35 @@ manifests, build from scratch rather than trusting `dist/`, verify the packed
 contents, and publish in dependency order so a half-finished release never
 leaves a package pointing at one that does not exist.
 
+> **Corrected 2026-08-08 — the claim below is wrong, and how it went wrong is
+> the point.** The security holding package is **`cocopilot`**, the spelling
+> this product used until 2026-08-07. The rename commit replaced `cocopilot`
+> with `cocoapilot` everywhere, which silently turned a *true* statement about
+> the old name into a *false* one about the new one. A blanket rename can
+> invert a verified fact without touching a line of code; re-check external
+> facts after one rather than carrying them across. The decision this section
+> defers has since been made — see [quickstart.md](quickstart.md).
+
 **Naming is the one decision this feature does not make.** The unscoped name
-`cocopilot` is an npm security holding package and cannot be had, so `npx
-cocopilot` is unavailable whatever else is decided. Beyond that there are two
+`cocoapilot` is an npm security holding package and cannot be had, so `npx
+cocoapilot` is unavailable whatever else is decided. Beyond that there are two
 shapes, and the choice is irreversible in the way publishing is:
 
-| | Scoped — keep `@cocopilot/*` | Unscoped — `cocopilot-*` |
+| | Scoped — keep `@cocoapilot/*` | Unscoped — `cocoapilot-*` |
 |---|---|---|
-| Entry point | `npx @cocopilot/board` | `npx cocopilot-board` |
+| Entry point | `npx @cocoapilot/board` | `npx cocoapilot-board` |
 | Needs an npm organisation | **Yes**, and its availability could not be verified without a login | No |
-| Churn to adopt | None | 52 files import `@cocopilot/contract` |
+| Churn to adopt | None | 52 files import `cocoapilot-contract` |
 
 **Nothing here is built against that choice.** The runner package, the release
 script, the manifest hygiene and the tests are all name-agnostic, and the new
-package takes the unscoped `cocopilot-board` because it is a new name with
+package takes the unscoped `cocoapilot-board` because it is a new name with
 nothing to rename and is confirmed free. The existing two keep their names until
 someone checks whether the organisation can be claimed — which is the first step
 of the release runbook, not a build task.
 
 If the organisation turns out to be taken, the fallback is a mechanical rename
-to `cocopilot-contract` / `cocopilot-mcp`: a find-and-replace across 52 files
+to `cocoapilot-contract` / `cocoapilot-mcp`: a find-and-replace across 52 files
 that the typechecker verifies completely, plus one assertion in
 `packaging.test.ts` and one line in the client README. Recorded so that
 discovering it at publish time is an inconvenience rather than a redesign.
@@ -122,12 +131,15 @@ Recorded rather than researched afresh, because they were established by direct
 check on 2026-08-07:
 
 - `cocopilot` on npm is a **security holding package** (`0.0.1-security`, no
-  maintainer). Unavailable.
-- `cocopilot-board`, `cocopilot-mcp`, `cocopilot-contract`, `cocopilot-app`,
-  `cocopilot-cli` and `co-copilot` are all free.
-- `@cocopilot/mcp` does not exist; whether the `@cocopilot` **organisation** is
+  maintainer). Unavailable. *(Reads `cocoapilot` in earlier revisions of this
+  file — that was the rename overwriting a fact about the old spelling.
+  `cocoapilot` itself is free, and is deliberately not being taken; see
+  [quickstart.md](quickstart.md).)*
+- `cocoapilot-board`, `cocoapilot-mcp`, `cocoapilot-contract`, `cocoapilot-app`,
+  `cocoapilot-cli` and `co-copilot` are all free.
+- `cocoapilot-mcp` does not exist; whether the `@cocoapilot` **organisation** is
   free could not be determined without an authenticated session.
-- `@cocopilot/mcp` packs to 21.4 kB over 46 files and installs cleanly with both
-  binaries working — but only alongside `@cocopilot/contract`, which is pinned
+- `cocoapilot-mcp` packs to 21.4 kB over 46 files and installs cleanly with both
+  binaries working — but only alongside `cocoapilot-contract`, which is pinned
   exactly and unpublished, so installing the client alone fails with a 404.
 - No npm credentials are present on the development machine.

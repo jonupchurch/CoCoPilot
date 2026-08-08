@@ -10,7 +10,7 @@ this defines what sits in front of it.
 
 ## MCP tools
 
-### `cocopilot_report`
+### `cocoapilot_report`
 
 Report what you are working on right now.
 
@@ -42,7 +42,7 @@ specified in [`docs/design/push-schema.md`](../../../docs/design/push-schema.md)
   *why this file wants your eye* — `conflict`, `regenerated, check the diff` —
   and it is the only way to draw attention to one file among many.
 
-### `cocopilot_note`
+### `cocoapilot_note`
 
 Record a note for the human.
 
@@ -60,8 +60,8 @@ using your own file tools.
 ## CLI
 
 ```
-cocopilot report [--task ID] [--note TEXT] [--chip STATE]
-cocopilot note TEXT [--source TEXT]
+cocoapilot report [--task ID] [--note TEXT] [--chip STATE]
+cocoapilot note TEXT [--source TEXT]
 ```
 
 Both derive `repo` and `branch` from the working directory — see *Identity*
@@ -85,7 +85,7 @@ it monitors.
 
 One constant, used by both clients:
 
-> CoCoPilot board is not running — continue working, no need to retry.
+> CoCoapilot board is not running — continue working, no need to retry.
 
 Its exact wording is a behavioural requirement. It has to say three things: the
 board is absent, this is not a failure of your work, and retrying will not help.
@@ -129,7 +129,7 @@ an id (001 FR-004).
 
 1. Try `127.0.0.1:41847` through `:41851` in order.
 2. `GET /v1/health` on each.
-3. Accept the first whose body has `app === "cocopilot"`.
+3. Accept the first whose body has `app === "cocoapilot"`.
 4. Transmit nothing to anything else, including anything returning 200.
 5. All five exhausted → the board is absent.
 

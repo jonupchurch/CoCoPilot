@@ -18,7 +18,7 @@ session.
 
 ## The defining property: it is a display panel
 
-Almost everything below follows from one idea. CoCoPilot **reads nothing from
+Almost everything below follows from one idea. CoCoapilot **reads nothing from
 the user's repository, writes nothing anywhere, and owns no durable state**
 (decisions 11, 21, 24). Everything on screen either arrived in a push or was
 read from Claude Code's own session transcript.
@@ -47,10 +47,10 @@ system is shaped the way it is.
 flowchart LR
   subgraph claude ["Claude Code session"]
     agent["agent"]
-    mcp["MCP server<br/>npx @cocopilot/mcp<br/><i>one per session</i>"]
+    mcp["MCP server<br/>npx cocoapilot-mcp<br/><i>one per session</i>"]
   end
 
-  subgraph app ["CoCoPilot (Electron)"]
+  subgraph app ["CoCoapilot (Electron)"]
     api["HTTP API<br/>127.0.0.1"]
     state["in-memory state<br/><i>per session</i>"]
     tail["transcript reader"]
@@ -83,7 +83,7 @@ Two consequences that are easy to get wrong:
   the tools missing for that entire session, including after the user opens the
   board two minutes later.
 - When a call cannot reach the board it **fails soft and says so plainly** —
-  *"CoCoPilot board is not running — continue working, no need to retry."* A
+  *"CoCoapilot board is not running — continue working, no need to retry."* A
   monitoring tool that derails the work it monitors is worse than none.
 
 **The CLI** is the same package, for hooks and scripts. Short-lived, stateless.
@@ -229,7 +229,7 @@ three sections of one tab.
 
 ## A note on this repository
 
-CoCoPilot both *uses* Spec-Kit and is *about* Spec-Kit. Our own `.specify/` and
+CoCoapilot both *uses* Spec-Kit and is *about* Spec-Kit. Our own `.specify/` and
 `specs/` are real tracked project state, while the app being built reads —
 rather, is *told about* — those same structures in other repos. Keep the two
 roles distinct in specs and fixtures.

@@ -14,14 +14,14 @@ import {
   type ReportedFeature,
   type Story,
   type Task,
-} from '@cocopilot/contract';
+} from 'cocoapilot-contract';
 
 import type { Availability } from './transcript/availability.js';
 import type { Prompt } from './transcript/classify.js';
 import type { ContextView } from './transcript/context.js';
 
 /**
- * Everything CoCoPilot holds.
+ * Everything CoCoapilot holds.
  *
  * All of it lives here, in memory, and dies with the process (decision 21).
  * There is no database, no migration, no storage format to version and no
