@@ -106,6 +106,19 @@ version cannot be replaced, and unpublishing is limited to 72 hours.
    - `@cocoapilot/board` keeps its scope. It is `private: true`, never reaches
      the registry, and renaming it would be churn across 33 references for no
      effect.
+   - **The board's binary stays `cocoapilot-board`** even though its package is
+     now `cocoapilot`, because the client already ships a binary called
+     `cocoapilot` — the reporting CLI — and the runner depends on the client.
+     Two bins of one name collide on install and one silently wins.
+     `npx cocoapilot` still opens the board: npm picks the binary from the
+     *requested package's* manifest, and `cocoapilot` declares exactly one.
+     (`libnpmexec/lib/get-bin-from-manifest.js`, read rather than assumed.)
+     - **One exception, and it is inherent to the name.** `npx` resolves a
+       local `node_modules/.bin/<name>` before it fetches anything. So in a
+       project that has run `npm install cocoapilot-mcp`, `npx cocoapilot`
+       runs that project's **CLI**, not the board. Nothing to fix — the
+       documented MCP entry is `npx -y cocoapilot-mcp`, which installs nothing
+       locally — but it is the one place the two meanings of the word meet.
 3. **`npm login`** on the release machine, or mint a granular token for CI.
 4. **`npm run release`** and read every line. It builds from scratch and
    rehearses the install.
