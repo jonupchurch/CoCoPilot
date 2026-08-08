@@ -1,10 +1,41 @@
 # Changelog
 
 All notable changes to CoCoapilot are recorded here.
-Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
-this project is pre-release and not yet versioned.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html). Versions below 1.0
+say what they are: the shape is still allowed to move.
 
 ## [Unreleased]
+
+### Fixed
+
+- **`docs/design/push-schema.md` disagreed with the schema it documents**, in
+  four places, all found by writing a client against the prose and watching the
+  service reject it. `plan` is a flat array and was documented as
+  `{ steps: [...] }`; `stories[].files` was missing; `sessionId` was marked
+  required and is optional; `transcriptId` was absent entirely, having arrived
+  with feature 005 after the document was written.
+  - **Only the first announced itself.** The service answered `400
+    invalid_field / plan / Expected array, received object` — the error named
+    the field and the expected shape, and cost about a minute. The other three
+    are the quieter kind: prose that would have a client send a field that does
+    not exist, or omit one that does, with nothing to correct it.
+  - Each correction was checked by parsing a payload against
+    `PushRequest` rather than by re-reading the schema, because re-reading is
+    how the drift survived this long. The document now says outright that
+    `packages/contract/src/schema.ts` is authoritative.
+
+## [0.1.0] — 2026-08-08
+
+**First release.** Published to npm as
+[`cocoapilot-board`](https://www.npmjs.com/package/cocoapilot-board),
+[`cocoapilot-mcp`](https://www.npmjs.com/package/cocoapilot-mcp) and
+[`cocoapilot-contract`](https://www.npmjs.com/package/cocoapilot-contract), and
+verified from the registry: a clean install resolves the exact pins, provides
+all three binaries, ships both icons, and the board starts and loads its own
+window. Exercised on Windows only — the command and packaging are identical on
+macOS and Linux by design, which is a claim about the design rather than a
+report from a test.
 
 ### Changed
 

@@ -44,7 +44,8 @@ Identity, and none of it composed by the model:
 |---|---|---|---|
 | `repo` | absolute path | yes | Identifies the session and resolves the transcript directory by slug (decisions 13, 10). |
 | `branch` | string | yes | Shown beside the repo in the title bar. |
-| `sessionId` | string | yes | One per MCP server process. Pushes with no such process behind them share one *unattributed* session per repo, labelled as a script or hook (decision 23). |
+| `sessionId` | string | no | One per MCP server process. **Omitting it is the supported case, not an error:** pushes with no such process behind them share one *unattributed* session per repo, labelled as a script or hook (decision 23). |
+| `transcriptId` | string | no | The AI tool's *own* session id, which is **not** `sessionId` — it names a transcript file, read from `CLAUDE_CODE_SESSION_ID`. Without it the board cannot tell which transcript belongs to the session it is showing (decision 32, feature 005's FR-016). An agent that is not Claude Code omits it and the board falls back to the most recently modified transcript in the repository's directory. |
 
 The board stamps receipt time itself. No client clock is ever trusted — the
 "heard 40s ago" display (decision 15) counts from arrival.
@@ -57,11 +58,25 @@ agent knows, and the board shows what it has.
 | Key | Shape | Notes |
 |---|---|---|
 | `feature` | `{ id, title, specPath? }` | The feature the session is working. |
-| `stories` | array of `{ id, title, priority?, status?, asA?, want?, soThat?, criteria[], taskIds[] }` | Drives the User Stories tab. |
+| `stories` | array of `{ id, title, priority?, status?, asA?, want?, soThat?, criteria[], taskIds[], files[] }` | Drives the User Stories tab. |
 | `tasks` | array of `{ id, storyId?, title, status, detail?, checks[], files[] }` | Drives the Tasks tab and the Overview spec section. |
-| `plan` | `{ steps: [ { text, status, detail? } ] }` | The Plan section. |
+| `plan` | **array** of `{ text, status, detail? }` | The Plan section. A flat array, *not* an object with a `steps` key — see the note below. |
 | `focus` | `{ task?, note?, chip? }` | What is happening right now. |
 | `changedFiles` | array of `{ path, change, added?, removed?, note? }` | The Changed files section. Pushed rather than read from git, since we do not read the repo. Lowest-priority section (decision 12). |
+
+> **`packages/contract/src/schema.ts` is authoritative; this document
+> describes it.** Four corrections on 2026-08-08, all found by writing a client
+> against the prose and watching the service reject it: `plan` is a flat array
+> and was documented as `{ steps: [...] }`; `stories[].files` was missing;
+> `sessionId` was marked required and is optional; `transcriptId` was absent
+> entirely, having arrived with feature 005 after this was written.
+>
+> Only the first was load-bearing — the service answered
+> `400 invalid_field / plan / Expected array, received object`, which is a good
+> error and cost a minute. The other three are the quieter kind: prose that
+> would have had a client send a field that does not exist, or omit one that
+> does, without any error to correct it. A payload contract that drifts from
+> its schema is worse than no document, because it is believed.
 
 ### `status` is a free string
 
