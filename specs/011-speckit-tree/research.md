@@ -98,6 +98,42 @@ arrivals. A boolean in the store needs no observer at all.
 claimed. It is one field, one assignment and one projected line, and it is worth
 the correction rather than the contortion.
 
+### It puts the first accumulation into `putReport`, and that is a real cost
+
+`putReport`'s own comment says there is "no merge path in this method, and
+deliberately none anywhere else in this file (decision 26)", because "the moment
+held state becomes an accumulation, correctness depends on every message arriving
+exactly once and nothing in the system can correct a board that has drifted."
+
+`everReportedStories ||= stories.length > 0` is an accumulation by that
+definition, and it has exactly the failure the comment describes: if a session's
+only story-carrying push is dropped, the flag never sets, and no later push
+corrects it because later pushes carry no stories. The board is then quietly
+wrong about that session for its whole life. Feature 010 built a separate
+endpoint rather than accept the analogous cost.
+
+**Accepted anyway, on three grounds, and the comment in `store.ts` must carry
+them** — this is the first thing in that method that survives a replace, and the
+next feature to want one will cite it.
+
+1. **What decision 26 protects is reported content**, and this is not reported
+   content. It is one derived boolean about whether a field was ever non-empty.
+   A drifted *report* shows the developer work that is not happening; a drifted
+   flag offers a navigation option, and the tree it opens still draws only what
+   the current report says.
+2. **It is monotonic, so it cannot drift progressively.** There is one wrong
+   state, reachable only by losing the single push that carried stories, and it
+   is self-healing the moment any later push carries them — which for a Spec-Kit
+   agent is every push, since every push is a full snapshot (decision 26 again).
+3. **The failure is visible and benign.** The developer sees the story and task
+   views they had before, which still work. Nothing is lost, misreported, or
+   silently wrong on screen; a destination is merely not offered.
+
+**The honest residue**: this weakens a rule that was absolute, and "one small
+monotonic boolean" is exactly how such rules erode. The mitigation is that the
+argument lives in the method rather than in this document, so the next person
+proposing a second one has to answer it there.
+
 **Alternatives considered**:
 
 - *Derive presence from the report on screen.* Rejected: it is FR-003's exact
