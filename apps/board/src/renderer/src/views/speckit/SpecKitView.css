@@ -1,0 +1,60 @@
+/*
+ * Tree beside detail at or above 640px, stacked below it.
+ *
+ * The same breakpoint the other two work views use, from `lib/breakpoint.ts` so
+ * the CSS and the component agree by construction rather than by both being
+ * edited to the same number.
+ *
+ * The narrow answer here is the Tasks tab's rather than the Stories tab's: the
+ * tree stacks above the detail instead of collapsing into a picker, because a
+ * tree *is* the navigation and replacing it with a picker would remove the one
+ * thing this tab exists to show.
+ */
+.speckit {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+}
+
+.speckit[data-narrow='true'] {
+  flex-direction: column;
+}
+
+/*
+ * One scroll container for the whole tree, which is what makes the scroll
+ * position survive a report without anything managing it: nothing re-mounts
+ * this element, so the browser keeps its scrollTop.
+ */
+.speckit__tree {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-2) 0;
+}
+
+.speckit__group {
+  min-width: 0;
+}
+
+/* Indented so the parent relationship is visible without a connector line. */
+.speckit__tasks {
+  padding-left: var(--space-4);
+}
+
+.speckit__none {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-meta);
+  color: var(--muted);
+}
+
+.speckit--empty {
+  padding: var(--space-4) 14px;
+  font-size: var(--text-body);
+  color: var(--muted);
+}
+
+.speckit--empty p {
+  margin: 0;
+}

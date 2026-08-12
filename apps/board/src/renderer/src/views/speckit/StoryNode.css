@@ -1,0 +1,85 @@
+/*
+ * A story row: chevron, then the selectable rest of it.
+ *
+ * Two controls side by side rather than one, for the reason the component gives
+ * — opening a story and reading it are different acts. The chevron is kept
+ * narrow so the selectable area is almost the whole row.
+ */
+.storynode {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.storynode__toggle {
+  flex: 0 0 auto;
+  width: 22px;
+  height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.storynode__toggle:hover {
+  color: var(--ink-soft);
+}
+
+.storynode__chevron {
+  font-size: var(--text-meta);
+  line-height: 1;
+}
+
+.storynode__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-1);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.storynode__main:hover {
+  background: var(--raised);
+}
+
+.storynode__main[data-selected='true'] {
+  background: var(--raised);
+  /* The selected row is marked by a rule rather than a fill alone, so it is
+     still distinguishable from a hovered row. */
+  box-shadow: inset 2px 0 0 var(--teal);
+}
+
+.storynode__id {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  color: var(--muted);
+}
+
+/*
+ * The title yields first at a narrow width, because the identifier and the
+ * status are short and fixed while the title is neither. `min-width: 0` is what
+ * lets it shrink inside a flex row at all.
+ */
+.storynode__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-body);
+}

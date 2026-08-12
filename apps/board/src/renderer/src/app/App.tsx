@@ -3,9 +3,11 @@ import { useMemo, useState } from 'react';
 import type { BoardState } from '../../../main/view.js';
 import { dismissSession, selectSession, useBoardState } from '../state/useBoardState.js';
 import { useNow } from '../state/useNow.js';
+import { usePresence } from '../state/usePresence.js';
 import { useUnread } from '../state/useUnread.js';
 import { NotesView } from '../views/notes/NotesView.js';
 import { OverviewView } from '../views/overview/OverviewView.js';
+import { SpecKitView } from '../views/speckit/SpecKitView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
 import { SessionSwitcher } from './SessionSwitcher.js';
@@ -27,7 +29,8 @@ export function App(): React.JSX.Element {
   const now = useNow();
   const [chosen, setChosen] = useState<Tab | null>(null);
 
-  const available = useMemo(() => availableTabs(state), [state]);
+  const presence = usePresence(state.selectedKey, state.session?.everReportedStories ?? false);
+  const available = useMemo(() => availableTabs(state, presence.tree), [state, presence.tree]);
   // Falls back rather than resetting: if the tab someone chose stops existing,
   // land on the first one that does. Since decision 36 that happens only when
   // the last session goes, so the choice now survives every report — which is
@@ -60,6 +63,8 @@ export function App(): React.JSX.Element {
           <WaitingState />
         ) : active === 'overview' ? (
           <OverviewView session={state.session} now={now} />
+        ) : active === 'speckit' ? (
+          <SpecKitView session={state.session} now={now} />
         ) : active === 'stories' ? (
           <StoriesView session={state.session} now={now} />
         ) : active === 'tasks' ? (
@@ -89,6 +94,22 @@ export function App(): React.JSX.Element {
  * The strip is still absent entirely with nothing held: a session is what the
  * tabs are *about*, so before there is one there is nothing to navigate.
  */
-function availableTabs(state: BoardState): Tab[] {
-  return state.session === null ? [] : [...TABS];
+function availableTabs(state: BoardState, tree: boolean): Tab[] {
+  if (state.session === null) return [];
+
+  /*
+   * The one conditional destination, and it does not contradict the paragraph
+   * above.
+   *
+   * FR-009 gated a tab on a *count*, so an agent reporting no tasks withdrew the
+   * Tasks tab from whoever was reading it. This gates on whether the session has
+   * ever had the concept at all: a project with no user stories is not a
+   * Spec-Kit project, and one that has had them keeps the tree even when a later
+   * report carries none (feature 011, FR-003). No count gates anything, and no
+   * report can remove a destination.
+   *
+   * Withdrawing the Stories and Tasks tabs where this one appears is feature
+   * 011's other half and is not wired yet; `usePresence` already decides it.
+   */
+  return TABS.filter((tab) => tab !== 'speckit' || tree);
 }

@@ -118,12 +118,12 @@ report always described.
 **Independent test**: Report stories and tasks with the links between them and
 confirm each task appears beneath the story it names, once, in reported order.
 
-- [ ] T015 [US1] Create `apps/board/src/renderer/src/views/speckit/SpecKitView.tsx` and its CSS — the tree beside the pane, one scroll container for the tree so that nothing re-mounts it and the scroll position survives by construction (FR-032)
-- [ ] T016 [P] [US1] Create `apps/board/src/renderer/src/views/speckit/StoryNode.tsx` and its CSS — identifier, title, the expand control, and the reported status through `StatusLabel`, never classified locally. Counted progress is T029; leave the slot
-- [ ] T017 [P] [US1] Create `apps/board/src/renderer/src/views/speckit/TaskNode.tsx` — wraps the existing `TaskRow` rather than restating a row, passing `focused` from `focus.task` and the elapsed tag as `TasksView` does
-- [ ] T018 [US1] Render the unassigned scope last in `SpecKitView.tsx`, **absent entirely when empty** (FR-013) — not an empty heading, not a zero. It carries no counted progress and no status, because it has no story for either to be about
-- [ ] T019 [P] [US1] Write `apps/board/tests/e2e/speckit.spec.ts` — stories in reported order, expansion revealing tasks in reported order, collapse hiding them, and a story with no tasks **saying so**. Then the placement table end-to-end, with `tasks drawn = tasks reported` asserted on the rendered tree as well as in T007's unit test
-- [ ] T020 [US1] Extend `speckit.spec.ts` for the unassigned group — present and holding the task when one cannot be placed, and **wholly absent** when every task is placed
+- [x] T015 [US1] Create `apps/board/src/renderer/src/views/speckit/SpecKitView.tsx` and its CSS — the tree beside the pane, one scroll container for the tree so that nothing re-mounts it and the scroll position survives by construction (FR-032)
+- [x] T016 [P] [US1] Create `apps/board/src/renderer/src/views/speckit/StoryNode.tsx` and its CSS — identifier, title, the expand control, and the reported status through `StatusLabel`, never classified locally. Counted progress is T029; leave the slot
+- [x] T017 [P] [US1] Create `apps/board/src/renderer/src/views/speckit/TaskNode.tsx` — wraps the existing `TaskRow` rather than restating a row, passing `focused` from `focus.task` and the elapsed tag as `TasksView` does
+- [x] T018 [US1] Render the unassigned scope last in `SpecKitView.tsx`, **absent entirely when empty** (FR-013) — not an empty heading, not a zero. It carries no counted progress and no status, because it has no story for either to be about
+- [x] T019 [P] [US1] Write `apps/board/tests/e2e/speckit.spec.ts` — stories in reported order, expansion revealing tasks in reported order, collapse hiding them, and a story with no tasks **saying so**. Then the placement table end-to-end, with `tasks drawn = tasks reported` asserted on the rendered tree as well as in T007's unit test
+- [x] T020 [US1] Extend `speckit.spec.ts` for the unassigned group — present and holding the task when one cannot be placed, and **wholly absent** when every task is placed
 
 ---
 
