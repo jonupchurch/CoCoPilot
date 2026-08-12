@@ -66,6 +66,19 @@ export interface Session {
   lastHeardAt: number;
   /** Null when only notes have arrived. Distinct from an empty report. */
   report: Report | null;
+  /**
+   * Whether any report for this session has ever carried a story.
+   *
+   * Held rather than derived because reports replace wholesale: `report.stories`
+   * being empty says only that the *current* snapshot has none, and a session
+   * that reported stories once is a Spec-Kit session for the rest of its life
+   * (feature 011, FR-003). A view cannot answer this from the report in front of
+   * it, so the store answers it instead.
+   *
+   * One-way. Nothing sets this back to false; see `putReport` for why that is
+   * load-bearing rather than incidental.
+   */
+  everReportedStories: boolean;
   notes: Note[];
   /**
    * Read from disk, never reported. Null until the reader has looked at all,
@@ -126,6 +139,28 @@ export class Store {
    * nothing when the next one is authoritative; the moment held state becomes an
    * accumulation, correctness depends on every message arriving exactly once and
    * nothing in the system can correct a board that has drifted.
+   *
+   * **`everReportedStories` is the one exception, and it is an exception.** If
+   * you are here to add a second, this paragraph is the argument you have to
+   * beat.
+   *
+   * What it costs, stated plainly: if the only push that ever carried stories is
+   * dropped, the flag stays false and nothing later corrects it, because later
+   * pushes carry no stories either. That is precisely the drift the paragraph
+   * above forbids, and it is real.
+   *
+   * Accepted on three grounds. **It is not reported content.** Decision 26
+   * protects what the board tells the developer about the work; this is one
+   * derived boolean about whether a field was ever non-empty, and the views it
+   * gates still draw only what the current report says. **It is monotonic**, so
+   * there is exactly one wrong state rather than progressive drift, and any
+   * later push carrying stories heals it — which for a Spec-Kit agent is every
+   * push, since every push is a full snapshot. **And the failure is benign**:
+   * the developer keeps the story and task views they already had, nothing on
+   * screen is wrong, and a destination is merely not offered.
+   *
+   * A second accumulation would have none of those properties by default. Say
+   * why yours does before adding it.
    */
   putReport(request: PushRequest, receivedAt: number): StoreResult<Session> {
     const opened = this.#openSession(request, receivedAt);
@@ -135,6 +170,9 @@ export class Store {
     session.branch = request.branch;
     session.transcriptId = request.transcriptId;
     session.lastHeardAt = receivedAt;
+
+    // Never `=`, and never an else branch. See the note above.
+    session.everReportedStories ||= request.stories.length > 0;
 
     // Assigned whole. Never spread over `session.report`.
     session.report = {
@@ -287,6 +325,7 @@ export class Store {
       declaredAt: receivedAt,
       lastHeardAt: receivedAt,
       report: null,
+      everReportedStories: false,
       notes: [],
       transcript: null,
     };
