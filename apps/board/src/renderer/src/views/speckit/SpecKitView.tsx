@@ -4,6 +4,7 @@ import { focusAge } from '../../lib/elapsed.js';
 import { usePlacement } from '../../state/usePlacement.js';
 import { scopeKey } from '../../state/useSelection.js';
 import { useTreeState } from '../../state/useTreeState.js';
+import { DetailPane } from './DetailPane.js';
 import { StoryNode } from './StoryNode.js';
 import { TaskNode } from './TaskNode.js';
 
@@ -67,7 +68,7 @@ export function SpecKitView({
               <StoryNode
                 scope={scope}
                 open={open}
-                selected={tree.selection.story?.id === scope.id && tree.selection.task === null}
+                selected={tree.selection.scope?.id === scope.id && tree.selection.task === null}
                 onToggle={tree.toggle}
                 onSelect={tree.selectStory}
               />
@@ -98,6 +99,8 @@ export function SpecKitView({
           );
         })}
       </div>
+
+      <DetailPane selection={tree.selection} session={session} now={now} />
     </div>
   );
 }

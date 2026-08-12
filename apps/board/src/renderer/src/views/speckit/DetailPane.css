@@ -1,0 +1,45 @@
+/*
+ * The pane beside the tree.
+ *
+ * It owns its own scrolling, separately from the tree's, so that reading a long
+ * story does not move the tree and scrolling the tree does not move what is
+ * being read. Two panes, two scroll positions — the arrangement the Stories and
+ * Tasks views already use.
+ */
+.detailpane {
+  flex: 1 1 55%;
+  min-width: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--line);
+}
+
+.speckit[data-narrow='true'] .detailpane {
+  flex: 1 1 auto;
+  border-left: 0;
+  border-top: 1px solid var(--line);
+}
+
+/*
+ * Which kind of thing is being read (FR-020).
+ *
+ * A label rather than a heading: the detail below has its own title, and two
+ * titles would compete. This says what sort of thing that title names.
+ */
+.detailpane__kind {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) 0;
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detailpane--absent {
+  padding: var(--space-4);
+  font-size: var(--text-body);
+  color: var(--muted);
+}
+
+.detailpane--absent p {
+  margin: 0;
+}

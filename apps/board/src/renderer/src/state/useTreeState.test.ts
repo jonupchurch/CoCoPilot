@@ -40,13 +40,13 @@ const SCOPES = place(
 
 describe('resolveSelection', () => {
   it('resolves nothing when nothing has been selected', () => {
-    expect(resolveSelection(SCOPES, null)).toEqual({ story: null, task: null, missing: false });
+    expect(resolveSelection(SCOPES, null)).toEqual({ scope: null, task: null, missing: false });
   });
 
   it('resolves a selected story', () => {
     const resolved = resolveSelection(SCOPES, { kind: 'story', id: 'B' });
 
-    expect(resolved.story?.id).toBe('B');
+    expect(resolved.scope?.story?.id).toBe('B');
     expect(resolved.task).toBeNull();
     expect(resolved.missing).toBe(false);
   });
@@ -55,14 +55,14 @@ describe('resolveSelection', () => {
     const resolved = resolveSelection(SCOPES, { kind: 'task', id: 'a2' });
 
     expect(resolved.task?.id).toBe('a2');
-    expect(resolved.story?.id).toBe('A');
+    expect(resolved.scope?.story?.id).toBe('A');
   });
 
   it('resolves a task in the unassigned group, which has no story above it', () => {
     const resolved = resolveSelection(SCOPES, { kind: 'task', id: 'loose' });
 
     expect(resolved.task?.id).toBe('loose');
-    expect(resolved.story).toBeNull();
+    expect(resolved.scope?.story ?? null).toBeNull();
     expect(resolved.missing).toBe(false);
   });
 
@@ -84,7 +84,7 @@ describe('resolveSelection', () => {
 
     expect(resolved.missing).toBe(true);
     expect(resolved.task).toBeNull();
-    expect(resolved.story).toBeNull();
+    expect(resolved.scope?.story ?? null).toBeNull();
   });
 
   it('reports a dropped story as missing rather than selecting another', () => {
@@ -93,7 +93,7 @@ describe('resolveSelection', () => {
     const resolved = resolveSelection(later, { kind: 'story', id: 'B' });
 
     expect(resolved.missing).toBe(true);
-    expect(resolved.story).toBeNull();
+    expect(resolved.scope?.story ?? null).toBeNull();
   });
 
   it('never reports missing for a selection that resolved', () => {

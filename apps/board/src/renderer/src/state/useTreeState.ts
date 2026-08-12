@@ -22,8 +22,15 @@ export interface TreeSelection {
 }
 
 export interface ResolvedSelection {
-  /** The selected story, or the story above the selected task. */
-  story: Story | null;
+  /**
+   * The scope selected, or the one holding the selected task.
+   *
+   * The whole scope rather than just its story, because the detail components
+   * take a `Scope` — resolving it here saves the pane searching the tree a
+   * second time for something this function already found. `scope.story` is null
+   * for the unassigned group, where a selected task legitimately has no story.
+   */
+  scope: Scope | null;
   /** The selected task. Null whenever a story is what is selected. */
   task: Task | null;
   /**
@@ -33,7 +40,7 @@ export interface ResolvedSelection {
   missing: boolean;
 }
 
-const NOTHING: ResolvedSelection = { story: null, task: null, missing: false };
+const NOTHING: ResolvedSelection = { scope: null, task: null, missing: false };
 
 /**
  * **There is deliberately no fallback to the first item**, which is the one
@@ -57,14 +64,12 @@ export function resolveSelection(
   if (selection.kind === 'story') {
     const scope = scopes.find((candidate) => candidate.id === selection.id);
     if (scope === undefined) return { ...NOTHING, missing: true };
-    return { story: scope.story, task: null, missing: false };
+    return { scope, task: null, missing: false };
   }
 
   for (const scope of scopes) {
     const task = scope.tasks.find((candidate) => candidate.id === selection.id);
-    // `scope.story` is null only for the unassigned group, where a selected task
-    // legitimately has no story above it.
-    if (task !== undefined) return { story: scope.story, task, missing: false };
+    if (task !== undefined) return { scope, task, missing: false };
   }
 
   return { ...NOTHING, missing: true };

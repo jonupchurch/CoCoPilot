@@ -185,6 +185,120 @@ test.describe('placement — every reported task is drawn exactly once', () => {
   });
 });
 
+test.describe('the detail pane', () => {
+  const FULL = {
+    feature: { id: 'F-01', title: 'Session handling', specPath: 'specs/002/spec.md' },
+    stories: [
+      {
+        id: 'US-002',
+        title: 'Share one session fetch across routes',
+        priority: 'P1',
+        status: 'active',
+        asA: 'developer',
+        want: 'one hook that fetches the session',
+        soThat: 'three route components stop doing it themselves',
+        criteria: ['The hook is used by every route.', 'Error handling is unchanged.'],
+      },
+      { id: 'US-004', title: 'Bare as reported' },
+    ],
+    tasks: [
+      {
+        id: 'T-011',
+        title: 'Audit the three call sites',
+        status: 'done',
+        storyId: 'US-002',
+        detail: 'Three components fetch the session independently.',
+        checks: ['Every call site listed', 'No behaviour changed'],
+        files: ['src/hooks/useSession.ts'],
+      },
+      { id: 'T-013', title: 'Bare task', status: 'todo', storyId: 'US-004' },
+    ],
+  };
+
+  test('says nothing is selected rather than drawing an empty pane', async () => {
+    await openTree(FULL);
+
+    await expect(board.page.getByTestId('speckit-detail-none')).toBeVisible();
+  });
+
+  test('shows a selected story in full, and says it is a story', async () => {
+    await openTree(FULL);
+    const { page } = board;
+
+    await page.getByTestId('speckit-story-US-002').click();
+
+    await expect(page.getByTestId('speckit-detail-kind')).toHaveText('Story');
+    await expect(page.getByTestId('story-detail')).toContainText('one hook that fetches the session');
+    await expect(page.getByTestId('story-detail')).toContainText('Error handling is unchanged.');
+  });
+
+  test('shows a selected task in full, and says it is a task', async () => {
+    await openTree(FULL);
+    const { page } = board;
+
+    // Nothing is reported as current here, so every story starts collapsed.
+    await page.getByTestId('speckit-toggle-US-002').click();
+    await page.getByTestId('speckit-task-T-011').click();
+
+    await expect(page.getByTestId('speckit-detail-kind')).toHaveText('Task');
+    await expect(page.getByTestId('task-detail')).toContainText(
+      'Three components fetch the session independently.',
+    );
+    await expect(page.getByTestId('task-detail')).toContainText('Every call site listed');
+  });
+
+  test('omits what was not reported rather than showing it blank or unknown', async () => {
+    await openTree(FULL);
+    const { page } = board;
+
+    await page.getByTestId('speckit-story-US-004').click();
+    const detail = page.getByTestId('story-detail');
+
+    await expect(detail).toContainText('Bare as reported');
+    // No invented values and no empty headings for fields the agent never sent.
+    await expect(detail).not.toContainText('unknown');
+    await expect(detail).not.toContainText('Acceptance criteria');
+    await expect(detail).not.toContainText('As a');
+  });
+
+  test('keeps showing a selected task after its story is collapsed', async () => {
+    await openTree(FULL);
+    const { page } = board;
+
+    await page.getByTestId('speckit-toggle-US-002').click();
+    await page.getByTestId('speckit-task-T-011').click();
+    await expect(page.getByTestId('speckit-detail-kind')).toHaveText('Task');
+
+    await page.getByTestId('speckit-toggle-US-002').click();
+
+    // The row is hidden; what is being read is not.
+    await expect(page.getByTestId('speckit-task-T-011')).toHaveCount(0);
+    await expect(page.getByTestId('task-detail')).toContainText(
+      'Three components fetch the session independently.',
+    );
+  });
+
+  test('says a selection has gone rather than landing on something else', async () => {
+    await openTree(FULL);
+    const { page } = board;
+
+    await page.getByTestId('speckit-toggle-US-002').click();
+    await page.getByTestId('speckit-task-T-011').click();
+    await expect(page.getByTestId('task-detail')).toBeVisible();
+
+    // A report that no longer contains it. The pane must say so — not quietly
+    // show the next task, which is what the Tasks view's fallback would do.
+    await board.push({
+      ...envelope(),
+      stories: [{ id: 'US-002', title: 'Share one session fetch across routes' }],
+      tasks: [{ id: 'T-099', title: 'Something else entirely', status: 'todo', storyId: 'US-002' }],
+    });
+
+    await expect(page.getByTestId('speckit-detail-gone')).toBeVisible();
+    await expect(page.getByTestId('task-detail')).toHaveCount(0);
+  });
+});
+
 test.describe('the unassigned group', () => {
   test('gathers tasks belonging to no reported story, last', async () => {
     await openTree({

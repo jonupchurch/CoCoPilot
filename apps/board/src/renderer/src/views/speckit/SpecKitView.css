@@ -26,7 +26,7 @@
  * this element, so the browser keeps its scrollTop.
  */
 .speckit__tree {
-  flex: 1 1 auto;
+  flex: 1 1 45%;
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;

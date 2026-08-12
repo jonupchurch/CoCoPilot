@@ -136,9 +136,9 @@ confirm each task appears beneath the story it names, once, in reported order.
 **Independent test**: Select a story, then a task, and confirm each shows every
 field reported for it and nothing that was not.
 
-- [ ] T021 [US2] Create `apps/board/src/renderer/src/views/speckit/DetailPane.tsx` and its CSS — dispatches to the existing `StoryDetail` or `TaskDetail`, handing each a `Scope` built by `usePlacement`. It must be evident which kind is shown (FR-020). Do not re-implement either component; if one needs a prop it does not have, add the prop rather than a parallel component
-- [ ] T022 [US2] Add the two empty states to `DetailPane.tsx` — nothing selected says so (FR-021), and a selection the report no longer contains says **that**, distinctly, rather than reading as an empty pane (FR-034)
-- [ ] T023 [P] [US2] Extend `speckit.spec.ts` — a fully reported story and a story with only `id` and `title` (no empty rows, no "unknown", no invented values); the same for a task; the two empty states; and a selected task still shown after its story is collapsed
+- [x] T021 [US2] Create `apps/board/src/renderer/src/views/speckit/DetailPane.tsx` and its CSS — dispatches to the existing `StoryDetail` or `TaskDetail`, handing each a `Scope` built by `usePlacement`. It must be evident which kind is shown (FR-020). Do not re-implement either component; if one needs a prop it does not have, add the prop rather than a parallel component
+- [x] T022 [US2] Add the two empty states to `DetailPane.tsx` — nothing selected says so (FR-021), and a selection the report no longer contains says **that**, distinctly, rather than reading as an empty pane (FR-034)
+- [x] T023 [P] [US2] Extend `speckit.spec.ts` — a fully reported story and a story with only `id` and `title` (no empty rows, no "unknown", no invented values); the same for a task; the two empty states; and a selected task still shown after its story is collapsed
 
 ---
 
