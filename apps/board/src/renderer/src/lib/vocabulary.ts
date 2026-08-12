@@ -76,3 +76,35 @@ export function isDone(status: string): boolean {
 export function isActive(status: string): boolean {
   return classify(status) === 'active';
 }
+
+/** Every bucket, plus how many statuses were counted into them. */
+export type Tally = Record<Vocabulary, number> & { total: number };
+
+/**
+ * Counting a set of statuses, bucket by bucket.
+ *
+ * Here rather than beside the caller for the reason `classify` is here at all:
+ * `source-hygiene.test.ts` fails the build if anything outside this file and
+ * `StatusLabel.tsx` classifies a status, and counting *is* classifying — a
+ * tallier elsewhere would be a second place deciding what `wip` means.
+ *
+ * **`unrecognised` is a bucket, never a remainder.** Folding it into `todo`
+ * would be the guess `classify` refuses two paragraphs above: a story whose five
+ * tasks carry idiosyncratic words is not five tasks outstanding, it is five
+ * tasks the board cannot read, and a caller that wants to say so needs the
+ * number to say it with.
+ */
+export function tally(statuses: readonly string[]): Tally {
+  const counts: Tally = {
+    todo: 0,
+    active: 0,
+    blocked: 0,
+    done: 0,
+    unrecognised: 0,
+    total: statuses.length,
+  };
+
+  for (const status of statuses) counts[classify(status)] += 1;
+
+  return counts;
+}

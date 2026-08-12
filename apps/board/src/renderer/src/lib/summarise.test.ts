@@ -5,9 +5,11 @@ import {
   changedFilesSummary,
   focusSummary,
   formatChangedFiles,
+  formatStoryProgress,
   formatTokens,
   planSummary,
   specSummary,
+  storyProgress,
   taskSummary,
 } from './summarise.js';
 
@@ -196,5 +198,92 @@ describe('formatTokens', () => {
     expect(formatTokens(999)).toBe('999');
     expect(formatTokens(99_999)).toBe('99.9k');
     expect(formatTokens(999_999)).toBe('999k');
+  });
+});
+
+describe('storyProgress', () => {
+  it('counts each recognised status into its own bucket', () => {
+    const progress = storyProgress([
+      task('a', 'done'),
+      task('b', 'in progress'),
+      task('c', 'blocked'),
+      task('d', 'todo'),
+      task('e', 'complete'),
+    ]);
+
+    expect(progress).toEqual({
+      done: 2,
+      active: 1,
+      blocked: 1,
+      todo: 1,
+      unrecognised: 0,
+      total: 5,
+    });
+  });
+
+  it('counts an unrecognised status as neither done nor todo', () => {
+    // The refusal `classify` already makes, inherited rather than re-decided.
+    // Counting these as "not done" would be the guess it exists to avoid.
+    const progress = storyProgress([
+      task('a', 'done'),
+      task('b', 'donee'),
+      task('c', 'almost'),
+      task('d', 'WIP-ish'),
+    ]);
+
+    expect(progress?.done).toBe(1);
+    expect(progress?.todo).toBe(0);
+    expect(progress?.unrecognised).toBe(3);
+    expect(progress?.total).toBe(4);
+  });
+
+  it('always accounts for every task exactly once', () => {
+    const tasks = [
+      task('a', 'done'),
+      task('b', 'stuck'),
+      task('c', 'queued'),
+      task('d', 'doing'),
+      task('e', 'nonsense'),
+    ];
+
+    const p = storyProgress(tasks);
+    const summed = (p?.done ?? 0) + (p?.active ?? 0) + (p?.blocked ?? 0) + (p?.todo ?? 0) +
+      (p?.unrecognised ?? 0);
+
+    expect(summed).toBe(tasks.length);
+  });
+
+  it('is null when there is nothing to count, rather than a row of zeroes', () => {
+    expect(storyProgress([])).toBeNull();
+  });
+
+  it('recognises exactly what the vocabulary recognises and nothing more', () => {
+    // Case and surrounding space are ignored; nothing else is. If this starts
+    // passing for a near miss, a synonym was added somewhere it should not be.
+    expect(storyProgress([task('a', '  DONE  ')])?.done).toBe(1);
+    expect(storyProgress([task('a', 'don')])?.unrecognised).toBe(1);
+    expect(storyProgress([task('a', 'done!')])?.unrecognised).toBe(1);
+  });
+});
+
+describe('formatStoryProgress', () => {
+  it('reads as arithmetic rather than as a status', () => {
+    const progress = storyProgress([task('a', 'done'), task('b', 'todo'), task('c', 'todo')]);
+
+    expect(formatStoryProgress(progress!)).toBe('1 of 3 done');
+  });
+
+  it('states unrecognised statuses rather than absorbing them', () => {
+    // Without the second clause, "1 of 3 done" would imply the other two are
+    // outstanding when the board cannot read them at all.
+    const progress = storyProgress([task('a', 'done'), task('b', 'donee'), task('c', 'almost')]);
+
+    expect(formatStoryProgress(progress!)).toBe('1 of 3 done · 2 not recognised');
+  });
+
+  it('says nothing about unrecognised statuses when there are none', () => {
+    const progress = storyProgress([task('a', 'done')]);
+
+    expect(formatStoryProgress(progress!)).not.toContain('not recognised');
   });
 });
