@@ -54,8 +54,8 @@ field that was reported, with nothing shown that was not.
 
 1. **Given** a session for which no ticket has been reported, **When** the
    developer looks, **Then** no ticket tab is offered.
-2. **Given** such a session, **When** a report carrying a ticket arrives,
-   **Then** a ticket tab appears and shows that ticket.
+2. **Given** such a session, **When** a ticket is reported for it, **Then** a
+   ticket tab appears and shows that ticket.
 3. **Given** a reported ticket, **When** the developer reads it, **Then** every
    field the agent reported is shown, and every field it did not report is
    absent rather than shown as blank or filled in by the board.
@@ -65,10 +65,10 @@ field that was reported, with nothing shown that was not.
 5. **Given** a description containing formatting characters or markup, **When**
    it is shown, **Then** those characters appear as written and none of it is
    interpreted as markup.
-6. **Given** a shown ticket, **When** a later report for that session omits the
-   ticket, **Then** the tab remains and continues to show the last ticket
-   reported.
-7. **Given** a shown ticket, **When** a report carries a different one, **Then**
+6. **Given** a shown ticket, **When** the agent goes on reporting its work
+   without reporting the ticket again, **Then** the tab remains and continues to
+   show the last ticket reported.
+7. **Given** a shown ticket, **When** a different ticket is reported, **Then**
    the tab shows the new one in place of the old.
 8. **Given** two held sessions, one ticket-driven and one not, **When** the
    developer switches between them, **Then** the tab is offered for the first
@@ -335,10 +335,11 @@ does not model, and confirm all of them are displayed.
   pair of sources.
 - **One ticket per session at a time.** A session working two tickets at once is
   not a case this feature serves; the newest reported ticket is the one shown.
-- **Presence is sticky for the life of the session**, which makes the held ticket
-  the second thing that survives a report replacing everything else. That is a
-  deliberate exception and it is why the ticket is held apart from the report
-  rather than inside it.
+- **Presence is sticky for the life of the session.** A ticket, once reported,
+  stays until a different one replaces it or the session goes. The agent reports
+  its work continuously and its ticket rarely, so the ticket has a lifetime of
+  its own and is held apart from the ongoing report rather than inside it. How
+  that separation is achieved is a planning matter; that it exists is not.
 - **Openable addresses in this feature are the ticket's and its parent's only.**
   Addresses elsewhere on the board — changed files, specification paths — stay
   text, and making them openable is separate work.
