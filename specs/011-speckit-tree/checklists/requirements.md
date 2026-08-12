@@ -33,25 +33,30 @@
 
 Three things a reader of this spec should not have to discover for themselves.
 
-**Two requirements of feature 006 are reversed here, deliberately.** FR-005 and
-FR-007 withhold a task that belongs to no story, against 006's FR-018 ("every
-reported task reachable, including one belonging to no reported story"). FR-018
-and FR-019 have the board count a story's progress, against 006's FR-016 ("MUST
-NOT infer, derive, re-order or supply anything the agent did not send"). Both are
-argued in Assumptions with their costs. They are the same shape as decision 36
-superseding feature 003's FR-009, and they should be recorded as decisions when
-this feature lands rather than left as a contradiction between two specs.
+**One requirement of feature 006 is reversed here, deliberately.** FR-025 and
+FR-026 have the board count a story's progress, against 006's FR-016 ("MUST NOT
+infer, derive, re-order or supply anything the agent did not send"). It is argued
+in Assumptions with its cost, and it is the same shape as decision 36 superseding
+feature 003's FR-009. It should be recorded as a decision when this feature lands
+rather than left as a contradiction between two specs.
 
-**One question is deliberately left open and is named as open**: what happens to
-an unplaced task when the two duplicated tabs are eventually retired. The spec
-gates the retirement on answering it rather than answering it now, because the
-answer is not needed to build this tab and would be guesswork today. This is the
-one item a `/speckit-clarify` pass would most usefully attack.
+**A second reversal was withdrawn during specification, and the record should say
+so.** An earlier draft withheld tasks belonging to no story, which reversed 006's
+FR-018 and forced the spec to gate the retirement of the task view on an
+unanswered question. Once the tree began to displace that view rather than sit
+beside it, a task reachable nowhere became a different proposition from one
+reachable in the other tab, and the draft was abandoned in favour of gathering
+those tasks into a final group (FR-012). FR-018 is upheld, and the gate is closed.
 
-**The pixel floor is deliberately absent.** The spec says "minimum supported
-width" throughout; the figure belongs to planning, matching feature 010's spec.
+**This spec adds the second and third conditional destinations**, one week after
+decision 36 established that every tab is offered from the first report and one
+feature after 010 added the first. The argument that they are consistent with what
+decision 36 actually reasoned — gating on whether a session has the *concept*
+rather than on a count of content — is in Assumptions and in
+[contracts/presence.md](../contracts/presence.md). A reviewer who disagrees with
+that reading should say so before this is built, because it is load-bearing.
 
-Initial validation passed on the first iteration, with one correction applied
-before signing off: two references to the concrete pixel width were replaced with
-"minimum supported width", which is the vocabulary the spec layer uses in this
-repo.
+Revalidated after the presence and displacement requirements were added. Passed on
+the first iteration; one correction was applied before signing off in the earlier
+round, replacing two references to a concrete pixel width with "minimum supported
+width", which is the vocabulary the spec layer uses in this repo.

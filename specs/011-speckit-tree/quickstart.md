@@ -4,10 +4,9 @@
 
 ## Prerequisites
 
-Features 001–008 implemented. Feature 010 is **not** a prerequisite for the tree
-itself, but it is for scenario 7: the density question is about six destinations,
-and the fifth is 010's. If 010 has not landed, scenario 7 measures five and the
-result does not answer the question this feature has to answer.
+Features 001–008 implemented. Feature 010 is **not** required for the tree, but it
+is for scenario 9: the widest strip this feature can produce includes 010's ticket
+destination, and measuring without it does not answer the question.
 
 ## Run the checks
 
@@ -22,21 +21,50 @@ npm run typecheck
 
 Six end-to-end tests currently fail on a machine whose display scale is not 100%
 — `setContentSize(380, …)` never reaches `innerWidth === 380`. They fail
-identically without this feature. **Scenario 7 depends on that same mechanism**,
+identically without this feature. **Scenario 9 depends on that same mechanism**,
 so confirm the baseline before reading its result as a regression.
 
 ## Validation scenarios
 
-### 1. The tree draws the relationship (US1)
+### 1. Not every project is a Spec-Kit project (US3) — **the absence test**
 
-Report three stories and tasks naming them.
+Report tasks and **no stories**.
 
-- Stories list in reported order.
-- Expanding one reveals its tasks, in reported order.
-- Collapsing hides them and leaves the story.
-- A story with no tasks says so when expanded, rather than showing an empty frame.
+- No Spec-Kit destination is offered.
+- The story and task views are offered and behave exactly as they did before this
+  feature (SC-003).
+- The strip has the same membership it had before this feature.
 
-### 2. Placement, one case per rule (US1) — **the countable one**
+This is the comparison the feature turns on, and it comes first because it is the
+case most easily broken by the code that serves every other scenario.
+
+### 2. Becoming Spec-Kit shaped (US3)
+
+Start the same session, then report stories.
+
+- The Spec-Kit destination appears.
+- The story and task destinations **go**, because neither was opened (SC-004).
+- One arrived and two left: the strip is shorter than before.
+- Overview is still the landing view.
+
+Then report again with **no stories**.
+
+- The Spec-Kit destination is still offered (FR-003). A report cannot withdraw it.
+
+### 3. Once used, always offered (US3, US5) — **the no-withdrawal test**
+
+Same setup, but **open the task view first**, then report stories.
+
+- The Spec-Kit destination appears and the story and task destinations **remain**,
+  for the rest of the session (FR-005).
+- Nothing the developer was reading was taken away.
+
+Then, across every sequence in [contracts/presence.md](contracts/presence.md),
+assert the property that stands in for FR-007: **no destination ever disappears
+from a developer who had opened it.** Assert it over the sequence, not at one
+moment — this is the requirement decision 36 was raised about.
+
+### 4. Placement, one case per rule (US1) — **the countable one**
 
 Build one report that hits every branch of
 [contracts/placement.md](contracts/placement.md) at once:
@@ -47,26 +75,27 @@ Build one report that hits every branch of
 | Task names story A; **B**'s `taskIds` names it | Drawn under A only, and **not** under B |
 | Task `storyId` null; A's `taskIds` names it | Drawn under A |
 | Task `storyId` null; named by two stories | Drawn under the first in reported order |
-| Task names an unreported story; named by nobody | Withheld, counted |
-| Task names nothing; named by nobody | Withheld, counted |
+| Task names an unreported story; named by nobody | Drawn in the unassigned group |
+| Task names nothing; named by nobody | Drawn in the unassigned group |
 | Story's `taskIds` names a task never reported | Nothing drawn, nothing invented |
 | Two tasks sharing an identifier | Both drawn where each claims |
 
-Then assert the arithmetic: **drawn + withheld = reported**. That single
+Then assert the arithmetic: **tasks drawn = tasks reported**. That single
 assertion is what makes the tree countable, and it is the one to write first.
 
-The second row is the one a plausible implementation gets wrong, because the
-existing `buildScopes` deliberately draws it in both places.
+The second row is the one a plausible implementation gets wrong, because
+`buildScopes` deliberately draws it in both places — and the two views are on
+screen together in scenario 3, where the same task legitimately appears once in
+one and twice in the other.
 
-### 3. Withholding is stated (US1, FR-007) — **the honesty test**
+### 5. The unassigned group (US1)
 
-- With one unplaceable task, the view says one task is not shown.
-- With none, it says nothing at all — no zero, no empty notice.
-- **Report tasks and no stories whatsoever.** The tree is empty *and* the count
-  states every task. This is the degenerate case: without the count it reads as a
-  broken board, and it is the reason FR-007 exists.
+- With one unplaceable task, the group is present and holds it.
+- With none, the group is **absent entirely** — not empty, not a heading with
+  nothing under it (FR-013).
+- The group carries no counted progress and no status, because it has no story.
 
-### 4. The detail pane (US2)
+### 6. The detail pane (US2)
 
 - Selecting a story shows its narrative, criteria, priority and status; a story
   reported with only `id` and `title` shows no empty rows and no invented values.
@@ -75,95 +104,97 @@ existing `buildScopes` deliberately draws it in both places.
 - Nothing selected says so rather than drawing an empty frame.
 - Collapsing the story above a selected task leaves the pane showing that task.
 
-### 5. Counted progress (US3)
+### 7. Counted progress (US4)
 
 - A story reporting no status, with tasks in mixed states, shows counts.
 - The counts are distinguishable from a reported status **by inspection alone**.
 - A story reporting its own status shows that status and **no** count.
 - A story reporting `done` whose tasks are all `todo` shows `done` and **no**
-  contradiction anywhere (FR-022). Assert on the absence.
+  contradiction anywhere (FR-029). Assert on the absence.
 - Tasks whose statuses are `donee`, `almost` and `WIP-ish` are counted as
-  unrecognised and stated, **not** as done and not as todo.
+  unrecognised and stated — **not** as done and not as todo.
 - A story with no reported status and no tasks shows neither status nor count.
 
-### 6. Nothing moves under the reader (US4) — **the load-bearing test**
+### 8. Nothing moves under the reader (US5) — **the load-bearing test**
 
 Expand a story, select a task, scroll, then send **ten** reports.
 
-- Expansion, selection and scroll position all unchanged (SC-004).
+- Expansion, selection and scroll position all unchanged (SC-006).
 - A report that adds a story or a task moves nothing already on screen.
 - A report that drops the selected task makes the view **say** the selection is
   gone — it does not select the next task, which is what the existing `resolve`
-  would do and what FR-027 forbids.
+  would do and what FR-034 forbids.
 - A report that drops an expanded story collapses or expands no other story.
 
 Assert scroll on `scrollTop` against a measured anchor row, not by eye — the
 technique feature 007 used for arriving notes.
 
-### 7. Six destinations at the floor (US5, SC-009) — **the measured one**
+### 9. The widest strip, at the floor (US6, SC-010) — **the measured one**
 
-With feature 010 landed and a ticket held, drive the window to 380px.
+The case to measure is **not** the ordinary one. Set up a session that is
+Spec-Kit shaped, with a ticket held (feature 010), **and** whose developer has
+opened the task view — so that Overview, Ticket, Spec-Kit, Stories, Tasks and
+Notes are all offered at once. Drive the window to 380px.
 
-- Six destinations, every label legible, every one operable.
+- Every destination legible, every one operable.
 - **No horizontal scrolling** anywhere.
+
+Also measure the ordinary Spec-Kit case, which should be *shorter* than today's
+strip, and confirm it is.
 
 Measured, the way feature 008 verified six pills at the same floor. See the
 display-scale caveat above.
 
-**If this fails, it is not a licence to relax the floor.** The answer per
-[research.md §5](research.md) is to bring forward the retirement of the Stories
-and Tasks tabs — which returns the strip to four — and that requires answering the
-gate in [contracts/placement.md](contracts/placement.md) first. Record the
-measurement and stop; do not improvise a navigation idiom.
-
-### 8. The narrow arrangement (US5)
+### 10. The narrow arrangement (US6)
 
 At the minimum width, with a full tree and a selection:
 
 - Tree and detail are both reachable and neither is truncated into uselessness.
-- A very long story title or task title degrades legibly with its full value
+- A very long story or task title degrades legibly with its full value
   retrievable.
 - Nothing scrolls horizontally at any supported width.
 
-### 9. The two existing tabs are untouched (SC-008) — **the regression test**
+### 11. Sessions and lifetime
 
-Over the same reports used in scenario 2:
+- Two sessions, one Spec-Kit shaped and one not: each offers its own destinations,
+  and switching between them does not leak either way (FR-006).
+- Opening the task view in one session does not keep it offered in the other.
+- Dismissing a Spec-Kit session and having it report again starts it over.
+- Pills carry no information about which shape a session is.
+- After a restart, nothing is remembered: no expansion, no selection, and no
+  record of which views were used (FR-039).
 
-- The Stories tab presents what it presented before this feature.
-- The Tasks tab presents what it presented before, **including the unassigned
-  scope holding the tasks this feature withholds**. That contrast is the point:
-  the same report draws differently in the two places, on purpose, and the older
-  view is still the one that reaches everything.
-- `buildScopes` and its tests are unmodified — assert over the source, not only
-  the rendered page.
-
-### 10. Scale, markup and inertness
+### 12. Scale, markup and inertness
 
 - 50 stories and 500 tasks: scrollable, legible, and the tree is not the only way
   to find anything.
-- Markup in every field the tree and pane draw — story title, narrative,
-  criteria, task title, detail, checks — appears as characters. No element
-  created, no handler run.
+- Markup in every field the tree and pane draw — story title, narrative, criteria,
+  task title, detail, checks — appears as characters. No element created, no
+  handler run.
 - No control anywhere on the tab alters reported content or sends anything to an
-  agent (SC-012), asserted structurally over the source as well as the page.
-- After a restart, no tree state is held (FR-033).
+  agent (SC-013), asserted structurally over the source as well as the page.
 
 ## Expected outcome
 
-All pass. Scenarios 2, 3 and 6 are the load-bearing ones — respectively that
-every task lands in exactly one place, that the board says what it is not
-showing, and that a report never moves the reader.
+All pass. Scenarios 1, 3 and 4 are the load-bearing ones — respectively that a
+non-Spec-Kit project is untouched, that no destination is ever taken from a
+reader, and that every task lands in exactly one place.
 
-Scenario 7 is the one that can legitimately fail. It is a measurement of a
-constraint this feature tightens rather than a bug in it, and its failure has a
-prescribed response that is not "make the tab strip smaller".
+Scenario 3 deserves the most care. It is the one that keeps this feature from
+re-creating the fault decision 36 was raised to fix, and its assertion is over a
+*sequence* of reports and navigations rather than over one screen.
+
+Scenario 9 is the one that can legitimately fail, and it now measures a rarer case
+than it would have: the ordinary Spec-Kit session's strip is shorter than today's,
+and only a developer who deliberately opened a legacy view produces the widest
+one.
 
 ## Not validated here
 
-- Retiring the Stories and Tasks tabs, and what becomes of a withheld task when
-  they go. Gated, and named as gated, in the spec and in
-  [contracts/placement.md](contracts/placement.md).
-- Any change to the contract, the store or the projection — this feature makes
-  none, and a test asserting one would be testing that nothing happened.
-- Agent-side behaviour that would make links more consistent. The board draws
-  what it is told.
+- Retiring the separate story and task views entirely. Out of scope, and smaller
+  than it was: the tree now reaches every reported task, so what remains is
+  whether a developer who prefers those views should keep the choice.
+- Any change to the contract — this feature makes none, and a test asserting one
+  would be testing that nothing happened.
+- Agent-side behaviour that would make links more consistent. The board draws what
+  it is told.
