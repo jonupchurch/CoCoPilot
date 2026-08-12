@@ -9,7 +9,7 @@ import { OverviewView } from '../views/overview/OverviewView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
 import { SessionSwitcher } from './SessionSwitcher.js';
-import { TabStrip, type Tab } from './TabStrip.js';
+import { TABS, TabStrip, type Tab } from './TabStrip.js';
 import { TitleBar } from './TitleBar.js';
 import { WaitingState } from './WaitingState.js';
 
@@ -29,8 +29,9 @@ export function App(): React.JSX.Element {
 
   const available = useMemo(() => availableTabs(state), [state]);
   // Falls back rather than resetting: if the tab someone chose stops existing,
-  // land on the first one that does instead of snapping them elsewhere on every
-  // report.
+  // land on the first one that does. Since decision 36 that happens only when
+  // the last session goes, so the choice now survives every report — which is
+  // the whole of FR-017 and used to be true only of tabs that stayed populated.
   const active = chosen !== null && available.includes(chosen) ? chosen : (available[0] ?? 'overview');
 
   // Asked here rather than inside the strip, which knows about destinations and
@@ -74,16 +75,20 @@ export function App(): React.JSX.Element {
 }
 
 /**
- * A tab is offered only when its view has something in it (FR-009). Overview
- * needs only a session, because identity and focus are always worth showing.
+ * Every destination, from the first report onwards — content or not (decision
+ * 36, superseding feature 003's FR-009).
+ *
+ * FR-009 hid a tab whose view would be empty, on the argument that it would be
+ * a dead end. Two things retired that argument. All three views grew their own
+ * empty state, so the destination says what it has rather than nothing; and
+ * gating on counts meant an agent's report could *take away* the tab a
+ * developer was reading, which the fallback above then answered by moving them
+ * — a report reaching into someone's attention, which is the thing FR-017
+ * exists to forbid.
+ *
+ * The strip is still absent entirely with nothing held: a session is what the
+ * tabs are *about*, so before there is one there is nothing to navigate.
  */
 function availableTabs(state: BoardState): Tab[] {
-  const { session } = state;
-  if (session === null) return [];
-
-  const tabs: Tab[] = ['overview'];
-  if (session.storyCount > 0) tabs.push('stories');
-  if (session.taskCount > 0) tabs.push('tasks');
-  if (session.noteCount > 0) tabs.push('notes');
-  return tabs;
+  return state.session === null ? [] : [...TABS];
 }

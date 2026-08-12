@@ -47,12 +47,12 @@ export function NotesView({
       </div>
 
       {/*
-        A guard rather than a state the strip can currently produce: a tab whose
-        view would be empty is not offered (feature 003), so this tab appears
-        only once a note exists and the active tab falls back if it stops being
-        available. FR-010 is satisfied by that rule; this is what would be shown
-        if the rule ever changed, and the other two detail views hold the same
-        line for the same reason.
+        How FR-010 is satisfied, and as of decision 36 it is satisfied here
+        rather than one level up. This used to be unreachable — a tab whose view
+        would be empty was not offered, so "the view says so when there is
+        nothing" was answered by there being no view to open. The tab is now
+        permanent, so this is the answer, and the other two detail views hold
+        the same line for the same reason.
       */}
       {newest.length === 0 ? (
         <p className="notes__empty" data-testid="notes-empty">

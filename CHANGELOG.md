@@ -8,6 +8,27 @@ this project is pre-release and not yet versioned.
 
 ### Changed
 
+- **Every tab is offered from the first report**, whether or not its view has
+  content — User Stories, Tasks and Notes no longer appear and disappear as an
+  agent's snapshots come and go. Decision 36, superseding feature 003's FR-009.
+  - **The rule it replaces had outlived its argument.** FR-009 hid a tab whose
+    view would be empty so that a tab was never a dead end, and when it was
+    written that was the only answer an empty view had. Features 006 and 007 then
+    gave all three views an explicit empty state, each one written in its own
+    comment as what would be shown *if this rule ever changed*. They are now what
+    is shown, and the tests that asserted their unreachability assert the
+    sentences instead.
+  - **It was also costing FR-017.** Reports replace wholesale, so a report with
+    no tasks following one that had some is ordinary — and it withdrew the Tasks
+    tab from a developer mid-read, whereupon the fallback moved them to Overview.
+    An agent's report is not allowed to move the human's attention, and the
+    count-gated strip could not honour that. There is now a test for the case.
+  - **Unchanged:** the waiting state still offers no tab strip at all. That
+    absence is about there being no session rather than no content.
+  - *Cost:* three destinations that on a quiet board say "nothing reported for
+    this session". Navigation to an empty room — the difference from what FR-009
+    forbade being that the room says so, and that looking is the developer's
+    choice rather than a report's.
 - **Renamed to CoCoapilot**, from CoCoPilot. Free to do because nothing has been
   published: the change reaches the published package names, both client
   binaries, the MCP tool names (`cocoapilot_report`, `cocoapilot_note`), the

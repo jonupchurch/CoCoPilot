@@ -77,27 +77,23 @@ test.describe('reading what the agent recorded', () => {
     await expect(board.page.locator('.noterow__source')).toHaveCount(0);
   });
 
-  test('offers no notes tab at all until there is a note', async () => {
+  test('says there is nothing yet, and gives way to the list when a note arrives', async () => {
     /*
-     * How FR-010 is actually satisfied.
+     * How FR-010 is actually satisfied — and since decision 36 it is satisfied
+     * by this view rather than one level up.
      *
-     * The view has an explicit empty state, but nothing can currently reach it:
-     * a tab whose view would be empty is not offered (feature 003's rule, so a
-     * tab is never a dead end), and the active tab falls back if it stops being
-     * available. "The view says so when there is nothing" is therefore answered
-     * one level up — by there being no view to open.
-     *
-     * Worth asserting rather than assuming, because the alternative reading is
-     * that the empty state is dead code to be deleted.
+     * The empty state was written with feature 007 and was unreachable for as
+     * long as a tab whose view would be empty was not offered at all. The tab
+     * is permanent now, so the sentence the view was given is the answer, and
+     * this is the test that stops it being read as dead code to delete.
      */
     await board.push({ ...envelope(), tasks: [{ id: 'T-1', title: 'A task', status: 'todo' }] });
-    await expect(board.page.getByTestId('tab-overview')).toBeVisible();
-    await expect(board.page.getByTestId('tab-notes')).toHaveCount(0);
+    await openNotes();
+    await expect(board.page.getByTestId('notes-empty')).toBeVisible();
+    await expect(board.page.getByTestId('notes-list')).toHaveCount(0);
 
     await record('The first thing worth writing down.');
 
-    await expect(board.page.getByTestId('tab-notes')).toBeVisible();
-    await openNotes();
     await expect(board.page.getByTestId('notes-list')).toBeVisible();
     await expect(board.page.getByTestId('notes-empty')).toHaveCount(0);
   });
@@ -200,8 +196,20 @@ test.describe('the view says what it does, and does what it says', () => {
 
     // Same port, so this is the same board as far as any agent is concerned.
     expect(board.port).not.toBe(port);
-    // No notes, and therefore no notes tab to open.
-    await expect(board.page.getByTestId('tab-notes')).toHaveCount(0);
+    // Nothing held at all, so there is not yet a session for notes to belong to.
+    await expect(board.page.getByTestId('waiting-state')).toBeVisible();
+
+    /*
+     * Asserted by writing one, which is what makes this SC-007 rather than a
+     * restatement of the line above. Under the count-gated strip the absent tab
+     * was the whole assertion; it proved less than it looked, because a tab is
+     * also absent when no session has reported. One note, and the view holds
+     * one row: the note from before the restart did not come back with it.
+     */
+    await record('The first thing recorded by the new process.');
+    await openNotes();
+    await expect(board.page.locator('.noterow')).toHaveCount(1);
+    await expect(board.page.getByTestId('notes-summary')).toHaveText(/^1 note/u);
   });
 });
 

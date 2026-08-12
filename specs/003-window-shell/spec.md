@@ -78,7 +78,9 @@ views. Then report, and confirm the window populates.
    window makes clear the agent supplies everything and there is nothing to
    configure.
 3. **Given** that state, **When** the developer looks at navigation, **Then**
-   destinations that would be empty are not offered.
+   no navigation is offered at all. *(Amended by decision 36: in the waiting
+   state this still holds, and holds because there is no session rather than no
+   content. Once a session exists every destination is offered — see FR-009.)*
 4. **Given** the empty state, **When** a first report arrives, **Then** the
    window populates and navigation becomes available, without a restart.
 5. **Given** a populated board, **When** the application is closed and
@@ -173,7 +175,11 @@ confirm the section a person is reading remains identifiable throughout.
   reported, stating that it is waiting for an agent.
 - **FR-008**: The waiting state MUST make clear that no configuration is
   required.
-- **FR-009**: The window MUST NOT offer navigation to views that would be empty.
+- **FR-009**: ~~The window MUST NOT offer navigation to views that would be
+  empty.~~ **Superseded by decision 36**, which offers every destination from the
+  first report onwards; each view states its own emptiness instead. Kept for the
+  reasoning trail. What survives is narrower and still enforced: the window MUST
+  offer no navigation while no session is held.
 - **FR-010**: The window MUST transition out of the waiting state on the first
   report, without a restart.
 - **FR-011**: The window MUST retain nothing across restarts, returning to the

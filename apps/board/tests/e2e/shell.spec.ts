@@ -89,21 +89,66 @@ test.describe('identity and liveness', () => {
     await expect(page.locator('.chip')).toHaveAttribute('data-chip', 'needs-you');
   });
 
-  test('offers a tab only once its view has something in it', async () => {
+  test('offers every tab from the first report, content or not', async () => {
+    /*
+     * Decision 36, replacing FR-009's count-gated strip. A report carrying
+     * nothing but identity still offers all four destinations — the navigation
+     * is a property of the board, not of what happened to arrive in the last
+     * snapshot.
+     */
     const { page } = board;
 
     await board.push(envelope());
+
     await expect(page.getByTestId('tab-overview')).toBeVisible();
-    await expect(page.getByTestId('tab-tasks')).toHaveCount(0);
-    await expect(page.getByTestId('tab-notes')).toHaveCount(0);
+    await expect(page.getByTestId('tab-stories')).toBeVisible();
+    await expect(page.getByTestId('tab-tasks')).toBeVisible();
+    await expect(page.getByTestId('tab-notes')).toBeVisible();
+  });
+
+  test('opens each empty tab onto a view that says it has nothing', async () => {
+    /*
+     * The other half of decision 36, and the half that makes it defensible: a
+     * permanent tab is only not a dead end if the view behind it accounts for
+     * itself. Asserted per tab rather than trusting that three empty states
+     * exist, because they were written long before anything could reach them.
+     */
+    const { page } = board;
+
+    await board.push(envelope());
+
+    await page.getByTestId('tab-stories').click();
+    await expect(page.getByTestId('stories-empty')).toBeVisible();
+
+    await page.getByTestId('tab-tasks').click();
+    await expect(page.getByTestId('tasks-empty')).toBeVisible();
+
+    await page.getByTestId('tab-notes').click();
+    await expect(page.getByTestId('notes-empty')).toBeVisible();
+  });
+
+  test('does not move the developer when a report empties the tab they are reading', async () => {
+    /*
+     * FR-017, in the case the count-gated strip could not honour.
+     *
+     * Reports replace wholesale (decision 26), so a report carrying no tasks
+     * after one that carried some is ordinary. Under FR-009 that withdrew the
+     * Tasks tab mid-read and the fallback moved the developer to Overview —
+     * an agent's report reaching into someone's attention. Now the tab stays
+     * and says what it has.
+     */
+    const { page } = board;
 
     await board.push({
       ...envelope(),
       tasks: [{ id: 'T001', title: 'A task', status: 'todo' }],
     });
-    await expect(page.getByTestId('tab-tasks')).toBeVisible();
+    await page.getByTestId('tab-tasks').click();
+    await expect(page.getByTestId('task-row-T001')).toBeVisible();
 
-    await board.note({ ...envelope(), text: 'a note' });
-    await expect(page.getByTestId('tab-notes')).toBeVisible();
+    await board.push(envelope());
+
+    await expect(page.locator('[data-testid="body"]')).toHaveAttribute('data-tab', 'tasks');
+    await expect(page.getByTestId('tasks-empty')).toBeVisible();
   });
 });
