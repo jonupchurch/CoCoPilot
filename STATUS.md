@@ -9,7 +9,7 @@ on, a human watches.
 features are specced and planned, and features 001 through 004 are built and
 verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 
-**Last updated:** 2026-08-07 (features 001–004 implemented)
+**Last updated:** 2026-08-12 (decision 36: every tab offered from the first report)
 
 ## Where things stand
 
@@ -524,6 +524,39 @@ their head across a long agent session.
       files goes the same way: no visible rule, no source, so every held file
       gets the same disc and only the running one is marked.
     - *Cost:* two visible departures from an export that is otherwise canon.
+36. **Every tab is offered from the first report, whether or not its view has
+    content.** **Supersedes feature 003's FR-009** — "the window MUST NOT offer
+    navigation to views that would be empty" — which gated each tab on a count
+    (`storyCount`, `taskCount`, `noteCount`). All four are now present as soon as
+    any session declares itself. Raised 2026-08-12, in use rather than on paper.
+    - *FR-009's own argument retired itself.* The rule existed so a tab was never
+      a dead end, and at the time it was the *only* answer to an empty view.
+      Features 006 and 007 then gave all three views an explicit empty state —
+      `stories-empty`, `tasks-empty`, `notes-empty` — each written, in its own
+      comment, as what would be shown if this rule ever changed. A destination
+      that states it has nothing is not a dead end; it is an answer.
+    - *It was also costing FR-017, quietly.* Reports replace wholesale (decision
+      26), so a report carrying no tasks after one that carried some is ordinary
+      — and it withdrew the Tasks tab from a developer mid-read, whereupon the
+      active-tab fallback moved them to Overview. An agent's report reaching into
+      a human's attention is exactly what FR-017 forbids, and the count-gated
+      strip could not honour it. This is the second time a rule that reads as
+      politeness toward empty states turned out to be a way for a snapshot to
+      move the reader.
+    - *Kept:* the strip is still absent entirely in the waiting state. That
+      absence is about there being no *session* rather than no content — the tabs
+      are about a session, so before there is one there is nothing to navigate —
+      and feature 003's US1 acceptance criterion for the empty state stands.
+    - *Cost:* three destinations that usually say "nothing reported for this
+      session" on a board watching an agent that reports only a focus. Navigation
+      to an empty room, which is what FR-009 was written to prevent; the
+      difference is that the room now says it is empty, and that a developer
+      choosing to look is not the same as a report deciding for them.
+    - *Cost, smaller and worth naming:* the Stories tab now reaches a case it
+      previously could not — tasks reported with no stories resolve to feature
+      006's unassigned scope, so the tab shows that scope rather than
+      "no stories have been reported". Pre-existing behaviour, newly visible.
+      Left alone rather than folded in.
 
 ## What survives the restart
 

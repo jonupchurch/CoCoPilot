@@ -3,11 +3,12 @@ import './TabStrip.css';
 /**
  * The four destinations. Rendered only when there is somewhere to go.
  *
- * A tab whose view would be empty is a dead end, so the strip is hidden entirely
- * in the waiting state and each individual tab appears only once its content
- * exists (FR-009). That rule does more work than it looks: it is also how each
- * view's "nothing here yet" state is answered, by there being no view to open.
- * All four destinations are built as of feature 007.
+ * The strip is hidden entirely in the waiting state, and that is the only time
+ * it is hidden: since decision 36 every tab is offered from the first report
+ * onwards whether or not its view has content, and each view answers its own
+ * emptiness. This component never decided which tabs to draw — it is handed
+ * `available` — so the change is not here; what is here is the one remaining
+ * absence, which is about there being no session rather than no content.
  *
  * Tabs are view state, not routes. Giving them URLs would invent history, deep
  * links and back semantics that a single desktop panel does not have.

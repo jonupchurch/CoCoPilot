@@ -659,9 +659,13 @@ test.describe('what switching does to the rest of the window', () => {
     await page.getByTestId('tab-overview').click();
     await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
 
-    // Switch to the quiet one: no notes at all, so no notes tab either.
+    // Switch to the quiet one. Since decision 36 the tab is there either way,
+    // which is what makes the guard observable rather than merely written: the
+    // count drops from five to zero with the destination still on screen, and
+    // the dot must not appear for a note nobody wrote.
     await pill(1).locator('.pill__select').click();
-    await expect(page.getByTestId('tab-notes')).toHaveCount(0);
+    await expect(page.getByTestId('tab-notes')).toBeVisible();
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
 
     // One genuine note for the quiet session, read where the developer is not.
     await board.note({ ...envelope({ repo: REPO_B, sessionId: 'b2' }), text: 'The first here' });
