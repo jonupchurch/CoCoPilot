@@ -43,6 +43,29 @@ export const MAX_TASK_IDS = 500;
 /** Files listed on one story or one task. */
 export const MAX_FILES = 100;
 
+/**
+ * A ticket description, and nothing else in the contract.
+ *
+ * The one field whose content **somebody else wrote** — a product owner in a
+ * tracker, not the agent — so it is the one field the agent cannot shorten
+ * without changing what the developer is being measured against. Five times
+ * `MAX_TEXT`, which is not raised to meet it: 20,000 characters of agent prose
+ * in a focus note would be a regression in every other view.
+ */
+export const MAX_RICH_TEXT = 20_000;
+
+/** A ticket or parent address. Well past any address a tracker actually mints. */
+export const MAX_URL = 2_000;
+
+/** Comments carried on one ticket. Beyond this the agent says how many it left. */
+export const MAX_COMMENTS = 50;
+
+/** Labels on one ticket. */
+export const MAX_TICKET_LABELS = 30;
+
+/** Fields on one ticket that the board does not model — FR-012's escape hatch. */
+export const MAX_EXTRA_FIELDS = 30;
+
 /** Notes accumulated by one session before it stops accepting more. */
 export const MAX_NOTES_PER_SESSION = 1_000;
 

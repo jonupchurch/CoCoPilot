@@ -32,11 +32,18 @@ function push(overrides: Record<string, unknown>): Record<string, unknown> {
 }
 
 /**
- * Every cap accepts exactly the limit and refuses one past it.
+ * Every cap reachable from a **push or a note** accepts exactly the limit and
+ * refuses one past it.
  *
  * The refusal matters more than the limit: FR-011 rejects rather than
  * truncating, because silently shortening an agent's prose would put words on
  * the board that nobody wrote.
+ *
+ * The ticket caps — `MAX_RICH_TEXT`, `MAX_URL`, `MAX_COMMENTS`,
+ * `MAX_TICKET_LABELS`, `MAX_EXTRA_FIELDS` — are exercised the same way in
+ * `schema.test.ts`'s `TicketRequest` block, both directions, because they hang
+ * off a third request type rather than off `push()` above. Said here so this
+ * file's "every cap" is not read as covering them.
  */
 describe('length caps', () => {
   const cases: Array<[string, number, (value: string) => Record<string, unknown>]> = [
