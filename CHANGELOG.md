@@ -70,6 +70,30 @@ say what they are: the shape is still allowed to move.
 
 ### Fixed
 
+- **The unread mark on Notes read one session's note count against another's.**
+  Switching to a session holding more notes than the one being left raised the
+  dot for notes that had arrived while nobody was watching that session — hours
+  old, announced on the board's one signal for "an agent wants you now". FR-011
+  marks a note that arrived *for the selected session*; a count carried across a
+  switch cannot answer that question, and subtracting two sessions' counts is not
+  a comparison of anything.
+  - **The rule now remembers per session**, keyed the way `usePresence` keys its
+    set. Arriving at a session marks nothing however full it is — what is already
+    there is what the developer is turning up to — and the next genuine note
+    still speaks up.
+  - **Feature 007's defensive line covered only the other direction** (switching
+    to a *quieter* session, where the count falls) and it was a proxy for "the
+    selection changed" rather than a fact about notes. It survives with an
+    accurate reason: within a live session notes only append, so a fall means the
+    repository and session id were reused after a dismissal, and the count on
+    screen beats the memory.
+  - **The end-to-end test that was meant to catch this could not.** It asserted
+    the dot's absence to wait for the switch — a condition equally true of the
+    session being left, so it passed against the state *before* the click and let
+    the note that followed race the selection. It now waits on the arriving
+    session's own content. Two failures in one test, and only the second was in
+    the code.
+
 - **`docs/design/push-schema.md` disagreed with the schema it documents**, in
   four places, all found by writing a client against the prose and watching the
   service reject it. `plan` is a flat array and was documented as
