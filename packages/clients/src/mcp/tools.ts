@@ -9,16 +9,18 @@ import {
   ReportedFeature,
   Story,
   Task,
+  Ticket,
 } from 'cocoapilot-contract';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
-import { note, report, type ClientResult } from '../client.js';
+import { note, report, ticket, type ClientResult } from '../client.js';
 import { processSessionId } from '../identity.js';
 import type { SendOptions } from '../transport.js';
 
 export const REPORT_TOOL = 'cocoapilot_report';
 export const NOTE_TOOL = 'cocoapilot_note';
+export const TICKET_TOOL = 'cocoapilot_ticket';
 
 /**
  * Two facts an agent cannot infer from the schema, and behaves wrongly without,
@@ -41,6 +43,34 @@ export const NOTE_DESCRIPTION = [
   '',
   'Notes are CLEARED when the board window closes. They are not storage. Anything worth',
   'keeping should be written into the repository with your own file tools instead.',
+].join('\n');
+
+/**
+ * Three things an agent gets wrong without being told, and which no amount of
+ * correct code prevents — the same reasoning as the two above.
+ *
+ * The comment guidance is the one that matters most: `commentsOmitted` cannot be
+ * derived by the board, which sees only what it was sent. An agent that drops
+ * comments silently makes the board present a partial discussion as a whole one.
+ */
+export const TICKET_DESCRIPTION = [
+  'Report the tracker ticket this work comes from — Jira, Azure DevOps, or anything else —',
+  'so the human can read it on the CoCoapilot board without switching windows.',
+  '',
+  'Report it ONCE when you pick the work up, not on every update. It stays on the board',
+  'until you report a different one; your ordinary reports never disturb it.',
+  '',
+  'Flatten the description and comments to PLAIN TEXT before sending. The board renders',
+  'every character as written and interprets no markup, so wiki syntax or ADF will show as',
+  'itself.',
+  '',
+  'Send the ticket URL exactly as the tracker gives it — never construct one. If you leave',
+  'comments out, say how many in commentsOmitted, or the human will read a partial',
+  'discussion as the whole of it.',
+  '',
+  'Anything the schema does not model goes in fields, as label/value, most important first.',
+  '',
+  'Repository, branch and session identity are filled in for you. Do not ask for them.',
 ].join('\n');
 
 /**
@@ -93,6 +123,18 @@ export const noteInputShape = {
     .describe('Why it exists: "you asked", "noticed while editing"'),
 };
 
+/**
+ * The whole ticket as one argument, rather than its fields spread across the
+ * tool's surface.
+ *
+ * A ticket is copied from somewhere else in one go — the agent has the record in
+ * hand and is relaying it — so flattening seventeen fields into the tool schema
+ * would invite a model to fill them in one at a time from memory.
+ */
+export const ticketInputShape = {
+  ticket: Ticket.describe('The ticket as the tracker has it, flattened to plain text'),
+};
+
 export interface ToolOptions extends SendOptions {
   cwd?: string | undefined;
   sessionId?: string | undefined;
@@ -116,6 +158,16 @@ export function registerTools(server: McpServer, options: ToolOptions = {}): voi
     NOTE_TOOL,
     { title: 'Note on the CoCoapilot board', description: NOTE_DESCRIPTION, inputSchema: noteInputShape },
     async (args) => toToolResult(await note(args, call())),
+  );
+
+  server.registerTool(
+    TICKET_TOOL,
+    {
+      title: 'Report the ticket to the CoCoapilot board',
+      description: TICKET_DESCRIPTION,
+      inputSchema: ticketInputShape,
+    },
+    async (args) => toToolResult(await ticket(args, call())),
   );
 }
 

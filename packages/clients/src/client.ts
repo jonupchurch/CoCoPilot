@@ -42,6 +42,18 @@ export interface NoteContent {
   source?: string | undefined;
 }
 
+/**
+ * The ticket, whole, as the agent read it from the tracker.
+ *
+ * `unknown` for the same reason `ReportContent`'s collections are: the contract
+ * package owns the shape, and restating it here would be a second definition to
+ * keep in step. The board validates independently regardless — a client is not
+ * a trust boundary (decision 18).
+ */
+export interface TicketContent {
+  ticket: unknown;
+}
+
 export interface CallOptions extends SendOptions {
   /** Where to start looking for the repository. Defaults to the process cwd. */
   cwd?: string | undefined;
@@ -97,6 +109,33 @@ export async function note(content: NoteContent, options: CallOptions): Promise<
         transcriptId: transcriptId(),
         text: content.text,
         ...(content.source === undefined ? {} : { source: content.source }),
+      },
+      options,
+    ),
+  );
+}
+
+/**
+ * Report the tracker ticket the work came from.
+ *
+ * The third call, and it fails soft exactly as the other two do: no board
+ * running is "carry on", because the agent's job is the work rather than the
+ * dashboard. A 400 *is* surfaced, because that is the caller's own malformed
+ * call and nobody else will tell it.
+ */
+export async function ticket(content: TicketContent, options: CallOptions): Promise<ClientResult> {
+  const identity = findRepository(options.cwd ?? process.cwd());
+  if (!identity.ok) return { kind: 'not-a-repo', message: NOT_A_REPOSITORY };
+
+  return interpret(
+    await send(
+      '/v1/ticket',
+      {
+        repo: identity.value.repo,
+        branch: identity.value.branch,
+        sessionId: options.sessionId,
+        transcriptId: transcriptId(),
+        ticket: content.ticket,
       },
       options,
     ),

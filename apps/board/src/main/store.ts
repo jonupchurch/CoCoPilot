@@ -14,6 +14,8 @@ import {
   type ReportedFeature,
   type Story,
   type Task,
+  type Ticket,
+  type TicketRequest,
 } from 'cocoapilot-contract';
 
 import type { Availability } from './transcript/availability.js';
@@ -81,6 +83,33 @@ export interface Session {
   everReportedStories: boolean;
   notes: Note[];
   /**
+   * The tracker ticket this work came from, in its own branch of the session.
+   *
+   * **Not on `Report`, and that is the whole of FR-003.** A report is a snapshot
+   * that replaces wholesale, so a ticket carried on one would have to survive
+   * the replace — a merge inside `putReport`, which that method's own comment
+   * forbids. Here, a report carrying no ticket cannot withdraw the ticket
+   * because nothing in the report path can reach this field. The requirement is
+   * a property of the wiring rather than a rule anyone has to remember.
+   *
+   * Null means this session has no ticket *concept* — a Spec-Kit session, or one
+   * whose agent has never been told to report one. That is what the ticket
+   * destination is offered on, and it is distinct from a ticket with empty
+   * fields, which is decision 33's empty-versus-unavailable distinction.
+   */
+  ticket: Ticket | null;
+  /**
+   * When the ticket was reported, board-stamped, for FR-011's elapsed time.
+   *
+   * Separate from `lastHeardAt` for the reason `Report.receivedAt` is: the
+   * developer is asking how long ago the *ticket* was fetched from the tracker,
+   * and an ordinary report arriving must not reset that to zero. A ticket is the
+   * one thing on this board copied from a system the board cannot see, so how
+   * stale it is, is the question worth answering — and the board answers only
+   * that, never whether it is still current.
+   */
+  ticketReportedAt: number | null;
+  /**
    * Read from disk, never reported. Null until the reader has looked at all,
    * which is distinct from having looked and found nothing.
    */
@@ -108,6 +137,7 @@ export interface TranscriptState {
 export type StoreChange =
   | { type: 'report'; key: string }
   | { type: 'note'; key: string }
+  | { type: 'ticket'; key: string }
   | { type: 'transcript'; key: string }
   | { type: 'dismiss'; key: string };
 
@@ -224,6 +254,41 @@ export class Store {
   }
 
   /**
+   * Accept a ticket, replacing whatever this session held.
+   *
+   * The third verb, and each of the three has different semantics on purpose: a
+   * report **replaces** the snapshot, a note **appends**, and a ticket
+   * **replaces the ticket and only the ticket**. A reader should be able to say
+   * why each is different, and the difference is what each one costs to resend.
+   *
+   * Modelled on `putTranscript` — one method, one branch of `Session`, no merge
+   * — with the one difference that this *does* move `lastHeardAt`. Reporting a
+   * ticket is the agent saying something, whereas the transcript reader is
+   * another program touching a file it owns.
+   *
+   * **`putReport` is not touched by this feature.** If a future change finds
+   * itself adding a retain-across-replace guard there, the separate endpoint has
+   * been abandoned and the design needs revisiting rather than patching.
+   */
+  putTicket(request: TicketRequest, receivedAt: number): StoreResult<Session> {
+    const opened = this.#openSession(request, receivedAt);
+    if (!opened.ok) return opened;
+
+    const session = opened.value;
+    session.branch = request.branch;
+    session.transcriptId = request.transcriptId;
+    session.lastHeardAt = receivedAt;
+
+    // Assigned whole, like a report. A field-level update would let two partial
+    // reports compose into a ticket that never existed in the tracker.
+    session.ticket = request.ticket;
+    session.ticketReportedAt = receivedAt;
+
+    this.#announce({ type: 'ticket', key: sessionKey(session.repoPath, session.sessionId) });
+    return { ok: true, value: session };
+  }
+
+  /**
    * Record what the transcript reader found for one session.
    *
    * Assigned to its own field and nothing else. This method exists rather than
@@ -327,6 +392,8 @@ export class Store {
       report: null,
       everReportedStories: false,
       notes: [],
+      ticket: null,
+      ticketReportedAt: null,
       transcript: null,
     };
     this.#sessions.set(key, created);

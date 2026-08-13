@@ -1,4 +1,4 @@
-import { NoteRequest, PushRequest } from 'cocoapilot-contract';
+import { NoteRequest, PushRequest, TicketRequest } from 'cocoapilot-contract';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { sessionKey, Store, UNATTRIBUTED } from '../../src/main/store.js';
@@ -19,6 +19,14 @@ function note(overrides: Record<string, unknown> = {}): NoteRequest {
 /** A report carrying one story, for the Spec-Kit-shaped cases below. */
 function withStory(overrides: Record<string, unknown> = {}): PushRequest {
   return report({ stories: [{ id: 'US1', title: 'Read the ticket' }], ...overrides });
+}
+
+function ticket(overrides: Record<string, unknown> = {}): TicketRequest {
+  return TicketRequest.parse({
+    repo: 'D:\\Codelib\\example',
+    branch: 'main',
+    ticket: { key: 'PROJ-1234', title: 'The login form loses focus', ...overrides },
+  });
 }
 
 describe('Store — a report is held', () => {
@@ -264,5 +272,133 @@ describe('Store — a session that has reported stories stays one', () => {
 
     store.putReport(report({ sessionId: 'spec' }), 2);
     expect(flag('spec')).toBe(false);
+  });
+});
+
+describe('Store — a ticket is held in its own branch', () => {
+  let store: Store;
+
+  beforeEach(() => {
+    store = new Store();
+  });
+
+  const held = (sessionId = UNATTRIBUTED) =>
+    store.getSession('D:\\Codelib\\example', sessionId);
+
+  it('holds a reported ticket and stamps when it arrived', () => {
+    const result = store.putTicket(ticket(), 1_000);
+
+    expect(result.ok).toBe(true);
+    expect(held()?.ticket?.key).toBe('PROJ-1234');
+    expect(held()?.ticketReportedAt).toBe(1_000);
+  });
+
+  it('opens a session for a ticket, as a report or a note would', () => {
+    // FR-006: first contact may be any of the three. A ticket arriving first
+    // must not be dropped for want of a session to attach it to.
+    expect(store.size).toBe(0);
+    store.putTicket(ticket(), 1);
+
+    expect(store.size).toBe(1);
+    expect(held()?.report).toBeNull();
+  });
+
+  it('replaces the ticket wholesale rather than merging fields', () => {
+    /*
+     * A field-level update would let two partial reports compose into a ticket
+     * that never existed in the tracker — this one's title beside that one's
+     * criteria, shown to a developer as a single record. The second report is
+     * authoritative in full, exactly as a push is.
+     */
+    store.putTicket(ticket({ state: 'In Progress', labels: ['regression'], assignee: 'A. Dev' }), 1);
+    store.putTicket(ticket({ key: 'PROJ-9999', title: 'Something else' }), 2);
+
+    const after = held()?.ticket;
+    expect(after?.key).toBe('PROJ-9999');
+    expect(after?.state).toBeNull();
+    expect(after?.labels).toEqual([]);
+    expect(after?.assignee).toBeNull();
+  });
+
+  it('leaves the ticket untouched through ten reports that say nothing about it', () => {
+    /*
+     * **FR-003 as a unit fact, and the assertion is about reach rather than
+     * memory.** The ticket survives not because `putReport` preserves it but
+     * because `putReport` cannot address it: there is no path from the report
+     * schema to this field. Ten iterations rather than one because a guard that
+     * worked once and decayed — a stale copy, a reset on some later branch —
+     * would pass a single-call version of this test.
+     */
+    store.putTicket(ticket({ description: 'Tabbing past the password field.' }), 1);
+
+    for (let i = 0; i < 10; i += 1) {
+      store.putReport(report({ tasks: [{ id: `T${i}`, title: 'work', status: 'active' }] }), 2 + i);
+      expect(held()?.ticket?.key, `after report ${i}`).toBe('PROJ-1234');
+      expect(held()?.ticketReportedAt, `after report ${i}`).toBe(1);
+    }
+
+    expect(held()?.ticket?.description).toBe('Tabbing past the password field.');
+    // And the reports really were landing, so the loop above is not vacuous.
+    expect(held()?.report?.tasks).toHaveLength(1);
+    expect(held()?.report?.tasks[0]?.id).toBe('T9');
+  });
+
+  it('leaves the ticket untouched through notes and story reports too', () => {
+    store.putTicket(ticket(), 1);
+    store.appendNote(note(), 2);
+    store.putReport(withStory(), 3);
+
+    expect(held()?.ticket?.key).toBe('PROJ-1234');
+    expect(held()?.notes).toHaveLength(1);
+  });
+
+  it('does not move ticketReportedAt when an ordinary report arrives', () => {
+    // FR-011 asks how long ago the *ticket* was fetched from the tracker. An
+    // agent reporting its own work is not news about the tracker, so a report
+    // resetting this to zero would answer a question nobody asked.
+    store.putTicket(ticket(), 1_000);
+    store.putReport(report(), 5_000);
+
+    expect(held()?.ticketReportedAt).toBe(1_000);
+    expect(held()?.lastHeardAt).toBe(5_000);
+  });
+
+  it('moves lastHeardAt, because reporting a ticket is the agent speaking', () => {
+    // The one way this differs from `putTranscript`, which deliberately does not
+    // move it: another program touching a file it owns is not the agent talking.
+    store.putReport(report(), 1_000);
+    store.putTicket(ticket(), 4_000);
+
+    expect(held()?.lastHeardAt).toBe(4_000);
+  });
+
+  it('holds a ticket per session, not per repository', () => {
+    store.putTicket(TicketRequest.parse({ ...ticket(), sessionId: 'a' }), 1);
+    store.putReport(report({ sessionId: 'b' }), 2);
+
+    expect(held('a')?.ticket?.key).toBe('PROJ-1234');
+    expect(held('b')?.ticket).toBeNull();
+  });
+
+  it('takes the ticket with the session on dismissal, and brings it back on report', () => {
+    store.putTicket(ticket(), 1);
+    expect(store.dismiss('D:\\Codelib\\example', UNATTRIBUTED)).toBe(true);
+
+    store.putReport(report(), 2);
+    expect(held()?.ticket).toBeNull();
+    expect(held()?.ticketReportedAt).toBeNull();
+
+    store.putTicket(ticket(), 3);
+    expect(held()?.ticket?.key).toBe('PROJ-1234');
+  });
+
+  it('announces a ticket change, distinctly from a report', () => {
+    const seen: string[] = [];
+    store.subscribe((change) => seen.push(change.type));
+
+    store.putTicket(ticket(), 1);
+    store.putReport(report(), 2);
+
+    expect(seen).toEqual(['ticket', 'report']);
   });
 });

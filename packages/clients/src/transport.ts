@@ -28,8 +28,18 @@ interface Rejection {
   message?: unknown;
 }
 
+/**
+ * The three doors, closed as a union rather than left as `string`.
+ *
+ * A typo in a path would otherwise be a silent 404 that the client reports as a
+ * soft "no board", which is the worst available failure: the agent is told to
+ * carry on and the developer sees nothing. Adding a door is a deliberate edit
+ * here.
+ */
+type ServicePath = '/v1/push' | '/v1/note' | '/v1/ticket';
+
 export async function send(
-  path: '/v1/push' | '/v1/note',
+  path: ServicePath,
   body: unknown,
   options: SendOptions = {},
 ): Promise<Delivery> {

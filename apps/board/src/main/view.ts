@@ -8,6 +8,7 @@ import type {
   ReportedFeature,
   Story,
   Task,
+  Ticket,
 } from 'cocoapilot-contract';
 
 import { sessionKey, type Note, type Session, type Store } from './store.js';
@@ -59,6 +60,18 @@ export interface SessionView {
    * note arriving must not reset that to zero.
    */
   reportedAt: number | null;
+
+  /**
+   * The tracker ticket, or null for a session that has no ticket *concept*.
+   *
+   * Null is what the ticket destination is absent on, so this field carries
+   * FR-001 and FR-002 between them. There is deliberately **no `hasTicket`**:
+   * the renderer asks `ticket !== null`, and a second field meaning the same
+   * thing is a second thing to keep in step.
+   */
+  ticket: Ticket | null;
+  /** Board-stamped, for FR-011's elapsed time. Null with no ticket. */
+  ticketReportedAt: number | null;
 
   /**
    * The reported body, listed field by field rather than carried as a whole.
@@ -227,6 +240,10 @@ function toSessionView(session: Session): SessionView {
     everReportedStories: session.everReportedStories,
 
     reportedAt: report?.receivedAt ?? null,
+    // Not from `report` either, and for the strongest version of that reason:
+    // there is no path from a report to a ticket at all. See `Session.ticket`.
+    ticket: session.ticket,
+    ticketReportedAt: session.ticketReportedAt,
     feature: report?.feature ?? null,
     // Empty rather than null where the payload's own default is empty, so the
     // renderer has one absence to handle per field instead of two.
