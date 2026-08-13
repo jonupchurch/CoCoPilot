@@ -1,0 +1,67 @@
+/* The ticket's discussion, oldest first — a thread rather than a log. */
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.comments__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  /* A rule down the left rather than a card each: fifty cards is a wall, and
+     the thread should read as one column of text. */
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--line);
+}
+
+.comments__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.comments__author {
+  font-size: var(--text-label);
+  font-weight: 600;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The tracker's own rendering of when, and styled to read as *its* label rather
+ * than as one of the board's elapsed times — muted and monospace, which is how
+ * every other externally-authored string here is drawn.
+ */
+.comments__at {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.comments__text {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comments__empty,
+.comments__omitted {
+  margin: 0;
+  font-size: var(--text-meta);
+  color: var(--muted);
+}
+
+.comments__omitted {
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--line);
+}

@@ -4,9 +4,13 @@
 
 ## Prerequisites
 
-Features 001–008 implemented, and decision 36 (every tab offered from the first
-report) in place — this feature's tab is the one exception to it, so the rule has
-to exist before the exception means anything.
+Features 001–009 and 011 implemented, and decision 36 (every tab offered from the
+first report) in place — this feature's tab gates on a *concept* rather than a
+count, so the rule has to exist before the distinction means anything.
+
+*Corrected on building:* this said "features 001–008". Feature 011 shipped first
+and matters here, because it made three destinations conditional on the same
+principle and took the strip from four to five.
 
 ## Run the checks
 
@@ -19,10 +23,16 @@ npm run test:e2e  # Playwright
 npm run typecheck
 ```
 
-Six end-to-end tests currently fail on a machine whose display scale is not 100%
-— `setContentSize(380, …)` never reaches `innerWidth === 380`. They fail
-identically without this feature. **Scenario 6 below depends on that same
-mechanism**, so confirm the baseline before reading its result as a regression.
+`playwright.config.ts` sets `maxFailures: 3`, so a run with four or more failures
+prints "3 failed" and hides the rest. Use `--max-failures=0` when the question is
+*how much* is broken rather than *whether* anything is.
+
+**On the display-scale caveat this file used to state as fact:** it said six
+end-to-end tests "currently fail" on a machine whose display scale is not 100%,
+because `setContentSize(380, …)` never reaches `innerWidth === 380`. The
+mechanism is real; the failures are environment-specific and **did not occur**
+here (2026-08-13, display at 100%). Measure the baseline rather than assuming
+those six — an assumed failure is as misleading as an unnoticed one.
 
 ## Validation scenarios
 
@@ -32,8 +42,11 @@ Report normally, with no ticket.
 
 - No ticket destination is offered.
 - Every other destination is offered, per decision 36. This is the comparison
-  that matters: four tabs present with empty views, and the fifth *absent*
-  entirely (SC-002).
+  that matters: for a session that has reported no stories, **four** tabs present
+  with empty views — Overview, Stories, Tasks, Notes — and the ticket *absent*
+  entirely (SC-002). Assert the whole list rather than the one tab: a suite that
+  only checked `tab-ticket` is missing would pass on a board whose strip failed
+  to render at all.
 
 Then report a ticket for the same session.
 
@@ -97,8 +110,16 @@ Then report tickets whose `url` is, at minimum:
 Each is a 200 on the endpoint — a ticket with an unopenable address is still a
 valid ticket (SC-004, and see [data-model.md](data-model.md)).
 
-Confirm `read-only.spec.ts` passes with its bridge count raised to three writes,
-and that it still fails if a fourth member is added.
+Confirm `read-only.spec.ts` passes with its bridge count raised to three writes —
+five members in total — and that it still fails if a sixth is added.
+
+Its sibling test, "neither view tree contains a way to send anything", was
+**measuring nothing** and was widened here. It scanned for `cocoapilot\.member`,
+and this codebase has always written `window.cocoapilot?.select(...)` with
+optional chaining, because the bridge is absent outside Electron — so the pattern
+matched a syntax that appears nowhere. It now matches the real form, allows only
+the one file that owns the bridge, and was teeth-checked by having a view reach
+the bridge directly.
 
 ### 5. Comments (US3)
 
@@ -110,15 +131,31 @@ and that it still fails if a fourth member is added.
 
 ### 6. Density at the floor (SC-008) — **the measured one**
 
-With a ticket held, drive the window to 380px.
+Drive the window to 380px with a session that is every kind at once: a ticket
+reported, a story reported, and the old views kept (open Stories or Tasks
+*before* the first story arrives, or the tree displaces them).
 
-- Five destinations, every label legible, every one operable.
+- **Six** destinations, every label legible, every one operable.
 - **No horizontal scrolling** anywhere.
-- "Stories" is the shortened label; the view's own heading already said Stories,
-  so nothing reads as inconsistent.
+- "Stories" is the shortened label; `StoryList` already titled its column
+  `Stories`, so nothing reads as inconsistent. *Checked rather than assumed —
+  `StoryList.tsx` line 45.*
 
-Verified by measurement rather than by eye, the way feature 008 verified six
-pills at the same floor. See the display-scale caveat above.
+*Corrected on building:* this said **five**. Feature 011 shipped first, so its
+tree is the fifth and the ticket is the sixth — and this is the six-destination
+measurement 011 recorded as owed. It passes; `docs/design/revisions-owed.md`
+records the measurement as discharged.
+
+**Measure the applied width, not the requested one.** A fractional display scale
+quantises content width to whole physical pixels, so `setContentSize(380)` can
+apply 381 — assert what came back or the test is measuring a window that was
+never narrow.
+
+**And measure each label's box, not the document's scroll width.** A strip too
+wide for the window *clips* rather than widening the document, so `scrollWidth`
+stays equal to `clientWidth` while a destination sits off the right-hand edge.
+Confirmed by giving every tab a 120px floor: only the bounding-box assertion
+failed, at x + width = 488 in a 381px window.
 
 ### 7. An unknown tracker (US4)
 
@@ -139,10 +176,20 @@ passes with an entirely unmodelled ticket, the escape hatch works.
 - At 20,001 the request is **refused**, naming the field and the limit — and no
   shortened description appears on the board (SC-007).
 - 50 comments accepted; 51 refused the same way.
-- A ticket at every cap at once may be refused by the **body** ceiling with a 413
-  naming it. That is correct and expected — the per-field caps have never bounded
-  a request on their own (decision 29), and the arithmetic is in
-  [research.md §3](research.md).
+- **A ticket at every cap at once is accepted.** Measured: 581,057 bytes against
+  a 1 MiB body ceiling, and the schema parses it.
+
+*Corrected on building:* this said a maximal ticket "may be refused by the body
+ceiling with a 413 … the per-field caps have never bounded a request on their
+own". The general claim is decision 29's and is true of a *report* — 500 tasks
+carrying 50 checks of 4,000 characters is legal by every individual cap and still
+around 127 MB. It is **not** true of a ticket. A ticket has one description, one
+parent and three bounded collections, so its caps do bound it, at roughly 568 KB
+— a little over half the ceiling.
+
+That is worth knowing rather than correcting away: it means the body ceiling
+never has to catch a well-formed ticket, so a 413 on `/v1/ticket` always means
+something other than a large ticket.
 
 ### 9. Sessions and lifetime
 
@@ -167,9 +214,21 @@ field.
 
 ## Expected outcome
 
-All pass. Scenarios 3, 4 and 7 are the load-bearing ones — respectively that a
-report cannot take the tab away, that only ordinary web addresses ever open, and
-that the feature outlives its first tracker.
+**All pass, walked 2026-08-13.** Scenarios 3, 4 and 7 are the load-bearing ones —
+respectively that a report cannot take the tab away, that only ordinary web
+addresses ever open, and that the feature outlives its first tracker.
+
+Four things this walk corrected, each marked in place above: the prerequisites
+(011 shipped first), the display-scale caveat (stated as fact, not observed
+here), the destination count at the floor (six, not five), and the maximal-ticket
+body size (accepted, not refused). A fifth correction is in scenario 4 — a test
+that could not match the syntax it was scanning for.
+
+One finding with nowhere else to live: an object carrying its own `toString`
+cannot be structured-cloned across Electron's IPC, so it throws in the renderer
+and never reaches `openLink` at all. `isOpenable` type-checks before it parses
+regardless, and `url.test.ts` proves it never calls `toString` — but the
+transport refuses that case first.
 
 Scenario 4 deserves the most care of anything in this feature. It is the first
 time this product hands anything to the operating system, and the addresses it

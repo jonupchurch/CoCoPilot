@@ -52,15 +52,26 @@ board window closes.
 
 ## What you see
 
-| Tab | What it holds |
-|---|---|
-| **Overview** | The current task, the spec, the plan, changed files — plus the last prompt, the prompt history and the files the agent is holding, read from the agent's own transcript |
-| **User Stories** | Each reported story in full: narrative, acceptance criteria, its tasks, the files it touches |
-| **Tasks** | One task at a time — detail, checks, files, and which story it came from |
-| **Notes** | What the agent recorded this session, newest first. Cleared when the window closes, and the view says so |
+Not every tab is offered to every session — the board shows the destinations that
+session actually has, which is why two agents can give you two different strips.
+
+| Tab | What it holds | When it appears |
+|---|---|---|
+| **Overview** | The current task, the spec, the plan, changed files — plus the last prompt, the prompt history and the files the agent is holding, read from the agent's own transcript | Always |
+| **Ticket** | The tracker ticket the work came from — description, acceptance criteria, state, comments, and its address, openable in your own browser | Once an agent reports one |
+| **Spec-Kit** | Stories and the tasks beneath them as one expandable tree, with a detail pane | Once an agent reports a story |
+| **Stories** | Each reported story in full: narrative, acceptance criteria, its tasks, the files it touches | Until the Spec-Kit tree replaces it — unless you had already opened it |
+| **Tasks** | One task at a time — detail, checks, files, and which story it came from | Same as Stories |
+| **Notes** | What the agent recorded this session, newest first. Cleared when the window closes, and the view says so | Always |
 
 Several agents at once each get a pill in a switcher row; one asking for a human
 shows it there without the board switching to it.
+
+**The board reads nothing and fetches nothing.** Everything above either arrived
+in an agent's report or was read from the agent's own transcript file. It never
+opens your repository, never contacts your tracker, and the one thing it sends
+anywhere is a ticket address handed to your browser when you click it — and only
+ever an ordinary `http:` or `https:` one.
 
 ## The packages
 

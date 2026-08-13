@@ -26,6 +26,7 @@ export interface Board {
   /** Report as an agent would, over the same HTTP contract the clients use. */
   push(body: Record<string, unknown>): Promise<number>;
   note(body: Record<string, unknown>): Promise<number>;
+  ticket(body: Record<string, unknown>): Promise<number>;
   close(): Promise<void>;
 }
 
@@ -79,6 +80,7 @@ export async function launchBoard(options: LaunchOptions = {}): Promise<Board> {
     port,
     push: (body) => send('/v1/push', body),
     note: (body) => send('/v1/note', body),
+    ticket: (body) => send('/v1/ticket', body),
     close: () => app.close(),
   };
 }

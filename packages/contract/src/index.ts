@@ -12,4 +12,5 @@ export * from './caps.js';
 export * from './errors.js';
 export * from './ports.js';
 export * from './schema.js';
+export * from './url.js';
 export * from './version.js';

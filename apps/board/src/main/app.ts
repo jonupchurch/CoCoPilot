@@ -3,6 +3,7 @@ import { app, ipcMain, type BrowserWindow } from 'electron';
 import iconIco from '../../resources/icon.ico?asset';
 import iconPng from '../../resources/icon.png?asset';
 import { createService, type Service } from './index.js';
+import { openLink } from './links.js';
 import { TranscriptSource } from './transcript/index.js';
 import { toBoardState } from './view.js';
 import { createWindow, preloadPath, rendererPath } from './window.js';
@@ -68,6 +69,20 @@ async function start(): Promise<void> {
     // through the subscription below. Publishing here as well would send the
     // same state twice.
     held.dismissByKey(key);
+  });
+
+  /*
+   * The third local write, and the only one that leaves the process.
+   *
+   * `select` and `dismiss` change what this window shows; this asks the
+   * operating system to launch a browser. The validation is not here — it is in
+   * `links.ts`, so that the rule and the `shell` call are one greppable unit and
+   * nobody can add a second caller that skips the check. Fire-and-forget, and
+   * nothing is returned: a renderer that could tell "opened" from "refused"
+   * would start explaining the difference.
+   */
+  ipcMain.on('cocoapilot:open-link', (_event, url: unknown) => {
+    openLink(url);
   });
 
   const appPath = app.getAppPath();

@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-12
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: A tab holding the tracker ticket the current work comes from, reported by the agent like everything else — its identity, description, acceptance criteria, labels, comments and parent. Neutral across trackers, with a labelled-value escape hatch so a tracker the board does not model still displays in full. Absent entirely for sessions that are not ticket-driven, and sticky once seen so a later report cannot take it away mid-read. Its address, and its parent's, open in the developer's own browser — the first outbound action the product has ever had, restricted to ordinary web addresses and refused rather than repaired otherwise.
 

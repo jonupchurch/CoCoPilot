@@ -1,0 +1,108 @@
+/* The ticket tab: identity, then a stack of the sections used everywhere else. */
+.ticket {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 14px 16px 18px;
+  overflow-y: auto;
+}
+
+/*
+ * Somebody else's prose. `pre-wrap` keeps the paragraph breaks they typed, and
+ * `overflow-wrap: anywhere` handles the long unbroken URL or identifier that a
+ * ticket description almost always contains — the panel must not scroll
+ * sideways for one (FR-006). Same treatment as the transcript's last prompt,
+ * for the same two reasons.
+ */
+.ticket__prose {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ticket__criterion {
+  display: flex;
+  gap: var(--space-2);
+  padding: 3px 0;
+  min-width: 0;
+}
+
+.ticket__ordinal {
+  flex: none;
+  width: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  text-align: right;
+}
+
+.ticket__criterion-text {
+  min-width: 0;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ticket__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+/*
+ * Label and value on one line where there is room, stacked at the floor. The
+ * label column is fixed so the values line up, and `minmax(0, 1fr)` is what
+ * lets a long assignee name wrap instead of widening the grid.
+ */
+.ticket__row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.ticket__row-label {
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.ticket__row-value {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 420px) {
+  .ticket__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+.ticket__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.ticket__label {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--text-label);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

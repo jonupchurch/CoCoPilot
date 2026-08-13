@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } fr
 
 import { BOARD_ABSENT } from '../../src/messages.js';
 import { createMcpServer } from '../../src/mcp/server.js';
-import { NOTE_TOOL, REPORT_TOOL } from '../../src/mcp/tools.js';
+import { NOTE_TOOL, REPORT_TOOL, TICKET_TOOL } from '../../src/mcp/tools.js';
 import { closedPort } from '../helpers/harness.js';
 
 /**
@@ -37,11 +37,14 @@ describe('the MCP server with no board running anywhere', () => {
     return client;
   }
 
-  it('initialises and lists both tools', async () => {
+  it('initialises and lists all three tools', async () => {
+    // A counting assertion, and the kind that should have to be edited on
+    // purpose: a tool appearing here is new agent-facing surface, and it should
+    // not be possible to add one without saying so in a test.
     const client = await connect();
 
     const names = (await client.listTools()).tools.map((tool) => tool.name).sort();
-    expect(names).toEqual([NOTE_TOOL, REPORT_TOOL]);
+    expect(names).toEqual([NOTE_TOOL, REPORT_TOOL, TICKET_TOOL]);
   });
 
   it('makes no network call while starting up or listing tools', async () => {
@@ -78,7 +81,19 @@ describe('the MCP server with no board running anywhere', () => {
     expect(textOf(result)).toBe(BOARD_ABSENT);
   });
 
-  it('describes the two things an agent cannot infer', async () => {
+  it('answers a ticket the same way', async () => {
+    const client = await connect();
+
+    const result = await client.callTool({
+      name: TICKET_TOOL,
+      arguments: { ticket: { key: 'PROJ-1', title: 'A ticket with nowhere to go' } },
+    });
+
+    expect(textOf(result)).toBe(BOARD_ABSENT);
+    expect(result.isError).toBeFalsy();
+  });
+
+  it('describes what an agent cannot infer from each schema', async () => {
     const client = await connect();
     const tools = (await client.listTools()).tools;
 
@@ -89,6 +104,16 @@ describe('the MCP server with no board running anywhere', () => {
     const note = tools.find((tool) => tool.name === NOTE_TOOL);
     expect(note?.description).toMatch(/cleared/i);
     expect(note?.description).toMatch(/not storage/i);
+
+    // The three for the ticket: report it once rather than per update, flatten
+    // to plain text first, and say how many comments were left out. The last is
+    // the one the board cannot derive for itself.
+    const ticket = tools.find((tool) => tool.name === TICKET_TOOL);
+    expect(ticket?.description).toMatch(/once/i);
+    expect(ticket?.description).toMatch(/plain text/i);
+    expect(ticket?.description).toMatch(/commentsOmitted/);
+    // And it must not invite the agent to build an address of its own.
+    expect(ticket?.description).toMatch(/never construct/i);
   });
 
   it('exposes no identity parameters for a model to get wrong', async () => {

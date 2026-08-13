@@ -10,6 +10,7 @@ import { MAX_BODY_BYTES, rejection, type Rejection } from 'cocoapilot-contract';
 import { handleHealth } from './routes/health.js';
 import { handleNote } from './routes/note.js';
 import { handlePush } from './routes/push.js';
+import { handleTicket } from './routes/ticket.js';
 import type { Store } from './store.js';
 
 export interface ServiceDeps {
@@ -29,6 +30,21 @@ export interface HttpResult {
 type BodyResult = { ok: true; value: unknown } | { ok: false; rejection: Rejection; oversized: boolean };
 
 const JSON_CONTENT_TYPE = 'application/json';
+
+/**
+ * The three verbs, and each has different semantics on purpose: a push
+ * **replaces** the snapshot, a note **appends**, and a ticket **replaces the
+ * ticket alone**. A reader should be able to say why each is different.
+ *
+ * A table rather than a chain of ternaries, which stopped reading as one line at
+ * the third entry. Everything below this point — content type, body size,
+ * parsing — is identical for all three, which is the point of the shared path.
+ */
+const ROUTES = new Map<string, (body: unknown, deps: ServiceDeps) => HttpResult>([
+  ['/v1/push', handlePush],
+  ['/v1/note', handleNote],
+  ['/v1/ticket', handleTicket],
+]);
 
 export function createServer(deps: ServiceDeps): Server {
   return createHttpServer((req, res) => {
@@ -52,7 +68,7 @@ async function dispatch(req: IncomingMessage, res: ServerResponse, deps: Service
     return sendJson(res, result.status, result.body);
   }
 
-  const handler = path === '/v1/push' ? handlePush : path === '/v1/note' ? handleNote : null;
+  const handler = ROUTES.get(path) ?? null;
   if (handler === null) {
     return sendJson(
       res,

@@ -607,3 +607,132 @@ test.describe('the spec-kit tab shows only what was reported', () => {
     expect(remaining.replace(/[\s·—]/gu, '')).toBe('');
   });
 });
+
+const TICKET_PAYLOAD = {
+  key: 'PROJ-1234',
+  title: 'Tabbing past the password field returns focus to the top',
+  url: 'https://example.atlassian.net/browse/PROJ-1234',
+  system: 'Jira',
+  type: 'Bug',
+  state: 'In Progress',
+  priority: 'High',
+  assignee: 'A. Developer',
+  reporter: 'A. Tester',
+  sprint: 'Sprint 42',
+  description: 'The login form loses focus.\n\nOnly after the password field.',
+  criteria: ['Focus advances to Submit', 'Shift-tab returns to Password'],
+  labels: ['accessibility', 'regression'],
+  comments: [
+    { author: 'A. Tester', text: 'Only reproducible in Firefox 129.', at: '3 days ago' },
+    { text: 'Confirmed on the release branch.' },
+  ],
+  commentsOmitted: 150,
+  fields: [{ label: 'Area Path', value: 'Contoso Web Identity' }],
+  parent: { key: 'PROJ-1000', title: 'Accessibility pass', url: 'https://example.com/e/1000' },
+};
+
+/** Every string the ticket above actually contains. */
+const TICKET_REPORTED: string[] = [
+  TICKET_PAYLOAD.key,
+  TICKET_PAYLOAD.title,
+  TICKET_PAYLOAD.url,
+  TICKET_PAYLOAD.system,
+  TICKET_PAYLOAD.type,
+  TICKET_PAYLOAD.state,
+  TICKET_PAYLOAD.priority,
+  TICKET_PAYLOAD.assignee,
+  TICKET_PAYLOAD.reporter,
+  TICKET_PAYLOAD.sprint,
+  ...TICKET_PAYLOAD.description.split('\n\n'),
+  ...TICKET_PAYLOAD.criteria,
+  ...TICKET_PAYLOAD.labels,
+  ...TICKET_PAYLOAD.comments.flatMap((c) => [
+    ...(c.author === undefined ? [] : [c.author]),
+    c.text,
+    ...(c.at === undefined ? [] : [c.at]),
+  ]),
+  ...TICKET_PAYLOAD.fields.flatMap((f) => [f.label, f.value]),
+  TICKET_PAYLOAD.parent.key,
+  TICKET_PAYLOAD.parent.title,
+  TICKET_PAYLOAD.parent.url,
+];
+
+/**
+ * The sixth tab and the sixth copy of this list, for the reason the second one
+ * gives: a derived value added to this view fails the test below until somebody
+ * writes it down here and has to justify it.
+ *
+ * This tab is where the temptation is strongest, because the ticket is the one
+ * thing on the board copied from a system the board cannot see. Everything it
+ * would be *useful* to add — whether the ticket is still current, whether its
+ * state agrees with the reported tasks, how much of the discussion is missing —
+ * is a claim the board has no way to check. Only the last of those appears, and
+ * only because the agent reported the number.
+ */
+const TICKET_DERIVED: readonly RegExp[] = [
+  // Section labels, uppercase as `innerText` reports a `text-transform`.
+  /DESCRIPTION|ACCEPTANCE CRITERIA|DETAILS|FROM THE TRACKER|COMMENTS/g,
+  // The board's own labels for the five scalar fields it models.
+  /TRACKER|PRIORITY|ASSIGNEE|REPORTER|SPRINT|PART OF/g,
+  /[▼▶]/g, // the section carets, as on every other tab
+  /reported/g, // the elapsed-time lead-in; the elapsed value itself is below
+  /\b\d+[smhd]\b|\bnow\b/g, // the board's own elapsed time (FR-011)
+  /shown,/g, // the omission line's own words; both its numbers are counted below
+  /not included/g,
+  /\d+/g, // section counts, criterion ordinals, and the two omission numbers
+];
+
+test.describe('the ticket tab shows only what was reported', () => {
+  test('renders nothing that was not reported or declared as derived', async () => {
+    const { page } = board;
+    await board.ticket({ ...envelope(), ticket: TICKET_PAYLOAD });
+    await page.getByTestId('tab-ticket').click();
+    await expect(page.getByTestId('ticket')).toBeVisible();
+
+    let remaining = (await page.getByTestId('ticket').innerText()).replace(/\s+/gu, ' ');
+
+    /*
+     * **Reported first here, which is the opposite of every other block above,
+     * and the reason is worth writing down.**
+     *
+     * Those blocks subtract derived patterns first because `1 of 3 done` ends in
+     * a reported status. This tab has no such overlap, and it does have the
+     * opposite problem: a ticket is full of reported values that *contain*
+     * digits — `PROJ-1234`, `Sprint 42`, `Firefox 129`, `3 days ago`, two URLs —
+     * so any digit pattern run first punches holes in them and the exact-match
+     * subtraction below then fails to find them. Found by writing it the other
+     * way round and reading `PROJ-` out of the failure.
+     *
+     * What that costs, stated plainly: a bare `\d+` at the end can hide a number
+     * the board invented. It is bounded by everything else here — the words
+     * around every number this view draws are declared individually above, so an
+     * invented figure would have to arrive with no label at all.
+     */
+    for (const value of [...TICKET_REPORTED].sort((a, b) => b.length - a.length)) {
+      remaining = remaining.split(value).join(' ');
+    }
+    for (const pattern of TICKET_DERIVED) remaining = remaining.replace(pattern, ' ');
+
+    expect(remaining.replace(/[\s·—]/gu, '')).toBe('');
+  });
+
+  test('does not reorder, renumber or group what it was given', async () => {
+    /*
+     * The order of criteria, comments and unmodelled fields is the agent's, and
+     * the agent's is the tracker's. Sorting the fields alphabetically or the
+     * comments newest-first would each be the board deciding it knows better
+     * about somebody else's record.
+     */
+    const { page } = board;
+    await board.ticket({ ...envelope(), ticket: TICKET_PAYLOAD });
+    await page.getByTestId('tab-ticket').click();
+
+    expect(await page.locator('.ticket__criterion-text').allInnerTexts()).toEqual(
+      TICKET_PAYLOAD.criteria,
+    );
+    expect(await page.locator('.fieldlist__label').allInnerTexts()).toEqual(['Area Path']);
+    const comments = await page.locator('.comments__text').allInnerTexts();
+    expect(comments).toEqual(TICKET_PAYLOAD.comments.map((c) => c.text));
+    expect(await page.locator('.ticket__label').allInnerTexts()).toEqual(TICKET_PAYLOAD.labels);
+  });
+});

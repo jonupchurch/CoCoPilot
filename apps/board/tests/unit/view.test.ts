@@ -1,4 +1,4 @@
-import { NoteRequest, PushRequest } from 'cocoapilot-contract';
+import { NoteRequest, PushRequest, TicketRequest } from 'cocoapilot-contract';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { sessionKey, Store } from '../../src/main/store.js';
@@ -80,6 +80,12 @@ describe('toBoardState — the reported body crosses the bridge', () => {
     // `everReportedStories` (feature 011) is the third, and it is a different
     // kind: not reported content but a fact *about* the session, which is why it
     // is the one field here that outlives the snapshot that set it.
+    //
+    // `ticket` and `ticketReportedAt` (feature 010) are the fourth and fifth,
+    // and they arrive on their own endpoint — so unlike every reported field
+    // above them, no report can set or clear either. Added here on purpose, and
+    // note what is *not* here: no `hasTicket`, because the renderer asks
+    // `ticket !== null` and a second field meaning the same thing would drift.
     store.putReport(report({ stories: [{ id: 'S1', title: 'A story' }] }), 1_000);
 
     const { session } = toBoardState(store);
@@ -105,6 +111,8 @@ describe('toBoardState — the reported body crosses the bridge', () => {
       'storyCount',
       'taskCount',
       'tasks',
+      'ticket',
+      'ticketReportedAt',
       'transcript',
     ]);
   });
@@ -424,5 +432,92 @@ describe('toBoardState — a session that has ever reported stories says so', ()
 
     expect(spec?.everReportedStories).toBe(true);
     expect(plain?.everReportedStories).toBe(false);
+  });
+});
+
+describe('toBoardState — a ticket projects, and a pill never sees it', () => {
+  let store: Store;
+
+  beforeEach(() => {
+    store = new Store();
+  });
+
+  const ticket = (overrides: Record<string, unknown> = {}): TicketRequest =>
+    TicketRequest.parse({
+      repo: REPO,
+      branch: 'main',
+      ticket: { key: 'PROJ-1234', title: 'The login form loses focus', ...overrides },
+    });
+
+  it('projects a held ticket exactly as held', () => {
+    store.putTicket(
+      ticket({
+        url: 'https://example.com/browse/PROJ-1234',
+        state: 'Ready for QA',
+        criteria: ['Focus advances to Submit'],
+        comments: [{ author: 'A. Tester', text: 'Only in Firefox.', at: '3 days ago' }],
+        fields: [{ label: 'Area Path', value: 'Contoso' }],
+        parent: { key: 'PROJ-1000', title: 'Accessibility pass', url: null },
+      }),
+      1_000,
+    );
+
+    const { session } = toBoardState(store);
+
+    expect(session?.ticket?.key).toBe('PROJ-1234');
+    expect(session?.ticket?.state).toBe('Ready for QA');
+    expect(session?.ticket?.criteria).toEqual(['Focus advances to Submit']);
+    expect(session?.ticket?.comments[0]?.at).toBe('3 days ago');
+    expect(session?.ticket?.fields[0]?.label).toBe('Area Path');
+    expect(session?.ticket?.parent?.title).toBe('Accessibility pass');
+    expect(session?.ticketReportedAt).toBe(1_000);
+  });
+
+  it('projects null for a session that has no ticket concept', () => {
+    // Null rather than an empty ticket: this is the value FR-001 hangs the whole
+    // destination on, so "no ticket" and "a ticket with nothing in it" have to
+    // stay two different answers.
+    store.putReport(report(), 1_000);
+
+    const { session } = toBoardState(store);
+
+    expect(session?.ticket).toBeNull();
+    expect(session?.ticketReportedAt).toBeNull();
+  });
+
+  it('keeps ticket information off SessionSummary, so a pill cannot draw one', () => {
+    // The summary is every session's identity; the view is one session's
+    // content. A ticket on the summary would be sent for all 100 sessions to
+    // display one, and would let a pill start rendering tracker text.
+    store.putTicket(ticket(), 1_000);
+
+    const { sessions } = toBoardState(store);
+
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]).not.toHaveProperty('ticket');
+    expect(sessions[0]).not.toHaveProperty('ticketReportedAt');
+    expect(sessions[0]).not.toHaveProperty('hasTicket');
+  });
+
+  it('does not add a hasTicket field beside it', () => {
+    // The renderer asks `ticket !== null`. A second field meaning the same thing
+    // is a second thing to keep in step, and they drift in exactly one
+    // direction: the boolean stays true after the ticket goes.
+    store.putTicket(ticket(), 1_000);
+
+    const { session } = toBoardState(store);
+
+    expect(session).not.toHaveProperty('hasTicket');
+  });
+
+  it('shows only the selected session s ticket', () => {
+    store.putTicket(TicketRequest.parse({ ...ticket(), sessionId: 'withTicket' }), 1_000);
+    store.putReport(report({ sessionId: 'without' }), 2_000);
+
+    const selected = toBoardState(store, sessionKey(REPO, 'withTicket')).session;
+    const other = toBoardState(store, sessionKey(REPO, 'without')).session;
+
+    expect(selected?.ticket?.key).toBe('PROJ-1234');
+    expect(other?.ticket).toBeNull();
   });
 });
