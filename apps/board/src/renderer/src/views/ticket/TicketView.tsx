@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import type { SessionView } from '../../../../main/view.js';
 import { Section } from '../../components/Section.js';
+import { CommentList } from './CommentList.js';
+import { FieldList } from './FieldList.js';
 import { TicketIdentity } from './TicketIdentity.js';
 
 import './TicketView.css';
@@ -25,12 +27,14 @@ import './TicketView.css';
  * product has.
  */
 
-type SectionKey = 'description' | 'criteria' | 'details';
+type SectionKey = 'description' | 'criteria' | 'details' | 'fields' | 'comments';
 
 const ALL_OPEN: Record<SectionKey, boolean> = {
   description: true,
   criteria: true,
   details: true,
+  fields: true,
+  comments: true,
 };
 
 export function TicketView({
@@ -128,6 +132,27 @@ export function TicketView({
         </Section>
       )}
 
+      {ticket.fields.length === 0 ? null : (
+        <Section
+          label="From the tracker"
+          summary={`${ticket.fields.length}`}
+          open={open.fields}
+          onToggle={() => {
+            toggle('fields');
+          }}
+          testId="ticket-fields"
+        >
+          {/*
+            Labelled "From the tracker" rather than "Other" or "Custom fields":
+            these are not leftovers, they are the fields that tracker actually
+            has, and on a board serving Azure DevOps they may be the ones that
+            matter most. A dismissive heading would tell the developer the board
+            thinks less of them than of the five it happens to model.
+          */}
+          <FieldList fields={ticket.fields} />
+        </Section>
+      )}
+
       {ticket.labels.length === 0 ? null : (
         <div className="ticket__labels" data-testid="ticket-labels">
           {ticket.labels.map((label, index) => (
@@ -137,6 +162,29 @@ export function TicketView({
           ))}
         </div>
       )}
+
+      {/*
+        **Always present, even with nothing in it** — FR-017, and the one place
+        this view deliberately does the opposite of FR-008.
+
+        The difference is what an absence means. A ticket with no `sprint` is
+        from a tracker that has no sprints, so a "Sprint" row would invent a
+        concept; a ticket with no comments has a discussion, and it is empty.
+        "Nobody has commented" is a fact a developer wants — it is the
+        difference between a requirement nobody questioned and one whose
+        clarification they have not been shown.
+      */}
+      <Section
+        label="Comments"
+        summary={`${ticket.comments.length}`}
+        open={open.comments}
+        onToggle={() => {
+          toggle('comments');
+        }}
+        testId="ticket-comments"
+      >
+        <CommentList comments={ticket.comments} omitted={ticket.commentsOmitted} />
+      </Section>
     </div>
   );
 }

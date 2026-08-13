@@ -267,6 +267,165 @@ test.describe('a reported ticket', () => {
   });
 });
 
+test.describe('a tracker the board has never heard of', () => {
+  test('shows a ticket whose fields it models none of, in full and in order', async () => {
+    /*
+     * SC-010. The board is taught nothing about this tracker, and the ticket
+     * still arrives whole. Order is asserted positionally because it is the only
+     * signal the agent has for which of these matters most — sorting them would
+     * discard the one judgement anybody made.
+     */
+    const { page } = board;
+    await board.ticket({
+      ...envelope(),
+      ticket: {
+        key: 'AB#98231',
+        title: 'Identity provider drops the nonce on renewal',
+        system: 'Azure DevOps',
+        state: 'Ready for QA',
+        fields: [
+          { label: 'Area Path', value: 'Contoso\\Web\\Identity' },
+          { label: 'Iteration Path', value: 'Contoso\\2026\\Q3\\Sprint 4' },
+          { label: 'Effort', value: '8' },
+          { label: 'Value Area', value: 'Architectural' },
+        ],
+      },
+    });
+    await page.getByTestId('tab-ticket').click();
+
+    const labels = await page.locator('.fieldlist__label').allInnerTexts();
+    expect(labels).toEqual(['Area Path', 'Iteration Path', 'Effort', 'Value Area']);
+    const values = await page.locator('.fieldlist__value').allInnerTexts();
+    expect(values).toEqual(['Contoso\\Web\\Identity', 'Contoso\\2026\\Q3\\Sprint 4', '8', 'Architectural']);
+  });
+
+  test('names the tracker it was told, and names none when it was not', async () => {
+    // FR-013. `system` is printed and never branched on — the moment the board
+    // can tell which tracker this is, it can build an address for it, and then
+    // it has to be taught the next one.
+    const { page } = board;
+    await ticket({ system: 'Azure DevOps' });
+    await page.getByTestId('tab-ticket').click();
+    await expect(page.getByTestId('ticket-detail-Tracker')).toContainText('Azure DevOps');
+
+    await board.ticket({
+      ...envelope(),
+      ticket: { key: 'X-1', title: 'From somewhere unnamed' },
+    });
+    await expect(page.getByTestId('ticket-detail-Tracker')).toHaveCount(0);
+    // And nothing guessed it from the key or the address either.
+    const body = await page.getByTestId('ticket').innerText();
+    for (const guess of ['Jira', 'Azure', 'GitHub', 'Linear', 'Tracker']) {
+      expect(body, `"${guess}" should not be guessed`).not.toContain(guess);
+    }
+  });
+
+  test('shows a state in the tracker s own words, coloured only where recognised', async () => {
+    /*
+     * FR-014. `Ready for QA` is a real state in real trackers and the board
+     * understands none of it, so it shows exactly as written and falls back to
+     * neutral. `Done` is a word the vocabulary does know, and takes the same
+     * treatment a task's `done` takes — which is the whole reason a ticket's
+     * state goes through `StatusLabel` rather than being drawn here.
+     */
+    const { page } = board;
+    await ticket({ state: 'Ready for QA' });
+    await page.getByTestId('tab-ticket').click();
+
+    const unknown = page.locator('.status');
+    await expect(unknown).toHaveText('Ready for QA');
+    await expect(unknown).toHaveAttribute('data-vocabulary', 'unrecognised');
+
+    await ticket({ state: 'Done' });
+    await expect(page.locator('.status')).toHaveAttribute('data-vocabulary', 'done');
+  });
+});
+
+test.describe('the discussion', () => {
+  const COMMENTS = [
+    { author: 'A. Tester', text: 'Only reproducible in Firefox 129.', at: '3 days ago' },
+    { author: 'A. Owner', text: 'Submit must stay reachable by keyboard.', at: '2 days ago' },
+    { text: 'Confirmed on the release branch.' },
+  ];
+
+  test('lists comments with their authors, in the order reported', async () => {
+    /*
+     * **Oldest first**, which is the opposite of the notes view and is the
+     * point: a note log is read newest-first because the newest just arrived; a
+     * discussion is read forward because each comment answers the one above it.
+     * Asserted as the *whole* rendered order rather than by finding each one,
+     * because a reversed thread contains all the same comments.
+     */
+    const { page } = board;
+    await ticket({ comments: COMMENTS });
+    await page.getByTestId('tab-ticket').click();
+
+    const rows = await page.locator('.comments__row').allInnerTexts();
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toContain('Only reproducible in Firefox 129.');
+    expect(rows[1]).toContain('Submit must stay reachable by keyboard.');
+    expect(rows[2]).toContain('Confirmed on the release branch.');
+
+    await expect(page.getByTestId('ticket-comment-author-0')).toHaveText('A. Tester');
+    await expect(page.getByTestId('ticket-comment-author-1')).toHaveText('A. Owner');
+    // An unattributed comment shows no author rather than an invented one.
+    await expect(page.getByTestId('ticket-comment-author-2')).toHaveCount(0);
+  });
+
+  test('shows the tracker s own date as a label, and never as a board time', async () => {
+    // The board's times are elapsed and stamped from its own clock. A tracker's
+    // comment date is neither, so it is printed as written and never parsed.
+    const { page } = board;
+    await ticket({ comments: [{ author: 'A. Tester', text: 'x', at: 'Wed 3 Sept, 14:02 CEST' }] });
+    await page.getByTestId('tab-ticket').click();
+
+    await expect(page.getByTestId('ticket-comment-at-0')).toHaveText('Wed 3 Sept, 14:02 CEST');
+    // And the board has not turned it into one of its own elapsed strings.
+    await expect(page.getByTestId('ticket-comment-at-0')).not.toContainText('ago');
+  });
+
+  test('states how many comments were left out rather than showing 50 as all of them', async () => {
+    /*
+     * FR-016, and the reason it is reported rather than derived: the board
+     * cannot know a ticket had 200 comments when it was sent 50. Getting this
+     * wrong is quiet — a developer who believes they have read the whole
+     * discussion behaves differently from one who knows they have not.
+     */
+    const { page } = board;
+    await ticket({ comments: COMMENTS, commentsOmitted: 150 });
+    await page.getByTestId('tab-ticket').click();
+
+    await expect(page.getByTestId('ticket-comments-omitted')).toHaveText('3 shown, 150 not included');
+  });
+
+  test('says nothing about omissions when none were reported', async () => {
+    // Absent rather than "0 not included": a line saying nothing is missing
+    // would be a claim the board makes on the agent's behalf every time the
+    // field simply was not reported.
+    const { page } = board;
+    await ticket({ comments: COMMENTS });
+    await page.getByTestId('tab-ticket').click();
+
+    await expect(page.getByTestId('ticket-comments-omitted')).toHaveCount(0);
+  });
+
+  test('says a ticket has no comments rather than omitting the section', async () => {
+    /*
+     * FR-017, and the one place this view deliberately does the opposite of
+     * FR-008. An absent `sprint` means a tracker with no sprints, so a row would
+     * invent a concept; an empty discussion is a discussion, and "nobody has
+     * commented" is a fact the developer wants.
+     */
+    const { page } = board;
+    await ticket({ comments: [] });
+    await page.getByTestId('tab-ticket').click();
+
+    await expect(page.getByTestId('section-ticket-comments')).toBeVisible();
+    await expect(page.getByTestId('ticket-no-comments')).toBeVisible();
+    await expect(page.getByTestId('ticket-comments')).toHaveCount(0);
+  });
+});
+
 test.describe('opening a link — the safety test', () => {
   /*
    * **One case per row of the quickstart's address table**, and the two rows
