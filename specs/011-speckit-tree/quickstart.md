@@ -4,9 +4,15 @@
 
 ## Prerequisites
 
-Features 001–008 implemented. Feature 010 is **not** required for the tree, but it
-is for scenario 9: the widest strip this feature can produce includes 010's ticket
-destination, and measuring without it does not answer the question.
+Features 001–008 implemented.
+
+**Feature 010 was not built before this one**, contrary to what the plan assumed.
+Two consequences, both carried out rather than worked around: the decisions here
+took numbers **37–39** rather than 39–41, and scenario 9 measures the widest strip
+*this* feature can produce — five destinations — rather than the six a landed 010
+would make. The six-destination measurement is **owed** the moment 010 lands, and
+is recorded as owed in
+[docs/design/revisions-owed.md](../../docs/design/revisions-owed.md).
 
 ## Run the checks
 
@@ -19,10 +25,21 @@ npm run test:e2e  # Playwright
 npm run typecheck
 ```
 
-Six end-to-end tests currently fail on a machine whose display scale is not 100%
-— `setContentSize(380, …)` never reaches `innerWidth === 380`. They fail
-identically without this feature. **Scenario 9 depends on that same mechanism**,
-so confirm the baseline before reading its result as a regression.
+Six end-to-end tests fail on a machine whose display scale is not 100% —
+`setContentSize(380, …)` never reaches `innerWidth === 380`. They fail identically
+without this feature. **Scenario 9 depends on that same mechanism**, so confirm
+the baseline before reading its result as a regression.
+
+**On the machine this feature was built on, those six did not fail**: the display
+was at 100% and the resize tests passed. What the baseline did carry was a
+different failure, and it is worth naming so nobody spends time on it here:
+`sessions.spec.ts` → *"does not raise an unread mark for notes the developer never
+missed"* fails consistently, and was confirmed to fail identically with every
+change from this feature stashed. It belongs to feature 007's unread rule, not to
+this one, and is left for its own fix rather than folded in.
+
+**Last full run: 505 unit and integration tests, 262 of 263 end-to-end** — the one
+failure being that pre-existing case.
 
 ## Validation scenarios
 
@@ -132,9 +149,13 @@ technique feature 007 used for arriving notes.
 ### 9. The widest strip, at the floor (US6, SC-010) — **the measured one**
 
 The case to measure is **not** the ordinary one. Set up a session that is
-Spec-Kit shaped, with a ticket held (feature 010), **and** whose developer has
-opened the task view — so that Overview, Ticket, Spec-Kit, Stories, Tasks and
-Notes are all offered at once. Drive the window to 380px.
+Spec-Kit shaped **and** whose developer has opened the task view — so that
+Overview, Spec-Kit, Stories, Tasks and Notes are all offered at once. Drive the
+window to 380px.
+
+**Five, not six.** Feature 010's ticket destination would make six and it is not
+built, so that measurement is owed rather than taken. Five holds: every
+destination legible and operable at the floor with no horizontal scrolling.
 
 - Every destination legible, every one operable.
 - **No horizontal scrolling** anywhere.

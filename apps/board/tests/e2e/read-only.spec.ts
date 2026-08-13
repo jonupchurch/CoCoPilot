@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { glob } from 'node:fs/promises';
 
-import { envelope, launchBoard, type Board } from './board.js';
+import { envelope, keepOldViews, launchBoard, type Board } from './board.js';
 
 /**
  * SC-008 and FR-020: the detail views cannot send anything anywhere.
@@ -145,6 +145,10 @@ test('neither view tree contains a way to send anything', async () => {
 
 test('activating every control in both views sends nothing', async () => {
   const { page } = board;
+  // Since feature 011 these two destinations leave when the Spec-Kit tree
+  // arrives, unless the developer had already opened one. This test is about
+  // what their controls do, so it takes the path of a developer who was there.
+  await keepOldViews(board);
   await board.push({ ...envelope(), ...REPORT });
 
   // --- The Stories tab, wide: every row, and the detail each one produces.

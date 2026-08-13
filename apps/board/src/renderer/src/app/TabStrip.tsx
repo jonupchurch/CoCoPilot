@@ -14,12 +14,19 @@ import './TabStrip.css';
  * links and back semantics that a single desktop panel does not have.
  */
 
-export const TABS = ['overview', 'stories', 'tasks', 'notes'] as const;
+/**
+ * The Spec-Kit tree sits where the story view sits, because it is what displaces
+ * it: the reading order stays overview, then the work, then the log. Which of
+ * these a session is actually offered is `usePresence`'s decision, not this
+ * file's — see `App.tsx`.
+ */
+export const TABS = ['overview', 'speckit', 'stories', 'tasks', 'notes'] as const;
 
 export type Tab = (typeof TABS)[number];
 
 const LABELS: Record<Tab, string> = {
   overview: 'Overview',
+  speckit: 'Spec-Kit',
   stories: 'User Stories',
   tasks: 'Tasks',
   notes: 'Notes',

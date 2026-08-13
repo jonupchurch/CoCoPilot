@@ -1,0 +1,30 @@
+/*
+ * The selectable wrapper around a `TaskRow`.
+ *
+ * Deliberately almost nothing: the row inside owns its own layout, and this
+ * element adds only the affordance the tree needs. Restyling the row from here
+ * would make a task look different in this tab than in the Tasks tab, which is
+ * the one thing wrapping rather than restating was meant to avoid.
+ */
+.tasknode {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.tasknode:hover {
+  background: var(--raised);
+}
+
+.tasknode[data-selected='true'] {
+  background: var(--raised);
+  box-shadow: inset 2px 0 0 var(--teal);
+}

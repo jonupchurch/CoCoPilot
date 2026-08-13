@@ -79,6 +79,18 @@ export interface Selection {
  * places is more honest than silently picking a winner. And a `taskIds` entry
  * naming a task that was never reported produces nothing — what was reported is
  * shown, and missing entries are not fabricated.
+ *
+ * **A second placement rule exists, in `usePlacement.ts`, and this one is not
+ * wrong.** Feature 011's Spec-Kit tree needs a task drawn exactly once — under a
+ * tree, one task with two parents reads as two tasks — so it picks a winner on
+ * disagreement rather than unioning, and it is right to. The paragraph above is
+ * right for *these* views, where two scopes are two lists and a task in both is
+ * visibly the same task seen twice.
+ *
+ * Both rules stay while both view sets do: these views serve every session that
+ * is not Spec-Kit shaped and every session whose developer opened one of them.
+ * Do not reconcile them; two views want different answers and both are entitled
+ * to theirs.
  */
 export function buildScopes(stories: readonly Story[], tasks: readonly Task[]): Scope[] {
   const claimed = new Set<string>();

@@ -76,6 +76,10 @@ describe('toBoardState — the reported body crosses the bridge', () => {
     // the same. Their arrival is exactly what this test is for: each had to be
     // added here, deliberately, before it could reach a window rendering
     // agent-composed text.
+    //
+    // `everReportedStories` (feature 011) is the third, and it is a different
+    // kind: not reported content but a fact *about* the session, which is why it
+    // is the one field here that outlives the snapshot that set it.
     store.putReport(report({ stories: [{ id: 'S1', title: 'A story' }] }), 1_000);
 
     const { session } = toBoardState(store);
@@ -86,6 +90,7 @@ describe('toBoardState — the reported body crosses the bridge', () => {
       'branch',
       'changedFiles',
       'chip',
+      'everReportedStories',
       'feature',
       'focus',
       'hasReport',
@@ -368,5 +373,56 @@ describe('toBoardState — a session with no report', () => {
     expect(session?.tasks).toEqual([]);
     expect(session?.plan).toEqual([]);
     expect(session?.changedFiles).toEqual([]);
+  });
+});
+
+describe('toBoardState — a session that has ever reported stories says so', () => {
+  let store: Store;
+
+  beforeEach(() => {
+    store = new Store();
+  });
+
+  const STORY = { id: 'US1', title: 'Read the ticket' };
+
+  it('projects the held flag, not a count of the current snapshot', () => {
+    store.putReport(report({ stories: [STORY] }), 1_000);
+    store.putReport(report(), 2_000);
+
+    const { session } = toBoardState(store);
+
+    // The two answers differ here, which is the entire reason the field exists.
+    expect(session?.storyCount).toBe(0);
+    expect(session?.everReportedStories).toBe(true);
+  });
+
+  it('is false for a session whose reports have never carried one', () => {
+    store.putReport(report({ tasks: [t('T1')] }), 1_000);
+
+    const { session } = toBoardState(store);
+
+    expect(session?.taskCount).toBe(1);
+    expect(session?.everReportedStories).toBe(false);
+  });
+
+  it('keeps it out of the switcher pills, which draw identity and nothing else', () => {
+    store.putReport(report({ stories: [STORY] }), 1_000);
+
+    const { sessions } = toBoardState(store);
+
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]).not.toHaveProperty('everReportedStories');
+    expect(sessions[0]).not.toHaveProperty('stories');
+  });
+
+  it('answers per session rather than per board', () => {
+    store.putReport(report({ sessionId: 'spec', stories: [STORY] }), 1_000);
+    store.putReport(report({ sessionId: 'plain' }), 2_000);
+
+    const spec = toBoardState(store, sessionKey(REPO, 'spec')).session;
+    const plain = toBoardState(store, sessionKey(REPO, 'plain')).session;
+
+    expect(spec?.everReportedStories).toBe(true);
+    expect(plain?.everReportedStories).toBe(false);
   });
 });

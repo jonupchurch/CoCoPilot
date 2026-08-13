@@ -558,6 +558,74 @@ their head across a long agent session.
       "no stories have been reported". Pre-existing behaviour, newly visible.
       Left alone rather than folded in.
 
+37. **The Spec-Kit tree is offered only to a session that has reported a story,
+    and displaces the two views it duplicates.** Built in feature 011. A project
+    that has never seen Spec-Kit has tasks and no stories, and a tree whose top
+    level is stories has nothing to offer it — so the board stops presenting the
+    same navigation to both kinds of developer.
+    - *This does not contradict decision 36, and the difference is the whole
+      argument.* FR-009 gated a tab on a **count**, so a report carrying nothing
+      withdrew a destination. This gates on whether the session has ever had the
+      **concept**: a session that has reported a story keeps the tree even when a
+      later report carries none, so no report can remove a destination. That
+      required one boolean in the store — see 39.
+    - *Where the tree appears, Stories and Tasks leave.* One destination arrives
+      and two go, so the ordinary Spec-Kit session's strip is **shorter** than
+      before this feature. This is the second and third conditional destination
+      after feature 010's, and the first time the board has withdrawn a
+      destination on purpose.
+    - *Cost:* the widest strip the board can now produce needs a Spec-Kit
+      session whose developer also opened one of the displaced views. Measured at
+      the floor with five destinations and it holds. **Six is unmeasured** — the
+      sixth is feature 010's ticket tab and it is not built. If six will not fit,
+      the answer is to retire the displaced views rather than relax the floor.
+
+38. **A destination the developer has opened is never withdrawn**, which makes
+    decision 36's fault structurally impossible rather than merely avoided.
+    Feature 011.
+    - *The rule:* the Stories and Tasks views go when the tree arrives — unless
+      the developer has already opened one of them in that session, in which case
+      they stay for the life of it. A developer who has never opened a view
+      cannot be reading it; one who has, keeps it.
+    - *Why this shape.* Both facts behind it are one-way: a session's
+      "has reported a story" is only ever set, and a session id is only ever
+      added to the set of those whose old views were opened. So no destination
+      can go from offered to not-offered while a session lives, except the two at
+      the single moment the tree first appears, where "has it been opened"
+      decides. There is no timing to get right and no transition to animate —
+      which is exactly what decision 36's complaint was about, and it cannot
+      recur here.
+    - *Held per session, and in the renderer.* Which views one person opened in
+      one window is not a fact about the work: no agent reported it, and no other
+      window would agree. It dies with the window.
+
+39. **Counting a story's progress is the one thing the board derives**, and it
+    reverses feature 006's FR-016 — "MUST NOT infer, derive, re-order or supply
+    anything the agent did not send". Feature 011.
+    - *What it is:* `3 of 7 done` for a story that reported no status of its own,
+      and `3 of 7 done · 2 not recognised` where the vocabulary could not read a
+      status. Counts, never a rolled-up word: choosing "active" for a story whose
+      tasks are blocked, active and todo needs a precedence the board cannot
+      defend, and whatever word emerged would be indistinguishable from one an
+      agent reported.
+    - *A reported status always wins*, and the board never presents a
+      disagreement between a story's status and its tasks. An unrecognised status
+      is counted as unrecognised and said so, never folded into "not done" —
+      which is the refusal `classify` already makes for colour, inherited rather
+      than re-decided.
+    - **Feature 006's FR-018 is upheld, not reversed.** An earlier draft of 011
+      withheld tasks belonging to no story; that was abandoned once the tree began
+      to displace the task view, because a task reachable nowhere is a different
+      proposition from one reachable in the other tab. They gather in a final
+      group instead.
+    - *Cost, and it is the real one:* `putReport` now carries one accumulation,
+      against its own rule that there is no merge path in that method and
+      deliberately none in the file (decision 26). The argument for the exception
+      is written in the method rather than here, so that the next feature wanting
+      one has to answer it where it will be made. In short: it is a derived
+      boolean rather than reported content, it is monotonic so there is one wrong
+      state rather than drift, and its failure is benign.
+
 ## What survives the restart
 
 **The Spec-Kit format grounding.** Verified against `../LMNTLZ` (21 features,

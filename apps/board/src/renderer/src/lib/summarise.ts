@@ -1,7 +1,7 @@
 import type { ChangedFile, Focus, PlanStep, ReportedFeature, Task } from 'cocoapilot-contract';
 
 import { focusAge } from './elapsed.js';
-import { isActive, isDone } from './vocabulary.js';
+import { isActive, isDone, type Tally, tally } from './vocabulary.js';
 
 /**
  * The header summaries. Every one of them derived, at render, from held state.
@@ -49,6 +49,50 @@ export function taskSummary(tasks: readonly Task[]): string {
   if (tasks.length === 0) return 'no tasks';
 
   return `${tasks.filter((task) => isDone(task.status)).length}/${tasks.length}`;
+}
+
+/**
+ * What the Spec-Kit tree shows for a story that reported no status of its own.
+ *
+ * **Counts, and never a word.** A single rolled-up status would need a
+ * precedence among blocked, active and todo that the board cannot defend — is a
+ * story with one blocked task blocked, or active because something else is
+ * moving? — and whatever word came out would be indistinguishable from one the
+ * agent reported. Counts are visibly arithmetic, so nothing has to be styled
+ * into looking derived (feature 011, FR-026).
+ *
+ * Null when there is nothing to count, which the tree draws as no status at all
+ * rather than as a zero (FR-028).
+ *
+ * In this file rather than beside the tree for the reason stated above
+ * `taskSummary`: this is the fourth thing that counts reported tasks, and four
+ * components counting them four ways is how they come to disagree. It does not
+ * *replace* `taskSummary`, which the story list and scope picker still use and
+ * whose output must not change (SC-003).
+ *
+ * The bucketing itself is `tally`, in `vocabulary.ts`, because counting is
+ * classifying and only that file may classify. This function decides *when* a
+ * story has progress worth showing; it does not decide what any status means.
+ */
+export function storyProgress(tasks: readonly Task[]): Tally | null {
+  if (tasks.length === 0) return null;
+
+  return tally(tasks.map((task) => task.status));
+}
+
+/**
+ * `3 of 7 done`, and `3 of 7 done · 2 not recognised` when the board was sent
+ * words it will not classify.
+ *
+ * The second clause is stated rather than absorbed, because a reader who cannot
+ * see it would take `3 of 7 done` to mean the other four are outstanding when
+ * two of them are simply unreadable to the board.
+ */
+export function formatStoryProgress(progress: Tally): string {
+  const counted = `${progress.done} of ${progress.total} done`;
+  if (progress.unrecognised === 0) return counted;
+
+  return `${counted} · ${progress.unrecognised} not recognised`;
 }
 
 export interface PlanSummary {

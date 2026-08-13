@@ -16,6 +16,11 @@ function note(overrides: Record<string, unknown> = {}): NoteRequest {
   });
 }
 
+/** A report carrying one story, for the Spec-Kit-shaped cases below. */
+function withStory(overrides: Record<string, unknown> = {}): PushRequest {
+  return report({ stories: [{ id: 'US1', title: 'Read the ticket' }], ...overrides });
+}
+
 describe('Store — a report is held', () => {
   let store: Store;
 
@@ -174,5 +179,90 @@ describe('Store — a report is held', () => {
     expect(store.dismissByKey('nothing like a key')).toBe(false);
     expect(store.dismissByKey(sessionKey('D:\\Codelib\\example', 'gone'))).toBe(false);
     expect(seen).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Feature 011's one exception to snapshot-replace.
+ *
+ * `putReport` argues for it at length; these are the properties that argument
+ * rests on, so if any of them fails the argument fails with it.
+ */
+describe('Store — a session that has reported stories stays one', () => {
+  let store: Store;
+
+  beforeEach(() => {
+    store = new Store();
+  });
+
+  function flag(sessionId: string): boolean | undefined {
+    return store.getSession('D:\\Codelib\\example', sessionId)?.everReportedStories;
+  }
+
+  it('is false for a session whose reports have never carried a story', () => {
+    store.putReport(report({ sessionId: 'plain' }), 1);
+
+    // The precondition, asserted rather than assumed: this session really did
+    // report, and really did report no stories.
+    expect(store.getSession('D:\\Codelib\\example', 'plain')?.report?.stories).toEqual([]);
+    expect(flag('plain')).toBe(false);
+  });
+
+  it('is false for a session that has only ever sent notes', () => {
+    store.appendNote(note({ sessionId: 'noisy' }), 1);
+
+    expect(flag('noisy')).toBe(false);
+  });
+
+  it('is set by a report carrying a story', () => {
+    store.putReport(withStory({ sessionId: 'spec' }), 1);
+
+    expect(flag('spec')).toBe(true);
+  });
+
+  it('survives ten later reports carrying none — FR-003 as a unit fact', () => {
+    store.putReport(withStory({ sessionId: 'spec' }), 1);
+
+    for (let i = 0; i < 10; i += 1) store.putReport(report({ sessionId: 'spec' }), 2 + i);
+
+    // The snapshot really has been replaced by one with no stories...
+    expect(store.getSession('D:\\Codelib\\example', 'spec')?.report?.stories).toEqual([]);
+    // ...and the session is still Spec-Kit shaped, which is the whole point.
+    expect(flag('spec')).toBe(true);
+  });
+
+  it('is monotonic: no sequence of reports or notes returns it to false', () => {
+    // The property the decision 26 argument rests on. There is exactly one wrong
+    // state — never set — rather than a value that can drift back and forth.
+    store.putReport(withStory({ sessionId: 'spec' }), 1);
+
+    const sequence: Array<() => void> = [
+      () => store.putReport(report({ sessionId: 'spec' }), 2),
+      () => store.appendNote(note({ sessionId: 'spec' }), 3),
+      () => store.putReport(report({ sessionId: 'spec', tasks: [] }), 4),
+      () => store.putReport(withStory({ sessionId: 'spec' }), 5),
+      () => store.putReport(report({ sessionId: 'spec' }), 6),
+    ];
+
+    for (const step of sequence) {
+      step();
+      expect(flag('spec')).toBe(true);
+    }
+  });
+
+  it('is held per session, not per repository', () => {
+    store.putReport(withStory({ sessionId: 'spec' }), 1);
+    store.putReport(report({ sessionId: 'plain' }), 2);
+
+    expect(flag('spec')).toBe(true);
+    expect(flag('plain')).toBe(false);
+  });
+
+  it('goes with the session on dismissal, and a recreated session starts over', () => {
+    store.putReport(withStory({ sessionId: 'spec' }), 1);
+    expect(store.dismiss('D:\\Codelib\\example', 'spec')).toBe(true);
+
+    store.putReport(report({ sessionId: 'spec' }), 2);
+    expect(flag('spec')).toBe(false);
   });
 });

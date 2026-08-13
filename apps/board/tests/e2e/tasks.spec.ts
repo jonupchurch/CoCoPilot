@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { envelope, launchBoard, type Board } from './board.js';
+import { envelope, keepOldViews, launchBoard, type Board } from './board.js';
 
 /**
  * The Tasks tab: which story's tasks, which task, and that task in full.
@@ -48,6 +48,11 @@ const REPORT = {
 };
 
 async function openTasks(payload: Record<string, unknown> = REPORT): Promise<void> {
+  // Since feature 011 this destination leaves when the Spec-Kit tree arrives,
+  // unless the developer had already opened one of the two. This spec is about
+  // what the task view shows, not about whether it is offered, so it takes the
+  // path of a developer who was already there.
+  await keepOldViews(board);
   await board.push({ ...envelope(), ...payload });
   await board.page.getByTestId('tab-tasks').click();
   await expect(board.page.getByTestId('tasks')).toBeVisible();

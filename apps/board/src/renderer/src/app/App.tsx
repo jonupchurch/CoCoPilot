@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { BoardState } from '../../../main/view.js';
 import { dismissSession, selectSession, useBoardState } from '../state/useBoardState.js';
 import { useNow } from '../state/useNow.js';
+import { usePresence } from '../state/usePresence.js';
 import { useUnread } from '../state/useUnread.js';
 import { NotesView } from '../views/notes/NotesView.js';
 import { OverviewView } from '../views/overview/OverviewView.js';
+import { SpecKitView } from '../views/speckit/SpecKitView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
 import { SessionSwitcher } from './SessionSwitcher.js';
@@ -27,7 +29,11 @@ export function App(): React.JSX.Element {
   const now = useNow();
   const [chosen, setChosen] = useState<Tab | null>(null);
 
-  const available = useMemo(() => availableTabs(state), [state]);
+  const presence = usePresence(state.selectedKey, state.session?.everReportedStories ?? false);
+  const available = useMemo(
+    () => availableTabs(state, presence.tree, presence.oldViews),
+    [state, presence.tree, presence.oldViews],
+  );
   // Falls back rather than resetting: if the tab someone chose stops existing,
   // land on the first one that does. Since decision 36 that happens only when
   // the last session goes, so the choice now survives every report — which is
@@ -38,6 +44,23 @@ export function App(): React.JSX.Element {
   // not about notes. `active` is what makes it a rule about the developer's
   // attention rather than about the count alone.
   const unread = useUnread(state.session?.noteCount ?? 0, active === 'notes');
+
+  /**
+   * Choosing a destination, and remembering it if it was one of the two the tree
+   * displaces.
+   *
+   * Recorded **on the navigation** rather than on a render of either view. A
+   * view can render for reasons that are not a developer going there — a
+   * fallback, a re-render, a future preloading of something — and any of those
+   * marking it used would keep a destination alive that nobody asked for.
+   */
+  const chooseTab = useCallback(
+    (tab: Tab): void => {
+      if (tab === 'stories' || tab === 'tasks') presence.noteOldViewOpened();
+      setChosen(tab);
+    },
+    [presence],
+  );
 
   return (
     <div className="app">
@@ -53,13 +76,15 @@ export function App(): React.JSX.Element {
         onSelect={selectSession}
         onDismiss={dismissSession}
       />
-      <TabStrip available={available} active={active} unread={unread} onSelect={setChosen} />
+      <TabStrip available={available} active={active} unread={unread} onSelect={chooseTab} />
 
       <main className="app__body" data-testid="body" data-tab={active}>
         {state.session === null ? (
           <WaitingState />
         ) : active === 'overview' ? (
           <OverviewView session={state.session} now={now} />
+        ) : active === 'speckit' ? (
+          <SpecKitView session={state.session} now={now} />
         ) : active === 'stories' ? (
           <StoriesView session={state.session} now={now} />
         ) : active === 'tasks' ? (
@@ -89,6 +114,28 @@ export function App(): React.JSX.Element {
  * The strip is still absent entirely with nothing held: a session is what the
  * tabs are *about*, so before there is one there is nothing to navigate.
  */
-function availableTabs(state: BoardState): Tab[] {
-  return state.session === null ? [] : [...TABS];
+function availableTabs(state: BoardState, tree: boolean, oldViews: boolean): Tab[] {
+  if (state.session === null) return [];
+
+  /*
+   * Three conditional destinations, and they do not contradict the paragraph
+   * above.
+   *
+   * FR-009 gated a tab on a *count*, so an agent reporting no tasks withdrew the
+   * Tasks tab from whoever was reading it. These gate on whether the session has
+   * ever had the *concept*: a project with no user stories is not a Spec-Kit
+   * project, and one that has had them keeps the tree even when a later report
+   * carries none (feature 011, FR-003). No count gates anything here.
+   *
+   * The Stories and Tasks views leave where the tree arrives — but only for a
+   * developer who has never opened either of them in this session. Both of
+   * `usePresence`'s booleans are one-way, so nothing can be taken from someone
+   * who was reading it, which is precisely the fault decision 36 was raised
+   * about. The rule lives there; this function only asks.
+   */
+  return TABS.filter((tab) => {
+    if (tab === 'speckit') return tree;
+    if (tab === 'stories' || tab === 'tasks') return oldViews;
+    return true;
+  });
 }

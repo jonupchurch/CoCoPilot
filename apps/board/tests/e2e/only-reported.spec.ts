@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { envelope, launchBoard, type Board } from './board.js';
+import { envelope, keepOldViews, launchBoard, type Board } from './board.js';
 
 let board: Board;
 
@@ -213,6 +213,7 @@ test.describe('the stories tab shows only what was reported', () => {
 
   test('renders nothing that was not reported or declared as derived', async () => {
     const { page } = board;
+    await keepOldViews(board);
     await board.push({ ...envelope(), ...STORY_PAYLOAD });
     await page.getByTestId('tab-stories').click();
     await expect(page.getByTestId('stories')).toBeVisible();
@@ -229,6 +230,7 @@ test.describe('the stories tab shows only what was reported', () => {
 
   test('does not sort, group or renumber the stories it was given', async () => {
     const { page } = board;
+    await keepOldViews(board);
     await board.push({
       ...envelope(),
       stories: [
@@ -301,6 +303,7 @@ test.describe('the tasks tab shows only what was reported', () => {
 
   test('renders nothing that was not reported or declared as derived', async () => {
     const { page } = board;
+    await keepOldViews(board);
     await board.push({ ...envelope(), ...TASK_PAYLOAD });
     await page.getByTestId('tab-tasks').click();
     await expect(page.getByTestId('tasks')).toBeVisible();
@@ -317,6 +320,7 @@ test.describe('the tasks tab shows only what was reported', () => {
 
   test('does not sort or renumber the tasks it was given', async () => {
     const { page } = board;
+    await keepOldViews(board);
     await board.push({
       ...envelope(),
       stories: [{ id: 'US-002', title: 'One story' }],
@@ -522,5 +526,84 @@ test.describe('limits and hostile content', () => {
     expect(await page.evaluate(() => (window as { __pwned?: unknown }).__pwned)).toBeUndefined();
     await expect(page.locator('.overview img')).toHaveCount(0);
     await expect(page.locator('.overview script')).toHaveCount(0);
+  });
+});
+
+/**
+ * And a fifth time, on the Spec-Kit tree.
+ *
+ * A fifth copy rather than a parameterised one, for the reason the second gives.
+ * This tab is worth the copy for a new reason: **its counted progress is the
+ * first entry in this file that is arithmetic rather than a label.**
+ *
+ * Every other derived value declared above is chrome — a section heading, a
+ * caret, a disc — or a summary of a list that is on screen beside it. `1 of 3
+ * done` is the board doing sums over reported statuses and printing the result,
+ * which is a stronger claim, and feature 011 argued for it explicitly (FR-025,
+ * FR-026). It is declared here so that adding a second such value costs somebody
+ * the same argument.
+ */
+const TREE_PAYLOAD = {
+  stories: [
+    { id: 'US-002', title: 'Share one session fetch across routes', priority: 'P1' },
+    { id: 'US-004', title: 'Read the prompt history', status: 'active' },
+  ],
+  tasks: [
+    { id: 'T-011', title: 'Audit the three call sites', status: 'done', storyId: 'US-002' },
+    { id: 'T-013', title: 'Implement useSession', status: 'todo', storyId: 'US-002' },
+    { id: 'T-099', title: 'Belongs to nothing', status: 'todo' },
+  ],
+  focus: { task: 'T-013', chip: 'watching' },
+};
+
+const TREE_REPORTED: string[] = [
+  ...TREE_PAYLOAD.stories.flatMap((s) => [
+    s.id,
+    s.title,
+    ...(s.priority === undefined ? [] : [s.priority]),
+    ...(s.status === undefined ? [] : [s.status]),
+  ]),
+  ...TREE_PAYLOAD.tasks.flatMap((t) => [t.id, t.title, t.status]),
+];
+
+/** Everything the Spec-Kit tab is allowed to draw that nobody reported. */
+const TREE_DERIVED: readonly RegExp[] = [
+  /STORY|TASK/g, // the detail pane's kind label
+  /[▾▸]/g, // the expand controls
+  /[✓!]/g, // status discs, as on every other tab
+  /\bnot recognised\b/g, // stated rather than folded into a bucket
+  /\d+ of \d+ done/g, // the counted progress — arithmetic, argued for above
+  /\b\d+[smhd]\b|\bnow\b/g, // the report's age against the current task
+  /Select a story or a task to read it in full\./g, // the pane with no selection
+  /No tasks reported for this story\./g, // a story the agent decomposed into none
+  /Tasks belonging to no reported story/g, // the unassigned group's name
+];
+
+test.describe('the spec-kit tab shows only what was reported', () => {
+  test.beforeEach(async () => {
+    await board.app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setSize(900, 700);
+    });
+  });
+
+  test('renders nothing that was not reported or declared as derived', async () => {
+    const { page } = board;
+    await board.push({ ...envelope(), ...TREE_PAYLOAD });
+    await page.getByTestId('tab-speckit').click();
+    await expect(page.getByTestId('speckit')).toBeVisible();
+
+    // Every story open, so nothing escapes the subtraction by being collapsed.
+    for (const toggle of await page.locator('.storynode__toggle').all()) {
+      if ((await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click();
+    }
+
+    let remaining = (await page.getByTestId('speckit').innerText()).replace(/\s+/gu, ' ');
+
+    for (const pattern of TREE_DERIVED) remaining = remaining.replace(pattern, ' ');
+    for (const value of [...TREE_REPORTED].sort((a, b) => b.length - a.length)) {
+      remaining = remaining.split(value).join(' ');
+    }
+
+    expect(remaining.replace(/[\s·—]/gu, '')).toBe('');
   });
 });

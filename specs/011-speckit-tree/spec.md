@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-12
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: One tab holding the whole shape of the work — reported user stories at the top level, each expanding to the tasks that belong to it, with a pane beside the tree showing the detail and status of whatever is selected. Offered only to a session that has reported stories, because not every project is a Spec-Kit project; and where it is offered, it stands in place of the separate story and task views rather than beside them. A task is placed by its own declaration of which story it serves, with those belonging to no story gathered at the end. A story that says nothing about its own state has its progress counted from the tasks beneath it.
 

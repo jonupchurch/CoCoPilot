@@ -40,6 +40,16 @@ export interface SessionView {
   storyCount: number;
   taskCount: number;
   noteCount: number;
+  /**
+   * Whether this session has *ever* reported a story, which is not the same
+   * question as `storyCount > 0`.
+   *
+   * `storyCount` describes the snapshot on screen; this describes the session.
+   * Feature 011 offers its tree on the second, so that a report carrying no
+   * stories cannot withdraw a destination from a developer reading it. Held in
+   * the store because a replaced snapshot cannot answer it — see `putReport`.
+   */
+  everReportedStories: boolean;
 
   /**
    * When the last *report* arrived, or null until one has.
@@ -212,6 +222,9 @@ function toSessionView(session: Session): SessionView {
     storyCount: report?.stories.length ?? 0,
     taskCount: report?.tasks.length ?? 0,
     noteCount: session.notes.length,
+    // Not from `report`, for the same reason `notes` below is not: it outlives
+    // the snapshot that set it.
+    everReportedStories: session.everReportedStories,
 
     reportedAt: report?.receivedAt ?? null,
     feature: report?.feature ?? null,

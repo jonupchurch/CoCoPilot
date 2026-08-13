@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { envelope, launchBoard, type Board } from './board.js';
+import { envelope, keepOldViews, launchBoard, type Board } from './board.js';
 
 /**
  * Both detail views in the panel they will actually live in.
@@ -75,6 +75,11 @@ const REPORT = {
 };
 
 async function open(tab: 'stories' | 'tasks'): Promise<void> {
+  // Since feature 011 these two destinations leave when the Spec-Kit tree
+  // arrives — unless the developer had already opened one. This spec is about
+  // how those views lay out, not about whether they are offered, so it takes the
+  // path of a developer who was already there.
+  await keepOldViews(board);
   await board.push({ ...envelope(), ...REPORT });
   await board.page.getByTestId(`tab-${tab}`).click();
   await expect(board.page.getByTestId(tab)).toBeVisible();

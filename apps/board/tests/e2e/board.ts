@@ -94,6 +94,36 @@ export function envelope(overrides: Record<string, unknown> = {}): Record<string
 }
 
 /**
+ * Keep the Stories and Tasks destinations for a session that is about to report
+ * stories.
+ *
+ * Since feature 011 the tree displaces those two views — but only for a
+ * developer who has never opened either of them in that session. A test that
+ * reports stories and then reaches for the Tasks tab is a developer who never
+ * went there first, so the tab is legitimately gone.
+ *
+ * This does what such a developer would have done: reports without stories, so
+ * the old destinations are offered, and opens one. From then on that session
+ * keeps them however many stories arrive — which is the supported "developer
+ * kept the old views" state, not a way around the rule.
+ *
+ * Call it **before** the report the test actually cares about. Specs written
+ * against the tree itself do not need it, and specs whose sessions never report
+ * a story do not either.
+ */
+export async function keepOldViews(
+  board: Board,
+  overrides: Record<string, unknown> = {},
+): Promise<void> {
+  await board.push({ ...envelope(overrides), stories: [], tasks: [] });
+  await board.page.getByTestId('tab-tasks').click();
+  // Put the developer back where they were found. Leaving the Tasks tab active
+  // would make this helper change what the calling test is looking at, which
+  // several of them assert on before navigating anywhere themselves.
+  await board.page.getByTestId('tab-overview').click();
+}
+
+/**
  * Put the test window on a secondary display when one exists.
  *
  * The suite launches and closes a window per test, so a full run flashes fifty
