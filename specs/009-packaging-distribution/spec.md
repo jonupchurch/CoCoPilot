@@ -235,20 +235,32 @@ trust warning.
 - **FR-017**: The release process MUST make publishing an unbuilt or stale
   artefact impossible rather than merely unlikely.
 
-**The desktop installers**
+**The desktop installers — WITHDRAWN 2026-08-13 (decision 42)**
 
-- **FR-018**: The desktop application MUST be distributable as an installable
-  artefact for Windows, macOS and Linux.
-- **FR-019**: Each artefact MUST install and launch on a clean machine of its
-  platform.
-- **FR-020**: The macOS artefact MUST satisfy that platform's trust
-  requirements.
-- **FR-021**: The Windows artefact MUST install without a warning that the
-  publisher is unrecognised.
-- **FR-022**: Each artefact MUST uninstall cleanly, leaving no files behind.
-- **FR-023**: Installing a newer version over an older one MUST succeed.
-- **FR-024**: Documentation MUST state any platform for which trust
-  requirements are unmet, and what a developer will see as a result.
+> **npx is the only distribution route.** These seven requirements were
+> specified and parked behind signing credentials; they are now **out of scope**,
+> not pending. A developer already has Node and already runs `npx`, and a
+> board that watches an AI agent work is for developers — installers exist to
+> reach people who would not run a command, which is not this product's audience.
+>
+> Kept here struck through rather than deleted, because the reasoning is what a
+> future reader needs if the audience ever changes. Reopening them costs
+> credentials and `electron-builder` configuration, not redesign: FR-025 already
+> requires the npm route to ship the exact `out/` an installer would package.
+
+- ~~**FR-018**: The desktop application MUST be distributable as an installable
+  artefact for Windows, macOS and Linux.~~
+- ~~**FR-019**: Each artefact MUST install and launch on a clean machine of its
+  platform.~~
+- ~~**FR-020**: The macOS artefact MUST satisfy that platform's trust
+  requirements.~~ *(Would need an Apple Developer ID and notarisation.)*
+- ~~**FR-021**: The Windows artefact MUST install without a warning that the
+  publisher is unrecognised.~~ *(Would need an Authenticode certificate.)*
+- ~~**FR-022**: Each artefact MUST uninstall cleanly, leaving no files behind.~~
+- ~~**FR-023**: Installing a newer version over an older one MUST succeed.~~
+- ~~**FR-024**: Documentation MUST state any platform for which trust
+  requirements are unmet, and what a developer will see as a result.~~
+  *(Moot: with no installer, there is no unmet trust requirement to document.)*
 
 **Both routes**
 

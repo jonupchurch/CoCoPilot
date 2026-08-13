@@ -140,5 +140,7 @@ is not a package that runs, and everything short of running it is a proxy.
 
 - A genuinely clean machine, or any platform other than the one this was built
   on. Both need a real publish first.
-- The desktop installers — specified in [spec.md](spec.md) as FR-018 through
-  FR-024 and deferred until there are signing credentials to test against.
+- ~~The desktop installers — specified as FR-018 through FR-024 and deferred
+  until there are signing credentials.~~ **Withdrawn 2026-08-13 (decision 42):
+  npx is the only distribution route**, so there is nothing here left unvalidated
+  rather than something waiting to be.

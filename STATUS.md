@@ -5,13 +5,13 @@ information straight while working with Claude on a GitHub Spec-Kit repository.
 An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
 
-**Phase:** Implementation. Design is settled (**41 decisions** below), all eleven
-features are specced and planned, and **001–011 are built and verified** — bar
-009's desktop installers, deferred behind signing credentials. Rule 7 is
-satisfied, so anything further is ordinary feature work.
+**Phase:** Implementation. Design is settled (**42 decisions** below), all eleven
+features are specced and planned, and **001–011 are built and verified**.
+**Nothing specified is now unbuilt** — decision 42 withdrew 009's desktop
+installers rather than leaving them deferred. Rule 7 is satisfied, so anything
+further is ordinary feature work.
 
-**Last updated:** 2026-08-13 (decisions 40 and 41: the ticket's own endpoint, and
-the two protocols that ever open)
+**Last updated:** 2026-08-13 (decision 42: npx is the only distribution route)
 
 *The three sentences above were stale for several features — they claimed "31
 decisions" and "001 through 004" while the table below said otherwise. Corrected
@@ -31,14 +31,14 @@ here; check them against the table when adding a decision.*
 | Architecture — state ownership | ✅ Settled 2026-08-06: the app process owns volatile state; MCP/CLI are thin clients |
 | Architecture — push model | ✅ Settled 2026-08-06: typed facts + agent prose, board owns layout |
 | Architecture — everything else | ✅ Settled across decisions 1–31; no open design questions remain |
-| Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
+| Distribution | ✅ **npx only** — board, MCP server and CLI, all published at 0.1.0. Desktop installers withdrawn (decision 42), so nothing needs signing or notarizing |
 | Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against every UI-affecting decision; canon per decision 8 |
 | Design revisions owed | 🟡 Recorded in [`docs/design/revisions-owed.md`](docs/design/revisions-owed.md) — the tree (011) and the ticket tab (010). The six-destination floor measurement they shared is **discharged** |
 | Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 features 001–011 complete and merged; 009's npm route **published** at 0.1.0; its installer half specified and deferred behind signing credentials |
+| Implementation | ✅ features 001–011 complete and merged; 009 **published** at 0.1.0, and its installer half withdrawn (decision 42) rather than outstanding |
 
 ## What this is
 
@@ -682,6 +682,35 @@ their head across a long agent session.
       serve nobody. Only the address *length* is a rejection, because that is a
       size limit rather than a judgement about content.
 
+42. **npx is the only distribution route. The desktop installers are withdrawn,
+    not deferred.** Settled by the user 2026-08-13.
+    - *What this closes:* feature 009's FR-018 through FR-024 — installable
+      artefacts for Windows, macOS and Linux, macOS notarisation, an unwarned
+      Windows install, clean uninstall, and upgrade-in-place. They were specified
+      and parked behind signing credentials. They are now out of scope, and the
+      spec says so rather than carrying them as pending work forever.
+    - *Why it is a real decision and not just a deferral running out:* it settles
+      **who this is for**. A developer already has Node, already runs `npx`, and
+      is already the person an agent-reporting board is useful to. Installers
+      exist to reach people who would not run a command — and that is not this
+      product's audience. Decision 27 had already taken the spawnable half out of
+      the signing story; this takes the other half out too.
+    - *What it saves, and it is not small:* an Apple Developer Program membership
+      and a Windows code-signing certificate, both annual and both issued to a
+      named person; `electron-builder` configuration and per-platform artefacts
+      in the release script; and a second distribution channel to test, version
+      and keep in step with the npm one. Feature 009's own plan called the
+      installers "gated" work; the gate is now shut rather than waiting.
+    - *Cost:* the product is reachable only by someone comfortable with a command
+      line. If that is ever wrong, this decision is the thing to reopen — the
+      npm route already builds the exact `out/` an installer would package
+      (FR-025), so nothing here has to be undone first, and the work would be
+      configuration rather than redesign.
+    - *Not affected:* everything published. `cocoapilot-board`, `cocoapilot-mcp`
+      and `cocoapilot-contract` are unchanged, and the Electron runtime arriving
+      as an npm dependency never needed platform trust — which is precisely why
+      that route was buildable without credentials in the first place.
+
 ## What survives the restart
 
 **The Spec-Kit format grounding.** Verified against `../LMNTLZ` (21 features,
@@ -852,7 +881,7 @@ paper rather than mid-build. Build order is roughly the numbering.
 | 6 | Stories and Tasks tabs | Master–detail, the 640px breakpoint, free-string status rendering with the recognised-value vocabulary |
 | 7 | Notes | Append endpoint, the list, the impermanence footer, the unread dot |
 | 8 | Multiple sessions | Switcher appearing at two, pills carrying chip and elapsed, dismiss |
-| 9 | Packaging and distribution | Per-platform installers, macOS notarization, publishing the npx package |
+| 9 | Packaging and distribution | Publishing the npx packages. ~~Per-platform installers, macOS notarization~~ — withdrawn by decision 42 |
 
 **Known cost of this slicing:** features 1, 2 and 5 deliver nothing a user can
 see. Their specs need acceptance criteria that are *testable* rather than
@@ -867,11 +896,10 @@ Ordered roughly by how much downstream work each one blocks.
    [docs/design/push-schema.md](docs/design/push-schema.md), **awaiting review**.
    All three of its original open points are now decided (23, 22, and 24
    respectively). What is left is review, not unknowns.
-2. **Packaging the Electron app** per platform. The *design* question here is
-   closed by decision 27 — the spawnable piece ships via npx and is out of the
-   signing story. What remains is ordinary build work: installers for Windows,
-   macOS and Linux, and macOS notarization for the app itself. Well-trodden, and
-   not a thing to decide on paper.
+2. ~~**Packaging the Electron app** per platform.~~ **Closed by decision 42.**
+   Decision 27 had already taken the spawnable piece out of the signing story;
+   the board itself now ships the same way, so there is no per-platform packaging
+   left to do and nothing to notarize.
 
 ## Notable wrinkle
 

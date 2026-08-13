@@ -107,16 +107,22 @@ two.
 
 ---
 
-## Phase 6: Deferred — the desktop installers (Priority: P3)
+## Phase 6: ~~Deferred~~ **WITHDRAWN** — the desktop installers (Priority: P3)
 
-**Not built.** Gated on credentials that cost money and take time: an Apple
-developer account for notarisation, and a Windows code-signing certificate.
-Specified in [spec.md](spec.md) as FR-018 through FR-024 and left there
-deliberately, so that the deferral is visible rather than an omission.
+**Never built, and no longer owed.** This phase was gated on credentials that
+cost money and take time — an Apple developer account for notarisation and a
+Windows code-signing certificate — and was left visible so the deferral could not
+be mistaken for an omission.
 
-When the certificates exist: `electron-builder` over the same `apps/board/out`,
-one artefact per platform, a CI matrix that builds macOS on macOS, and FR-024's
-documentation of any platform whose trust requirements are still unmet.
+**Decision 42 (2026-08-13) closed it: npx is the only distribution route.** The
+gate is shut rather than waiting. FR-018 through FR-024 are struck through in
+[spec.md](spec.md) with the reasoning.
+
+If the audience ever changes, this is what the work would be: `electron-builder`
+over the same `apps/board/out` the runner already ships, one artefact per
+platform, a CI matrix that builds macOS on macOS, and documentation of any
+platform whose trust requirements are still unmet. Configuration rather than
+redesign, because FR-025 requires the two routes to package identical output.
 
 ---
 

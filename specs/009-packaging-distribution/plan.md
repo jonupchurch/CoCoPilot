@@ -8,7 +8,8 @@
 ## Summary
 
 Two distribution routes over one build. Three npm packages so the product runs
-from a single `npx`, and — later, behind credentials — signed installers for
+from a single `npx`, and — ~~later, behind credentials~~ **withdrawn by decision
+42 on 2026-08-13, and never built** — signed installers for
 three platforms.
 
 ## Technical Context

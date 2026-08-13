@@ -119,11 +119,15 @@ Electron's own logo.
 
 ## Status
 
-**0.1.0 is published.** Features 001–008 are built and merged: the contract and
-service, the MCP server and CLI, the window, all four tabs, the transcript
-reader, and multiple sessions. Feature 009 is packaging — the npm route above is
-released, with signed desktop installers specified and deferred until there are
-certificates to test them against.
+**Every specced feature is built.** Features 001–011: the contract and service,
+the MCP server and CLI, the window and its tabs, the transcript reader, multiple
+sessions, packaging, the Spec-Kit tree, and the ticket tab with openable links.
+
+**npm is the only way this is distributed**, deliberately. There are no
+downloadable installers and there will not be: CoCoapilot is for developers
+watching an agent work, and a developer already has Node. That also means nothing
+here needs code signing or notarisation — the Electron runtime arrives as an
+ordinary npm dependency.
 
 It is a first release and says so: the version is deliberately below 1.0, and
 the only platform it has been exercised on is Windows. The command and the

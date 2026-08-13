@@ -7,6 +7,18 @@ say what they are: the shape is still allowed to move.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.1] — 2026-08-13
+
+**Two features and a fix**, and one decision that removes something from the
+plan rather than adding to it: **npx is now the only way CoCoapilot is
+distributed**. The desktop installers that 0.1.0 recorded as "specified and
+deferred behind signing credentials" are **withdrawn** — a developer watching an
+agent work already has Node, and installers exist to reach people who would not
+run a command. Nothing published changes as a result; what changes is that
+nothing specified is unbuilt any more (decision 42).
+
 ### Added
 
 - **A Ticket tab: the tracker record the work came from, and its address in your
