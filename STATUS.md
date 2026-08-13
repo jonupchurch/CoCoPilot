@@ -5,11 +5,17 @@ information straight while working with Claude on a GitHub Spec-Kit repository.
 An MCP server + local API + desktop board: agents report what they're working
 on, a human watches.
 
-**Phase:** Implementation. Design is settled (31 decisions below), all nine
-features are specced and planned, and features 001 through 004 are built and
-verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
+**Phase:** Implementation. Design is settled (**41 decisions** below), all eleven
+features are specced and planned, and **001–011 are built and verified** — bar
+009's desktop installers, deferred behind signing credentials. Rule 7 is
+satisfied, so anything further is ordinary feature work.
 
-**Last updated:** 2026-08-12 (decision 36: every tab offered from the first report)
+**Last updated:** 2026-08-13 (decisions 40 and 41: the ticket's own endpoint, and
+the two protocols that ever open)
+
+*The three sentences above were stale for several features — they claimed "31
+decisions" and "001 through 004" while the table below said otherwise. Corrected
+here; check them against the table when adding a decision.*
 
 ## Where things stand
 
@@ -27,12 +33,12 @@ verified. Rule 7 is satisfied, so the remaining five are ordinary feature work.
 | Architecture — everything else | ✅ Settled across decisions 1–31; no open design questions remain |
 | Distribution | ✅ MCP server and CLI via npx; only the Electron app needs notarizing (decision 27) |
 | Design exports (`resources/`) | ✅ Round 3 landed — Overview Panel current against every UI-affecting decision; canon per decision 8 |
-| Design revisions owed | ✅ None outstanding |
+| Design revisions owed | 🟡 Recorded in [`docs/design/revisions-owed.md`](docs/design/revisions-owed.md) — the tree (011) and the ticket tab (010). The six-destination floor measurement they shared is **discharged** |
 | Design docs (`docs/design/`) | 🟡 `architecture.md` + `push-schema.md` drafted, both awaiting review |
 | Feature specs (`specs/`) | ✅ All nine written, each with a passing quality checklist |
 | Implementation plans | ✅ All nine planned; constitution check passes with no violations |
 | Stack packs (`stacks/`) | ✅ `electron.md` + `vite-react.md` written, owed before framework code |
-| Implementation | 🟡 features 001–008 complete and merged; **009's npm route built, nothing published**; its installer half specified and deferred behind signing credentials |
+| Implementation | 🟡 features 001–011 complete and merged; 009's npm route **published** at 0.1.0; its installer half specified and deferred behind signing credentials |
 
 ## What this is
 
@@ -625,6 +631,56 @@ their head across a long agent session.
       one has to answer it where it will be made. In short: it is a derived
       boolean rather than reported content, it is monotonic so there is one wrong
       state rather than drift, and its failure is benign.
+
+40. **The ticket gets its own endpoint**, `POST /v1/ticket`, rather than a field
+    on the report. Feature 010.
+    - *Why:* a report is a snapshot that replaces wholesale (decision 26), so a
+      ticket carried on one would have to survive the replace — which means a
+      merge inside `putReport`, the exact thing decision 39 had to argue an
+      exception for. It would also re-send the whole ticket on every report for
+      the life of the session, which is the cost decision 20 cited when it gave
+      notes their own endpoint.
+    - *What it buys:* FR-003 — "a later report carrying no ticket does not
+      withdraw the ticket" — becomes a property of the wiring rather than a rule
+      someone has to remember. Nothing in the report path can address the field.
+      The unit test asserts that shape: ten reports, and the ticket is untouched
+      because there is no reach, not because a guard held.
+    - *So there are three verbs with three semantics*, each argued: push
+      **replaces** the snapshot, note **appends**, ticket **replaces the ticket
+      alone**. A fourth should have to say which of these it is and why neither
+      of the others will do.
+    - *Cost:* a third door to keep in step — envelope handling, response codes,
+      a client call and an MCP tool. All of it copied from `/v1/note` rather than
+      invented, which is the mitigation.
+
+41. **Only `http:` and `https:` are ever opened, parsed rather than matched, and
+    checked twice.** Feature 010, and the first outbound action the product has.
+    - *Why it is the one dangerous act here:* everything else CoCoapilot does is
+      inward. This hands an **agent-composed string**, on a board any local
+      process may report to (decision 18), to the operating system's URL handler
+      — which will launch whatever application claims the protocol.
+    - *Parsed, never matched*, and this is load-bearing rather than fastidious.
+      `startsWith('http')` admits `httpx://example.com`; any `includes('https://')`
+      admits `javascript:void(0)//https://example.com`, where the real protocol is
+      `javascript:` and the rest is a comment. Both are named test cases, and each
+      was written as an implementation to confirm the tests catch it.
+    - *Checked twice, and the second is the one that counts.* The renderer runs
+      the rule so no control is drawn for an address that would be dropped; the
+      main process runs it again immediately before `shell.openExternal`. "The
+      renderer only asks for validated addresses" is a claim about the whole
+      renderer — every component, now and later — while the main-process check is
+      a claim about one function.
+    - *One rule, three callers.* It lives in `packages/contract/src/url.ts`
+      because two copies of a security check drift, and the copy that drifts is
+      the one nobody reads.
+    - **Refused, never repaired** (FR-022). `www.example.com` is not promoted to
+      `https:`; a `file:` is not rewritten. Repairing an address means guessing
+      what the sender meant, and the sender is a program.
+    - *And an unopenable address is not an invalid ticket.* It is held, shown as
+      text, and simply never offered as a control. Discarding a description and
+      its acceptance criteria to protect against a link nobody can activate would
+      serve nobody. Only the address *length* is a rejection, because that is a
+      size limit rather than a judgement about content.
 
 ## What survives the restart
 

@@ -160,6 +160,43 @@ Notes are volatile like everything else and clear when the app closes
 agent**, with its own file tools, which is outside this API entirely. The tool
 description should say so, or an agent will treat the board as storage.
 
+## The third call: a ticket
+
+Tickets **replace the ticket and only the ticket** — a third semantic, and each
+of the three is different on purpose. A report replaces the snapshot, a note
+appends, a ticket replaces what a `/v1/push` never touches.
+
+```
+POST http://127.0.0.1:<port>/v1/ticket
+```
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `repo`, `branch`, `sessionId`, `transcriptId` | — | see envelope | Same envelope as the other two. |
+| `ticket` | object | yes | The tracker's record. `key` and `title` required; every other field optional. |
+
+The ticket's own fields are in
+[`specs/010-ticket-tab-links/data-model.md`](../../specs/010-ticket-tab-links/data-model.md),
+and `packages/contract/src/schema.ts` is authoritative for both. The three that
+are easy to get wrong:
+
+- **`url` is reported, never derived.** Send exactly what the tracker gives; the
+  board constructs no addresses and repairs none. Only `http:` and `https:` are
+  ever opened — anything else is held and displayed as text rather than rejected,
+  because an unopenable address is not an invalid ticket.
+- **`commentsOmitted` is reported, not derived.** The board cannot know a ticket
+  had 200 comments when it was sent 50. If you drop comments, say how many.
+- **`fields`** is the escape hatch: anything the schema does not model, as
+  label/value, in the order that matters most. This is what lets a second tracker
+  be an agent-side adapter rather than a change to the board.
+
+Report a ticket **once**, when the work is picked up — not on every update. It
+survives every subsequent report, which is the whole reason it has its own door.
+
+Flatten the description and comments to plain text first. The board renders every
+character as written and interprets no markup, so wiki syntax or ADF shows as
+itself.
+
 ## What the model composes versus what the surface derives
 
 Only content comes from the model — `focus`, and the titles, statuses, criteria
@@ -180,14 +217,19 @@ with no auth and no TLS (decision 18).
 ```
 POST http://127.0.0.1:<port>/v1/push
 POST http://127.0.0.1:<port>/v1/note
+POST http://127.0.0.1:<port>/v1/ticket
 GET  http://127.0.0.1:<port>/v1/health   → { "app": "cocoapilot", "version": "…" }
 ```
 
-**MCP** — `cocoapilot_report` and `cocoapilot_note`. The server starts cleanly
-whether or not the app is running and connects lazily per call (decision 6),
-because Claude Code discovers an MCP tool list once, at session start.
+**MCP** — `cocoapilot_report`, `cocoapilot_note` and `cocoapilot_ticket`. The
+server starts cleanly whether or not the app is running and connects lazily per
+call (decision 6), because Claude Code discovers an MCP tool list once, at
+session start.
 
 **CLI** — `cocoapilot report` and `cocoapilot note "…"`, for hooks and scripts.
+**There is no `ticket` subcommand**: no hook or script reports a ticket, and a
+subcommand with no caller is surface for its own sake. Anything that needs one
+can POST.
 
 **HTTP** — the full payload, for anything that is neither.
 

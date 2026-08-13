@@ -9,6 +9,49 @@ say what they are: the shape is still allowed to move.
 
 ### Added
 
+- **A Ticket tab: the tracker record the work came from, and its address in your
+  own browser** — the one thing a developer kept in another window and switched
+  back to for the acceptance criteria they are being measured against. Reported
+  by the agent like everything else, neutral across trackers, and absent entirely
+  for sessions that are not ticket-driven. Feature 010, decisions 40 and 41.
+  - **The board is told; it never fetches.** It contacts no tracker, holds no
+    credential, and knows how to talk to no tracker at all. The agent already has
+    access, so the agent reports the ticket — which is what makes a second
+    tracker an agent-side adapter rather than a release of the board. Fields the
+    board does not model are carried through as labelled values, in the order the
+    agent sent them, because the agent is the only one who knows which matter.
+  - **It has its own endpoint**, `/v1/ticket`, rather than a field on the report.
+    So "an ordinary report does not withdraw the ticket" is a property of the
+    wiring — nothing in the report path can address it — rather than a rule
+    someone has to remember. There are now three verbs with three semantics: push
+    replaces the snapshot, note appends, ticket replaces the ticket alone.
+  - **Only `http:` and `https:` ever open, parsed rather than matched, and
+    checked twice.** This is the first outbound action the product has, and it
+    hands an agent-composed string to the operating system's URL handler. Every
+    cheaper form of the check has a working bypass: `startsWith('http')` admits
+    `httpx://`, and any `includes('https://')` admits
+    `javascript:void(0)//https://example.com`. Both are named tests, each
+    confirmed by writing the mistake and watching its own row fail.
+  - **Refused, never repaired.** `www.example.com` is not promoted to `https:`;
+    a `file:` is not rewritten. And an unopenable address is still a perfectly
+    good ticket — held, shown as text, never offered as a control — because
+    discarding a description and its acceptance criteria to protect against a
+    link nobody can activate would serve nobody.
+  - **The board judges nothing about it.** It shows how long ago the agent read
+    the ticket and says nothing about whether it is still current, and it never
+    compares the ticket against the reported stories or tasks. Both would need
+    the board to see the tracker, which it cannot.
+  - **"User Stories" is now "Stories"**, so six destinations fit the 380px floor.
+    It is the only label with a word that distinguishes it from nothing — every
+    story on this board is a user story — which made it cheaper than shrinking
+    type or dropping a destination. Six at the floor is measured, and it is the
+    measurement feature 011 recorded as owed.
+  - *Cost:* a third door to keep in step, and a fifth member on the preload
+    bridge — the only one that leaves the process. What was ever true of that
+    bridge is "nothing reaches an agent, and this application makes no request of
+    its own", and both still hold: a browser opening is not this process
+    fetching anything.
+
 - **A Spec-Kit tab: stories and the tasks beneath them, as one tree with a detail
   pane** — the relationship the board has been receiving since feature 001 and
   no view has ever drawn. The Stories and Tasks tabs each showed one end of it,

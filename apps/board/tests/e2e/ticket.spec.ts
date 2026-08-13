@@ -585,6 +585,136 @@ test.describe('opening a link — the safety test', () => {
   });
 });
 
+test.describe('hostile content, sessions and lifetime', () => {
+  test('renders markup in every reported field as visible characters', async () => {
+    /*
+     * SC-012. A ticket is the most externally-authored thing on this board —
+     * written by a product owner, relayed by an agent, and the agent was asked
+     * to flatten a tracker's own markup to plain text. Anything that was not
+     * flattened arrives here as itself, and every one of these fields is a place
+     * it could arrive.
+     */
+    const { page } = board;
+    const HOSTILE = '<script>alert(1)</script><img src=x onerror=alert(2)>';
+    const ADF = '{"type":"doc","content":[{"type":"paragraph"}]}';
+
+    await board.ticket({
+      ...envelope(),
+      ticket: {
+        key: `K${HOSTILE}`,
+        title: `T${HOSTILE}`,
+        state: `S${HOSTILE}`,
+        assignee: `A${HOSTILE}`,
+        description: `D${HOSTILE}\n${ADF}`,
+        criteria: [`C${HOSTILE}`],
+        labels: [`L${HOSTILE}`],
+        comments: [{ author: `AU${HOSTILE}`, text: `CT${HOSTILE}`, at: `AT${HOSTILE}` }],
+        fields: [{ label: `FL${HOSTILE}`, value: `FV${HOSTILE}` }],
+        parent: { key: `PK${HOSTILE}`, title: `PT${HOSTILE}`, url: null },
+      },
+    });
+    await page.getByTestId('tab-ticket').click();
+
+    // Every one of them is on screen as characters.
+    const text = await page.getByTestId('ticket').innerText();
+    for (const prefix of ['K', 'T', 'S', 'A', 'D', 'C', 'L', 'AU', 'CT', 'AT', 'FL', 'FV', 'PK', 'PT']) {
+      expect(text, `${prefix} should be visible as text`).toContain(`${prefix}${HOSTILE}`);
+    }
+    expect(text).toContain(ADF);
+
+    // And no element was created from any of it.
+    const created = await page.evaluate(() => ({
+      scripts: document.querySelectorAll('script[src], script:not([type])').length,
+      images: document.querySelectorAll('img').length,
+    }));
+    expect(created.images).toBe(0);
+    // The bundle's own module script is the only one, and it has a src.
+    expect(created.scripts).toBeLessThanOrEqual(1);
+
+    // The description's line break survived, because `pre-wrap` is what makes
+    // somebody else's paragraphs their own.
+    const description = await page.getByTestId('ticket-description-text').innerText();
+    expect(description.split('\n')).toHaveLength(2);
+  });
+
+  test('shows the ticket of the selected session only', async () => {
+    // FR-005. Two sessions, one ticket-driven and one not: the destination is
+    // offered for the first and not the second, and switching does not carry a
+    // ticket across.
+    const { page } = board;
+    const repoB = `${process.cwd()}/apps`;
+
+    await board.ticket({ ...envelope({ sessionId: 'a1' }), ticket: TICKET });
+    await board.push({ ...envelope({ repo: repoB, sessionId: 'b2' }) });
+    await expect(page.getByTestId('session-switcher')).toBeVisible();
+
+    await expect(page.getByTestId('tab-ticket')).toBeVisible();
+
+    await page.locator('.pill').nth(1).locator('.pill__select').click();
+    await expect(page.getByTestId('tab-ticket')).toHaveCount(0);
+
+    await page.locator('.pill').nth(0).locator('.pill__select').click();
+    await expect(page.getByTestId('tab-ticket')).toBeVisible();
+    await page.getByTestId('tab-ticket').click();
+    await expect(page.getByTestId('ticket-key')).toHaveText('PROJ-1234');
+  });
+
+  test('puts no ticket information on a pill', async () => {
+    // The switcher draws identity. A ticket key on a pill would be tracker text
+    // in the one part of the window that is about *which agent*, not about what.
+    const { page } = board;
+    await board.ticket({ ...envelope({ sessionId: 'a1' }), ticket: TICKET });
+    await board.push({ ...envelope({ repo: `${process.cwd()}/apps`, sessionId: 'b2' }) });
+    await expect(page.getByTestId('session-switcher')).toBeVisible();
+
+    const pills = await page.locator('.pill').allInnerTexts();
+    expect(pills).toHaveLength(2);
+    for (const pill of pills) {
+      expect(pill).not.toContain('PROJ-1234');
+      expect(pill).not.toContain(TICKET.title);
+    }
+  });
+
+  test('takes the ticket with the session when it is dismissed, and brings it back', async () => {
+    const { page } = board;
+    await board.ticket({ ...envelope({ sessionId: 'a1' }), ticket: TICKET });
+    await board.push({ ...envelope({ repo: `${process.cwd()}/apps`, sessionId: 'b2' }) });
+    await expect(page.getByTestId('tab-ticket')).toBeVisible();
+
+    await page.locator('.pill').nth(0).locator('.pill__dismiss').click();
+    await expect(page.getByTestId('session-switcher')).toHaveCount(0);
+    await expect(page.getByTestId('tab-ticket')).toHaveCount(0);
+
+    // Not muting: the agent reports again and the ticket is back (decision 17).
+    await board.ticket({ ...envelope({ sessionId: 'a1' }), ticket: TICKET });
+    await expect(page.getByTestId('session-switcher')).toBeVisible();
+
+    // **Last, not first.** Pills are in declaration order, and a dismissed
+    // session that reports again is a new one — so it is appended rather than
+    // restored to where it was. Selecting `nth(0)` here would select the
+    // *other* session and assert the absence of a tab that is legitimately
+    // absent, which is a test that passes while proving nothing.
+    await expect(page.locator('.pill')).toHaveCount(2);
+    await page.locator('.pill').nth(1).locator('.pill__select').click();
+    await expect(page.getByTestId('tab-ticket')).toBeVisible();
+    await page.getByTestId('tab-ticket').click();
+    await expect(page.getByTestId('ticket-key')).toHaveText('PROJ-1234');
+  });
+
+  test('holds no ticket across a restart', async () => {
+    // SC-011 and FR-028. The store is in memory and the process exiting is the
+    // whole of the retention policy, as it is for notes and everything else.
+    await board.ticket({ ...envelope(), ticket: TICKET });
+    await expect(board.page.getByTestId('tab-ticket')).toBeVisible();
+
+    await board.close();
+    board = await launchBoard();
+
+    await expect(board.page.getByTestId('waiting-state')).toBeVisible();
+    await expect(board.page.getByTestId('tab-ticket')).toHaveCount(0);
+  });
+});
+
 test('keeps six destinations legible and operable at the 380px floor', async () => {
   /*
    * SC-008 and FR-006, measured rather than eyeballed — and this is the

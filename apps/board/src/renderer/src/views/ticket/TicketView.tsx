@@ -204,7 +204,7 @@ export function TicketView({
  * to be taught the next one, and the escape hatch stops being what makes a
  * second tracker an adapter instead of a release.
  */
-function detailRows(ticket: NonNullable<SessionView['ticket']>): Array<[string, string]> {
+export function detailRows(ticket: NonNullable<SessionView['ticket']>): Array<[string, string]> {
   const rows: Array<[string, string]> = [];
   const add = (label: string, value: string | null): void => {
     if (value !== null && value.trim() !== '') rows.push([label, value]);
