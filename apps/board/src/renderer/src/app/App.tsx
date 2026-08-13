@@ -42,8 +42,9 @@ export function App(): React.JSX.Element {
 
   // Asked here rather than inside the strip, which knows about destinations and
   // not about notes. `active` is what makes it a rule about the developer's
-  // attention rather than about the count alone.
-  const unread = useUnread(state.session?.noteCount ?? 0, active === 'notes');
+  // attention rather than about the count alone, and `selectedKey` is what keeps
+  // the count comparable: two sessions' note counts mean nothing subtracted.
+  const unread = useUnread(state.selectedKey, state.session?.noteCount ?? 0, active === 'notes');
 
   /**
    * Choosing a destination, and remembering it if it was one of the two the tree

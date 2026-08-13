@@ -676,7 +676,13 @@ test.describe('what switching does to the rest of the window', () => {
     // which is what makes the guard observable rather than merely written: the
     // count drops from five to zero with the destination still on screen, and
     // the dot must not appear for a note nobody wrote.
+    //
+    // Waited on by the *arriving* session's own task, not by the absent dot.
+    // Selection round-trips through the main process, and "no dot" is equally
+    // true of the session being left — so asserting it alone would pass against
+    // the state before the switch and let the note below race the selection.
     await pill(1).locator('.pill__select').click();
+    await expect(page.getByTestId('task-T-b2')).toBeVisible();
     await expect(page.getByTestId('tab-notes')).toBeVisible();
     await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
 
@@ -693,5 +699,59 @@ test.describe('what switching does to the rest of the window', () => {
     // And back to the busy session, whose five notes are still its own.
     await pill(0).locator('.pill__select').click();
     await expect(page.locator('.noterow')).toHaveCount(5);
+  });
+
+  test('does not raise an unread mark for a session whose notes piled up unwatched', async () => {
+    /*
+     * The same rule from the other side, and the direction feature 007's
+     * defensive line did not cover: switching to a session that holds *more*
+     * notes than the one being left.
+     *
+     * FR-011 marks a note that arrived for the *selected* session while another
+     * view was active. Notes that accumulated in a session nobody had selected
+     * did not arrive for it in that sense — the developer switching over is
+     * turning up to a full view, not being told something just landed. Reading
+     * one count against another session's is what made this look like news.
+     *
+     * This is the more misleading of the two failures: a false dot spends the
+     * board's one "an agent wants you" signal on something hours old.
+     */
+    const { page } = board;
+    await declare(REPO_A, 'a1');
+    await declare(REPO_B, 'b2');
+
+    // Two notes here, read, so the mark is provably clear before the switch.
+    for (let i = 0; i < 2; i += 1) {
+      await board.note({ ...envelope({ repo: REPO_A, sessionId: 'a1' }), text: `Here ${i}` });
+    }
+    await page.getByTestId('tab-notes').click();
+    await expect(page.locator('.noterow')).toHaveCount(2);
+    await page.getByTestId('tab-overview').click();
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
+
+    // Four more in the session the developer is not looking at. No mark: the
+    // dot follows the selected session, and these are somebody else's.
+    for (let i = 0; i < 4; i += 1) {
+      await board.note({ ...envelope({ repo: REPO_B, sessionId: 'b2' }), text: `Elsewhere ${i}` });
+    }
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
+
+    await pill(1).locator('.pill__select').click();
+    await expect(page.getByTestId('task-T-b2')).toBeVisible();
+    // Four notes are now on the other side of that tab, and none of them
+    // arrived while this session was the one on screen.
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
+
+    // Not a mute button: the session speaks up for the next genuine arrival.
+    await board.note({ ...envelope({ repo: REPO_B, sessionId: 'b2' }), text: 'Now, though' });
+    await expect(page.getByTestId('tab-notes-unread')).toBeVisible();
+
+    // And going back does not re-announce the two that were read at the start.
+    await page.getByTestId('tab-notes').click();
+    await expect(page.locator('.noterow')).toHaveCount(5);
+    await page.getByTestId('tab-overview').click();
+    await pill(0).locator('.pill__select').click();
+    await expect(page.getByTestId('task-T-a1')).toBeVisible();
+    await expect(page.getByTestId('tab-notes-unread')).toHaveCount(0);
   });
 });
