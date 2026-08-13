@@ -24,9 +24,16 @@ client, no dependency added to any package.
 
 **Storage**: None, as ever.
 
-**Constraints**: Five destinations legible at the 380px floor with no horizontal
-scrolling; only `http:` and `https:` ever opened; no text ever truncated; nothing
-retained across a restart.
+**Constraints**: **Six** destinations legible at the 380px floor with no
+horizontal scrolling; only `http:` and `https:` ever opened; no text ever
+truncated; nothing retained across a restart.
+
+> **Rebased onto feature 011 (2026-08-12).** This plan was written expecting to
+> be built before the Spec-Kit tree and says five destinations throughout. 011
+> shipped first, so the ticket tab is the *sixth* and the floor measurement it
+> owes is the six-destination one that 011 recorded as owed
+> (`docs/design/revisions-owed.md`). The other correction is below, under the
+> conditional-destination note.
 
 **Scale/Scope**: One ticket per session, up to 50 comments and 30 unmodelled
 fields, a 20,000-character description.
@@ -93,7 +100,7 @@ apps/board/src/preload/index.ts  # + openLink, the third local write
 apps/board/src/renderer/src/
 ├── app/
 │   ├── TabStrip.tsx             # + ticket destination, "Stories" relabel
-│   └── App.tsx                  # availableTabs gains its one conditional
+│   └── App.tsx                  # availableTabs gains its fourth conditional
 └── views/ticket/
     ├── TicketView.tsx           # NEW: a stack of existing Sections
     ├── TicketIdentity.tsx       # NEW: key, title, state, link
@@ -153,12 +160,23 @@ kept, shown as text, not offered as a control. Discarding a whole ticket over on
 field would serve nobody. Only a length violation is a rejection, because that is
 a size limit rather than a judgement about content.
 
-**The fifth destination is the only conditional one**, one week after decision 36
-removed every other conditional. It gates on whether the session has a ticket
-*concept* rather than on whether a snapshot happens to carry one — a Spec-Kit
-session never has a ticket however long it runs. That is decision 33's
-empty-versus-unavailable distinction applied a level up, and the spec's checklist
-notes say so out loud so a later reader does not read it as a regression.
+**The sixth destination is conditional, and since 011 it is no longer alone.**
+It gates on whether the session has a ticket *concept* rather than on whether a
+snapshot happens to carry one — a Spec-Kit session never has a ticket however
+long it runs. That is decision 33's empty-versus-unavailable distinction applied
+a level up.
+
+*Rebased:* this paragraph read "the only conditional one, one week after decision
+36 removed every other conditional". Feature 011 then made three destinations
+conditional on exactly the same principle — the tree appears for a session that
+has ever reported a story, and the two views it duplicates leave. So the ticket
+tab is now the **fourth** conditional destination and an instance of an
+established rule rather than a lone exception, which is a better position than
+the one this plan argued for. What decision 36 forbids is gating on a *count*, so
+that a snapshot can withdraw a destination from a reader; none of the four do
+that. `usePresence` already anticipated this and says the ticket view "keeps
+whatever rule it already has and is not this file's business" — so the ticket
+condition stays in `availableTabs` rather than moving there.
 
 **It sits second, and that is a functional choice rather than an aesthetic one.**
 The active destination falls back to the first available, so a ticket destination

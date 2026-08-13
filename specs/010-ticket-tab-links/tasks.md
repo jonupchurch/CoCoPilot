@@ -9,6 +9,20 @@ report — is in place. That ordering matters: this feature's tab is the single
 exception to that rule, and a rule has to exist before an exception to it means
 anything.
 
+> **Rebased onto feature 011 (2026-08-12), which was built first.** Three things
+> in this list changed and are marked *(rebased)* where they occur:
+>
+> 1. **Six destinations, not five.** The tree is the fifth. T020's floor
+>    measurement is the six-destination one 011 recorded as owed.
+> 2. **The ticket tab is the fourth conditional destination, not the only one.**
+>    011 made the tree, Stories and Tasks conditional on the same principle
+>    (a *concept* the session has, never a *count* in a snapshot). T015's comment
+>    argues from that rule rather than against decision 36 alone.
+> 3. **Decisions 40 and 41, not 37 and 38.** 011 took 37–39.
+>
+> A session with no ticket and no stories still offers exactly four destinations,
+> so T018's absence test is unchanged.
+
 **Tests**: Included, and the weight is somewhere new. Feature 005 tested that
 failure was contained; 007 tested that the view does not lie; 008 tested that the
 developer is not moved. This one tests that **the board does not do what it is
@@ -105,12 +119,12 @@ state it is in, what it asks for, and what it will be accepted against.
 field that was reported, with nothing shown that was not.
 
 - [ ] T014 [US1] Add the ticket destination to `apps/board/src/renderer/src/app/TabStrip.tsx` **second, after Overview**, and shorten the existing "User Stories" label to "Stories". Second is functional rather than aesthetic: the active destination falls back to the first available, so a ticket tab placed first would silently change which view a ticket-driven session lands on ([research.md §4](research.md))
-- [ ] T015 [US1] Add the one conditional to `availableTabs` in `apps/board/src/renderer/src/app/App.tsx`, gated on `ticket !== null`. **Write the reason in the comment**: this is the single exception to decision 36, it gates on whether the session has a ticket *concept* rather than on whether a snapshot carries content, and it is decision 33's empty-versus-unavailable distinction applied a level up. A later reader must not be able to mistake it for the regression it resembles
+- [ ] T015 [US1] *(rebased)* Add the conditional to `availableTabs` in `apps/board/src/renderer/src/app/App.tsx`, gated on `ticket !== null`. **Write the reason in the comment**: it gates on whether the session has a ticket *concept* rather than on whether a snapshot carries content, which is decision 33's empty-versus-unavailable distinction applied a level up, and is the same principle as 011's three. Decision 36 forbids gating on a *count*, so that no snapshot can withdraw a destination from a reader; this does not. It stays here rather than in `usePresence`, which says so itself. A later reader must not be able to mistake it for the regression it resembles
 - [ ] T016 [P] [US1] Create `apps/board/src/renderer/src/views/ticket/TicketIdentity.tsx` and its CSS — key, title, and the state through the existing `StatusLabel`/`StatusDisc`, never classified locally. The address is drawn as text here whether or not it is openable; the control that opens it is T023
 - [ ] T017 [US1] Create `apps/board/src/renderer/src/views/ticket/TicketView.tsx` and its CSS — a stack of existing `Section` components. Description and criteria use `pre-wrap` with `overflow-wrap: anywhere`, per `LastPromptSection.css`. Every unreported field is **omitted**, never blank, never "unknown", never invented (FR-008). **No `Availability` wrapper** — a ticket is either reported or the destination is absent, so there is no unreadable state to model ([research.md §5](research.md))
 - [ ] T018 [P] [US1] Write `apps/board/tests/e2e/ticket.spec.ts` — start with **the absence test**: a session with no ticket offers four destinations with their empty views and **no fifth**, which is the comparison SC-002 turns on. Then a ticket is reported and the destination appears; Overview is still the landing view; every reported field is shown and every unreported one absent; elapsed time is present with no assessment of whether it is current (FR-011)
 - [ ] T019 [US1] **The stickiness test**, in the same spec — report a ticket, then send **ten** ordinary reports that say nothing about it: the destination is still offered and still shows it (SC-009). Then report a *different* ticket and confirm it replaces rather than accumulates. This is the scenario that fails if the ticket is ever folded into the report snapshot, and it is end-to-end rather than a unit test because the failure it catches is a tab withdrawn from under a reader
-- [ ] T020 [P] [US1] **The density test** — with a ticket held, drive the window to 380px using feature 006's content-size helper: five destinations, every label legible, every one operable, **no horizontal scrolling** (SC-008). Confirm the six known display-scale failures on the parent commit *first*, so a baseline failure is not read as a regression — [quickstart.md](quickstart.md) states the caveat and this scenario depends on the same mechanism
+- [ ] T020 [P] [US1] *(rebased)* **The density test** — with a ticket held *and* a story reported *and* the old views kept, drive the window to 380px using feature 006's content-size helper: **six** destinations, every label legible, every one operable, **no horizontal scrolling** (SC-008). This is the six-destination measurement feature 011 recorded as owed in `docs/design/revisions-owed.md`; 011 measured five and held. Measure the baseline on the parent commit *first* rather than assuming the six known display-scale failures — they did not occur on this machine at 100% scale, and an assumed failure is as misleading as an unnoticed one
 
 ---
 
@@ -168,13 +182,13 @@ does not model, and confirm all of them are displayed.
 
 ## Phase 6: Polish
 
-- [ ] T032 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` with a ticket-tab subtraction block — the elapsed time, the section headings, the comment-overflow line and the empty-comments sentence are all board text and each has to be declared. This is the fifth tab and the fifth copy, for the reason the second one gives
+- [ ] T032 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` with a ticket-tab subtraction block — the elapsed time, the section headings, the comment-overflow line and the empty-comments sentence are all board text and each has to be declared. This is the sixth tab and the sixth copy, for the reason the second one gives
 - [ ] T033 [P] **The markup test** (SC-012) in `ticket.spec.ts` — a ticket carrying `<script>`, `<img src=x onerror=…>` and an ADF fragment in the description, every criterion, every label, every comment and every extra field. All of it visible as characters, no element created, no handler run, and line breaks in the description preserved
 - [ ] T034 Extend `ticket.spec.ts` for sessions and lifetime — two sessions, one ticket-driven and one not, with the destination offered for the first and not the second and only the selected session's ticket shown (FR-005); pills carrying no ticket information; a dismissed session taking its ticket with it and bringing it back on reporting again; and **no ticket held after a restart** (SC-011, FR-028)
 - [ ] T035 Walk the `stacks/vite-react.md` checklist over `views/ticket/` — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data
-- [ ] T036 Record the design revision this feature owes in `docs/design/` — the exports draw four destinations and are canon for look and feel (decision 8), so the fifth tab and the shortened "Stories" label are a revision rather than a licence to improvise. The bar it must clear is FR-006 and SC-008, which T020 measures
+- [ ] T036 *(rebased)* Record the design revision this feature owes by **appending to `docs/design/revisions-owed.md`**, which feature 011 created for exactly this — the exports draw four destinations and are canon for look and feel (decision 8), so the sixth tab and the shortened "Stories" label are a revision rather than a licence to improvise. Discharge 011's owed six-destination measurement in the same edit. The bar is FR-006 and SC-008, which T020 measures
 - [ ] T037 Run `npm run build --workspace @cocoapilot/board`, `npm run typecheck`, `npm test` and `npm run test:e2e`, then walk the ten scenarios in [quickstart.md](quickstart.md) — correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
-- [ ] T038 [P] Update `CHANGELOG.md` and `STATUS.md` — the next decision numbers after 36 belong to the two this feature settled: **the ticket gets its own endpoint** rather than a field on the report, and **only `http:` and `https:` are ever opened, parsed rather than matched and checked twice**. Also flip `specs/010-ticket-tab-links/spec.md`'s `Status` from `Draft`, which the checklist has already passed
+- [ ] T038 [P] *(rebased)* Update `CHANGELOG.md` and `STATUS.md` — decisions **40 and 41** (011 took 37–39) belong to the two this feature settled: **the ticket gets its own endpoint** rather than a field on the report, and **only `http:` and `https:` are ever opened, parsed rather than matched and checked twice**. Also flip `specs/010-ticket-tab-links/spec.md`'s `Status` from `Draft`, which the checklist has already passed
 - [ ] T039 Read back the full diff, then merge
 
 ---
