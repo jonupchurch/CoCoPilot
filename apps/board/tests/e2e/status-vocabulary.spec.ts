@@ -1,6 +1,6 @@
 import { expect, test, type Locator } from '@playwright/test';
 
-import { envelope, launchBoard, type Board } from './board.js';
+import { envelope, keepOldViews, launchBoard, type Board } from './board.js';
 
 /**
  * One vocabulary, asserted identically everywhere a status is drawn.
@@ -27,6 +27,11 @@ test.beforeEach(async () => {
   await board.app.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setSize(900, 700);
   });
+  // Since feature 011 the Stories and Tasks destinations leave when the Spec-Kit
+  // tree arrives, unless the developer had already opened one. This spec reads a
+  // status off those surfaces, so it takes the path of a developer who was
+  // already there rather than losing the surfaces it is comparing.
+  await keepOldViews(board);
 });
 
 test.afterEach(async () => {

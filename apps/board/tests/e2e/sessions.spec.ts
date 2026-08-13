@@ -136,13 +136,26 @@ test.describe('two agents, and the board following one of them', () => {
     // showing the other one's tasks would be the worst possible failure here.
     const { page } = board;
     await declare(REPO_A, 'a1');
+    await declare(REPO_B, 'b2');
+
+    await pill(1).locator('.pill__select').click();
+
+    /*
+     * Since feature 011 the Stories and Tasks destinations leave a session once
+     * it reports a story — unless the developer had already opened one of them
+     * there. This test is about whether those views follow the selection, not
+     * about whether they are offered, so b2's developer goes to one first. That
+     * is also why it is done *here*, with b2 selected: which session has been
+     * visited is recorded per session.
+     */
+    await page.getByTestId('tab-tasks').click();
+
     await declare(REPO_B, 'b2', {
       stories: [{ id: 'US-b2', title: 'Only in b2' }],
       tasks: [{ id: 'T-b2', title: 'Work in b2', status: 'active', storyId: 'US-b2' }],
     });
 
-    await pill(1).locator('.pill__select').click();
-
+    await page.getByTestId('tab-overview').click();
     await expect(page.getByTestId('task-T-b2')).toBeVisible();
     await expect(page.getByTestId('task-T-a1')).toHaveCount(0);
 

@@ -83,3 +83,18 @@
   white-space: nowrap;
   font-size: var(--text-body);
 }
+
+/*
+ * The board's own count, and deliberately not styled as a status.
+ *
+ * No disc, no tint, no pill — a status carries a signal colour and this carries
+ * a number, and FR-026 asks for the difference to be visible without knowing the
+ * payload. Muted and monospaced reads as a measurement, which is what it is.
+ */
+.storynode__progress {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  color: var(--muted);
+  white-space: nowrap;
+}

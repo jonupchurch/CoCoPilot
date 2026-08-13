@@ -1,4 +1,5 @@
 import { StatusLabel } from '../../components/StatusLabel.js';
+import { formatStoryProgress, storyProgress } from '../../lib/summarise.js';
 import { scopeKey, type Scope } from '../../state/useSelection.js';
 
 import './StoryNode.css';
@@ -52,10 +53,23 @@ export function StoryNode({
 
   // Narrowed to values rather than booleans, so the `title` attributes can see
   // they are strings.
-  const status = story !== null && story.status !== null ? story.status : null;
+  const reported = story !== null && story.status !== null && story.status.trim() !== ''
+    ? story.status
+    : null;
   const id = story?.id ?? NO_STORY_ID;
   const title = story?.title ?? NO_STORY_TITLE;
   const key = scopeKey(scope);
+
+  /*
+   * Counted only where the agent said nothing about the story's state.
+   *
+   * A reported status always wins (FR-024), and putting a count beside one would
+   * invite the reader to notice a disagreement the board is forbidden to present
+   * (FR-029). The unassigned group gets none either: it has no story, so there
+   * is no reported status for a count to stand in for, and counting a group the
+   * agent never declared would be inventing a subject.
+   */
+  const progress = reported === null && story !== null ? storyProgress(scope.tasks) : null;
 
   return (
     <div className="storynode" data-selected={selected} data-open={open}>
@@ -90,7 +104,18 @@ export function StoryNode({
         <span className="storynode__title" title={title}>
           {title}
         </span>
-        {status === null ? null : <StatusLabel status={status} />}
+        {reported === null ? null : <StatusLabel status={reported} />}
+        {/*
+          Arithmetic, and it looks like arithmetic — no disc, no colour, no pill.
+          FR-026 wants it distinguishable from a reported status by inspection
+          alone, and the cheapest way to be distinguishable from a status is not
+          to be styled as one.
+        */}
+        {progress === null ? null : (
+          <span className="storynode__progress" data-testid={`speckit-progress-${key}`}>
+            {formatStoryProgress(progress)}
+          </span>
+        )}
         {children}
       </button>
     </div>

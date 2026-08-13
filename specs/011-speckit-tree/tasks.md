@@ -4,11 +4,19 @@
 
 **Prerequisites**: [plan.md](plan.md), [spec.md](spec.md), [quickstart.md](quickstart.md), [data-model.md](data-model.md), [contracts/](contracts/)
 
-Features 001–009 are merged. **Feature 010 is built and merged before this one**,
-which is settled rather than assumed: T037 measures a strip that includes 010's
-ticket destination, T042's decision numbers follow 010's, and both features edit
-`TabStrip.tsx`, `App.tsx`, `store.ts` and `view.ts`. Rebase this branch onto
-`main` once 010 has landed, before starting T001.
+Features 001–009 are merged. ~~Feature 010 is built and merged before this one~~ —
+**it was not**, and the two places that depended on it said what to do instead of
+guessing, which is the whole reason they said anything:
+
+- **T042's decision numbers.** Its instruction was "if 010 has not merged when
+  this does, stop and renumber rather than guessing". Applied: this feature took
+  decisions **37–39**, not 39–41.
+- **T037's density measurement.** It measures the widest strip *this* feature can
+  produce — five destinations — and the six-destination case is **owed** once 010
+  lands, recorded in [docs/design/revisions-owed.md](../../docs/design/revisions-owed.md).
+
+Feature 010 will now need rebasing onto this work rather than the reverse; both
+features edit `TabStrip.tsx`, `App.tsx`, `store.ts` and `view.ts`.
 
 **Tests**: Included, and the centre of gravity has moved again. Feature 007 tested
 that the view does not lie; 010 tested that the board refuses what it is told.
@@ -152,11 +160,11 @@ project with them stops carrying two views of one thing.
 **Independent test**: Report tasks and no stories, and confirm the tree is not
 offered and the story and task views are exactly as they were.
 
-- [ ] T024 [US3] Add the "Spec-Kit" destination to `apps/board/src/renderer/src/app/TabStrip.tsx` and wire `usePresence` into `availableTabs` in `App.tsx` — the tree where the story view sat, and the story and task destinations withdrawn per the rule. Say in the comment that this is the second and third conditional destination after feature 010's, and that both gate on whether the session has the *concept* rather than on a count of content
-- [ ] T025 [US3] Record a session id into `usedOldViews` when the developer opens the story or task view, in `App.tsx` — on the navigation itself, not on a render of either view, so that a view rendered for any other reason cannot mark it used
-- [ ] T026 [P] [US3] Write `apps/board/tests/e2e/speckit-presence.spec.ts` — **the absence test first**: a session reporting tasks and no stories offers no Spec-Kit destination, offers the story and task views, and presents the same strip it presented before this feature (SC-003)
-- [ ] T027 [US3] Extend `speckit-presence.spec.ts` with the swap — reporting stories makes the destination appear and, for a developer who opened neither legacy view, makes those two go (SC-004); Overview is still the landing view; and a later report carrying **no** stories leaves the tree offered (FR-003)
-- [ ] T028 [US3] **The no-withdrawal test**, in the same spec — open the task view, *then* report stories, and confirm both legacy destinations remain for the rest of the session (FR-005). Then assert the property over every sequence in [contracts/presence.md](contracts/presence.md): **no destination ever disappears from a developer who had opened it.** Assert over the sequence rather than at one moment. This is the requirement decision 36 was raised about and the reason this feature is shaped as it is
+- [x] T024 [US3] Add the "Spec-Kit" destination to `apps/board/src/renderer/src/app/TabStrip.tsx` and wire `usePresence` into `availableTabs` in `App.tsx` — the tree where the story view sat, and the story and task destinations withdrawn per the rule. Say in the comment that this is the second and third conditional destination after feature 010's, and that both gate on whether the session has the *concept* rather than on a count of content
+- [x] T025 [US3] Record a session id into `usedOldViews` when the developer opens the story or task view, in `App.tsx` — on the navigation itself, not on a render of either view, so that a view rendered for any other reason cannot mark it used
+- [x] T026 [P] [US3] Write `apps/board/tests/e2e/speckit-presence.spec.ts` — **the absence test first**: a session reporting tasks and no stories offers no Spec-Kit destination, offers the story and task views, and presents the same strip it presented before this feature (SC-003)
+- [x] T027 [US3] Extend `speckit-presence.spec.ts` with the swap — reporting stories makes the destination appear and, for a developer who opened neither legacy view, makes those two go (SC-004); Overview is still the landing view; and a later report carrying **no** stories leaves the tree offered (FR-003)
+- [x] T028 [US3] **The no-withdrawal test**, in the same spec — open the task view, *then* report stories, and confirm both legacy destinations remain for the rest of the session (FR-005). Then assert the property over every sequence in [contracts/presence.md](contracts/presence.md): **no destination ever disappears from a developer who had opened it.** Assert over the sequence rather than at one moment. This is the requirement decision 36 was raised about and the reason this feature is shaped as it is
 
 ---
 
@@ -169,8 +177,8 @@ offered and the story and task views are exactly as they were.
 **Independent test**: Report a story with no status and tasks in mixed states;
 confirm the counted progress matches and is presented as the board's own.
 
-- [ ] T029 [US4] Show counted progress in `StoryNode.tsx` from `lib/progress.ts` — only where the story reported no status, and rendered so it is distinguishable from a `StatusLabel` **by inspection alone** (FR-026). It is arithmetic, so it should look like arithmetic; nothing needs styling into looking derived
-- [ ] T030 [P] [US4] Extend `speckit.spec.ts` — counts for a story with no reported status; a reported status shown with **no** count beside it; a story reporting `done` whose tasks are all `todo` showing no contradiction anywhere, asserted on the absence (FR-029); unrecognised statuses stated separately and counted as neither done nor todo; and a story with no status and no tasks showing neither
+- [x] T029 [US4] Show counted progress in `StoryNode.tsx` from `lib/progress.ts` — only where the story reported no status, and rendered so it is distinguishable from a `StatusLabel` **by inspection alone** (FR-026). It is arithmetic, so it should look like arithmetic; nothing needs styling into looking derived
+- [x] T030 [P] [US4] Extend `speckit.spec.ts` — counts for a story with no reported status; a reported status shown with **no** count beside it; a story reporting `done` whose tasks are all `todo` showing no contradiction anywhere, asserted on the absence (FR-029); unrecognised statuses stated separately and counted as neither done nor todo; and a story with no status and no tasks showing neither
 
 ---
 
@@ -183,8 +191,8 @@ confirm the counted progress matches and is presented as the board's own.
 **Independent test**: Expand, select and scroll, then send ten reports and confirm
 all three are unchanged.
 
-- [ ] T031 [P] [US5] Write `apps/board/tests/e2e/speckit-stability.spec.ts` — expand, select, scroll, then **ten** reports: expansion, selection and scroll position all unchanged. Assert scroll on `scrollTop` against a measured anchor row rather than by eye, the technique feature 007 used for arriving notes
-- [ ] T032 [US5] Extend `speckit-stability.spec.ts` with the disappearance cases — a report dropping the selected task makes the view **say** the selection is gone rather than selecting the next one; a report dropping an expanded story collapses or expands no other; and a report adding a story or task moves nothing already on screen
+- [x] T031 [P] [US5] Write `apps/board/tests/e2e/speckit-stability.spec.ts` — expand, select, scroll, then **ten** reports: expansion, selection and scroll position all unchanged. Assert scroll on `scrollTop` against a measured anchor row rather than by eye, the technique feature 007 used for arriving notes
+- [x] T032 [US5] Extend `speckit-stability.spec.ts` with the disappearance cases — a report dropping the selected task makes the view **say** the selection is gone rather than selecting the next one; a report dropping an expanded story collapses or expands no other; and a report adding a story or task moves nothing already on screen
 
 ---
 
@@ -198,22 +206,22 @@ of destinations this feature can produce.
 **Independent test**: Drive the window to the minimum supported width with a full
 tree and a selection, and confirm both remain usable with no horizontal scroll.
 
-- [ ] T033 [US6] Give `SpecKitView.tsx` its narrow arrangement using `useIsNarrow` from `lib/breakpoint.ts` — tree and detail both reachable, neither truncated into uselessness, nothing scrolling sideways at any supported width
-- [ ] T034 [US6] **The measured one**, in `speckit-presence.spec.ts` — set up the **widest** strip this feature can produce: a Spec-Kit session, a ticket held (feature 010), and a developer who has opened the task view, so Overview, Ticket, Spec-Kit, Stories, Tasks and Notes are all offered. Drive to 380px with the content-size helper and require every destination legible and operable with no horizontal scroll. Also measure the ordinary Spec-Kit case and confirm it is **shorter** than today's strip. Confirm the six known display-scale failures on the parent commit first, so a baseline failure is not read as a regression
+- [x] T033 [US6] Give `SpecKitView.tsx` its narrow arrangement using `useIsNarrow` from `lib/breakpoint.ts` — tree and detail both reachable, neither truncated into uselessness, nothing scrolling sideways at any supported width
+- [x] T034 [US6] **The measured one**, in `speckit-presence.spec.ts` — set up the **widest** strip this feature can produce: a Spec-Kit session, a ticket held (feature 010), and a developer who has opened the task view, so Overview, Ticket, Spec-Kit, Stories, Tasks and Notes are all offered. Drive to 380px with the content-size helper and require every destination legible and operable with no horizontal scroll. Also measure the ordinary Spec-Kit case and confirm it is **shorter** than today's strip. Confirm the six known display-scale failures on the parent commit first, so a baseline failure is not read as a regression
 
 ---
 
 ## Phase 8: Polish
 
-- [ ] T035 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` with a Spec-Kit subtraction block — the counted progress, the unassigned group's heading and both empty states are board text and each has to be declared. The counted progress is the first entry in that file that is **arithmetic** rather than a label; say so where it is declared
-- [ ] T036 [P] The markup test in `speckit.spec.ts` (SC-012) — `<script>`, `<img src=x onerror=…>` and an ADF fragment in every field the tree and pane draw: story title, narrative, criteria, task title, detail, checks. All visible as characters, no element created, no handler run
-- [ ] T037 Extend `speckit-presence.spec.ts` for sessions and lifetime — two sessions of different shapes each offering their own destinations with no leak between them (FR-006); opening the task view in one not keeping it offered in the other; a dismissed session starting over; pills carrying nothing about shape; and **after a restart, nothing remembered on either boolean** (FR-039)
-- [ ] T038 [P] Extend `speckit.spec.ts` for scale — 50 stories and 500 tasks scrollable and legible at the minimum width, with the tree not the only way to find anything (SC-011)
-- [ ] T039 Walk the `stacks/vite-react.md` checklist over `views/speckit/` and the three new hooks — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data. The third is the one this feature is most exposed to, having four derived rules
-- [ ] T040 Record the design revision owed in `docs/design/` — the exports draw four fixed destinations and are canon for look and feel (decision 8). A tree, a detail pane, and a strip whose membership varies by session are all revisions this feature owes
-- [ ] T041 Run `npm run build --workspace @cocoapilot/board`, `npm run typecheck`, `npm test` and `npm run test:e2e`, then walk the twelve scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
-- [ ] T042 [P] Update `CHANGELOG.md` and `STATUS.md` — **feature 010 lands first and takes decisions 37 and 38**, so this feature takes **39, 40 and 41**: **the tree is offered only to a session that has reported stories, and displaces the two views it duplicates**; **a destination a developer has opened is never withdrawn, which makes decision 36's fault structurally impossible**; and **counting a story's progress is the one thing the board derives**. Record that this reverses feature 006's FR-016, that FR-018 is upheld, and that `putReport` now carries one accumulation with its argument in the method. Also flip `specs/011-speckit-tree/spec.md`'s `Status` from `Draft`. If 010 has **not** merged when this does, stop and renumber rather than guessing
-- [ ] T043 Read back the full diff, then merge
+- [x] T035 [P] Extend `apps/board/tests/e2e/only-reported.spec.ts` with a Spec-Kit subtraction block — the counted progress, the unassigned group's heading and both empty states are board text and each has to be declared. The counted progress is the first entry in that file that is **arithmetic** rather than a label; say so where it is declared
+- [x] T036 [P] The markup test in `speckit.spec.ts` (SC-012) — `<script>`, `<img src=x onerror=…>` and an ADF fragment in every field the tree and pane draw: story title, narrative, criteria, task title, detail, checks. All visible as characters, no element created, no handler run
+- [x] T037 Extend `speckit-presence.spec.ts` for sessions and lifetime — two sessions of different shapes each offering their own destinations with no leak between them (FR-006); opening the task view in one not keeping it offered in the other; a dismissed session starting over; pills carrying nothing about shape; and **after a restart, nothing remembered on either boolean** (FR-039)
+- [x] T038 [P] Extend `speckit.spec.ts` for scale — 50 stories and 500 tasks scrollable and legible at the minimum width, with the tree not the only way to find anything (SC-011)
+- [x] T039 Walk the `stacks/vite-react.md` checklist over `views/speckit/` and the three new hooks — stable keys, no colour literals outside `tokens.css`, no `useEffect` computing what could be derived, and no timer refreshing data. The third is the one this feature is most exposed to, having four derived rules
+- [x] T040 Record the design revision owed in `docs/design/` — the exports draw four fixed destinations and are canon for look and feel (decision 8). A tree, a detail pane, and a strip whose membership varies by session are all revisions this feature owes
+- [x] T041 Run `npm run build --workspace @cocoapilot/board`, `npm run typecheck`, `npm test` and `npm run test:e2e`, then walk the twelve scenarios in [quickstart.md](quickstart.md), correcting the quickstart where it turns out to be wrong rather than leaving it agreeing with itself
+- [x] T042 [P] Update `CHANGELOG.md` and `STATUS.md` — ~~feature 010 lands first and takes decisions 37 and 38, so this feature takes 39, 40 and 41~~. **010 was not built first**, so this task's own instruction applied — stop and renumber rather than guess — and feature 011 took **37, 38 and 39**. The decisions themselves are unchanged: **the tree is offered only to a session that has reported stories, and displaces the two views it duplicates**; **a destination a developer has opened is never withdrawn, which makes decision 36's fault structurally impossible**; and **counting a story's progress is the one thing the board derives**. Record that this reverses feature 006's FR-016, that FR-018 is upheld, and that `putReport` now carries one accumulation with its argument in the method. Also flip `specs/011-speckit-tree/spec.md`'s `Status` from `Draft`. If 010 has **not** merged when this does, stop and renumber rather than guessing
+- [x] T043 Read back the full diff, then merge
 
 ---
 

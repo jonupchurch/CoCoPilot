@@ -7,6 +7,43 @@ say what they are: the shape is still allowed to move.
 
 ## [Unreleased]
 
+### Added
+
+- **A Spec-Kit tab: stories and the tasks beneath them, as one tree with a detail
+  pane** — the relationship the board has been receiving since feature 001 and
+  no view has ever drawn. The Stories and Tasks tabs each showed one end of it,
+  and a developer who wanted the whole shape held it in their head. Feature 011,
+  decisions 37–39.
+  - **It is offered only to a session that has reported a story, and displaces
+    the two views it duplicates.** Not every project is a Spec-Kit project, and a
+    tree whose top level is stories has nothing to offer one that has none. One
+    destination arrives and two leave, so the ordinary Spec-Kit session's tab
+    strip is *shorter* than it was.
+  - **Except for a developer who had already opened one of them**, in which case
+    both stay for the life of that session. This is what makes "a destination is
+    never taken from a reader" structural rather than careful: both facts behind
+    the rule are one-way, so there is no timing to get right — and decision 36
+    was raised precisely because a count-gated strip once withdrew the Tasks tab
+    from someone mid-read.
+  - **A task is placed by its own `storyId`**, which wins over a story's
+    `taskIds` when they disagree, so every reported task is drawn exactly once
+    and the tree is countable. Tasks belonging to no story gather in a final
+    group, so nothing an agent reported is unreachable. This differs from the
+    rule the older views use, deliberately: they union the two directions and
+    show a disputed task twice, which is right for two lists and wrong for a tree
+    where one task under two parents reads as two tasks. Both rules stay while
+    both view sets do.
+  - **A story with no status of its own shows counted progress** — `1 of 3 done`,
+    and how many statuses the board could not read. Counts rather than a
+    rolled-up word, because a word would be indistinguishable from one an agent
+    reported. A reported status always wins, and the board never points out a
+    disagreement between a story's status and its tasks.
+  - *Cost:* `putReport` now carries one accumulation, against its own rule. It is
+    a derived boolean rather than reported content, it is monotonic, and its
+    failure is benign — and the argument is written in the method rather than in
+    a spec folder, so the next feature wanting an exception has to answer it
+    where the case will be made.
+
 ### Changed
 
 - **Every tab is offered from the first report**, whether or not its view has
