@@ -20,14 +20,39 @@ import './TabStrip.css';
  * these a session is actually offered is `usePresence`'s decision, not this
  * file's — see `App.tsx`.
  */
-export const TABS = ['overview', 'speckit', 'stories', 'tasks', 'notes'] as const;
+/**
+ * The reading order: overview, where the work came from, the work, then the log.
+ * Which of these a session is actually offered is decided in `App.tsx` — this
+ * component is handed `available` and has never chosen.
+ *
+ * The Spec-Kit tree sits where the story view sits, because it is what displaces
+ * it.
+ *
+ * **The ticket sits second, and that is functional rather than aesthetic.** The
+ * active destination falls back to the first available one, so a ticket
+ * destination placed first would silently change which view a ticket-driven
+ * session lands on. Overview stays the landing view for every session. Second
+ * because the ticket is where the work *came from*, and so is read before what
+ * the agent decided to do about it.
+ */
+export const TABS = ['overview', 'ticket', 'speckit', 'stories', 'tasks', 'notes'] as const;
 
 export type Tab = (typeof TABS)[number];
 
+/**
+ * "Stories" rather than "User Stories" since feature 010.
+ *
+ * Six destinations have to fit the 380px floor, and this is the only label with
+ * a word that carries nothing: every story on this board is a user story, so
+ * "User" distinguishes it from nothing. Shortening a label is cheaper than
+ * shrinking type or dropping a destination, and it is the only one where a word
+ * could go without losing meaning.
+ */
 const LABELS: Record<Tab, string> = {
   overview: 'Overview',
+  ticket: 'Ticket',
   speckit: 'Spec-Kit',
-  stories: 'User Stories',
+  stories: 'Stories',
   tasks: 'Tasks',
   notes: 'Notes',
 };

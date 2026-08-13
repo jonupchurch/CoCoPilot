@@ -1,0 +1,119 @@
+/* The ticket's identity block: what it is, and where it lives. */
+.ticketid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.ticketid__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ticketid__key {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 700;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.ticketid__type {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Pushed right where there is room, and simply next in line when there is not —
+   at the floor this row wraps rather than crushing the key. */
+.ticketid__age {
+  margin-left: auto;
+  flex: none;
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ticketid__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  /* A tracker title is somebody else's prose and can be long. It wraps rather
+     than ellipsising: this is the one line that says what the work *is*. */
+  overflow-wrap: anywhere;
+}
+
+/*
+ * An address, openable or not, gets the same monospace treatment — the
+ * difference between them is that one is a control, which the underline and the
+ * pointer say. `anywhere` because a tracker URL is long and unbroken and the
+ * panel must not scroll sideways for it (FR-006).
+ */
+.ticketid__link,
+.ticketid__address {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.ticketid__address {
+  color: var(--muted);
+}
+
+.ticketid__link {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ticketid__link:hover {
+  color: var(--ink);
+}
+
+.ticketid__parent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  padding-top: var(--space-1);
+}
+
+.ticketid__parent-lead {
+  flex: none;
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.ticketid__parent-key {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ticketid__parent-title {
+  min-width: 0;
+  font-size: var(--text-meta);
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}

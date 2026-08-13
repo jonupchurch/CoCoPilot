@@ -10,6 +10,7 @@ import { OverviewView } from '../views/overview/OverviewView.js';
 import { SpecKitView } from '../views/speckit/SpecKitView.js';
 import { StoriesView } from '../views/stories/StoriesView.js';
 import { TasksView } from '../views/tasks/TasksView.js';
+import { TicketView } from '../views/ticket/TicketView.js';
 import { SessionSwitcher } from './SessionSwitcher.js';
 import { TABS, TabStrip, type Tab } from './TabStrip.js';
 import { TitleBar } from './TitleBar.js';
@@ -84,6 +85,8 @@ export function App(): React.JSX.Element {
           <WaitingState />
         ) : active === 'overview' ? (
           <OverviewView session={state.session} now={now} />
+        ) : active === 'ticket' ? (
+          <TicketView session={state.session} now={now} />
         ) : active === 'speckit' ? (
           <SpecKitView session={state.session} now={now} />
         ) : active === 'stories' ? (
@@ -119,7 +122,7 @@ function availableTabs(state: BoardState, tree: boolean, oldViews: boolean): Tab
   if (state.session === null) return [];
 
   /*
-   * Three conditional destinations, and they do not contradict the paragraph
+   * Four conditional destinations, and they do not contradict the paragraph
    * above.
    *
    * FR-009 gated a tab on a *count*, so an agent reporting no tasks withdrew the
@@ -133,8 +136,23 @@ function availableTabs(state: BoardState, tree: boolean, oldViews: boolean): Tab
    * `usePresence`'s booleans are one-way, so nothing can be taken from someone
    * who was reading it, which is precisely the fault decision 36 was raised
    * about. The rule lives there; this function only asks.
+   *
+   * **The ticket is the fourth, on the same principle** (feature 010, FR-001 and
+   * FR-002). A session working from repository specs has no ticket *concept* —
+   * not a ticket with nothing in it, which is decision 33's empty-versus-
+   * unavailable distinction applied a level up — so the destination is absent
+   * rather than empty, and it is the only tab that is ever absent once a session
+   * exists.
+   *
+   * It cannot be withdrawn, because `session.ticket` is only ever set by
+   * `/v1/ticket`: no report can clear it, and there is no endpoint that removes
+   * one. So the resemblance to the regression decision 36 forbids is only a
+   * resemblance. This condition lives here rather than in `usePresence` because
+   * that file says so itself — it governs the tree and the two views the tree
+   * displaces, and nothing else.
    */
   return TABS.filter((tab) => {
+    if (tab === 'ticket') return state.session?.ticket != null;
     if (tab === 'speckit') return tree;
     if (tab === 'stories' || tab === 'tasks') return oldViews;
     return true;

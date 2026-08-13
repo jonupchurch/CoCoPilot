@@ -30,6 +30,18 @@ interface Bridge {
    */
   select(key: string): void;
   dismiss(key: string): void;
+  /**
+   * The third write, added in feature 010, and the only one that leaves the
+   * process — to the operating system's URL handler, never to an agent, and
+   * never as a request this application makes.
+   *
+   * Returns nothing for a different reason from the two above: there is no
+   * result. The main process validates the address again and drops it silently
+   * if it is not an ordinary web address, so nothing here can distinguish
+   * "opened" from "refused" — which is deliberate, because a component that
+   * could would start explaining the difference to the developer.
+   */
+  openLink(url: string): void;
 }
 
 declare global {
@@ -52,6 +64,19 @@ export function selectSession(key: string): void {
 
 export function dismissSession(key: string): void {
   window.cocoapilot?.dismiss(key);
+}
+
+/**
+ * Ask the operating system to open a reported address.
+ *
+ * Here beside the other two because this is the file that knows the bridge
+ * exists, and no component should reach `window.cocoapilot` directly. The main
+ * process validates independently before anything reaches the OS, so this being
+ * called with a bad address is not a hazard — but callers still ask `isOpenable`
+ * first, so that no control is ever drawn for something that would be dropped.
+ */
+export function openLink(url: string): void {
+  window.cocoapilot?.openLink(url);
 }
 
 export function useBoardState(): BoardState {
